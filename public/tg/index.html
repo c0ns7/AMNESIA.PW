@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amnesia WPN | Telegram Proxy</title>
+    <meta name="description" content="Amnesia WPN — бесплатные MTProto прокси для Telegram." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
+      <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff09_1px,transparent_1px),linear-gradient(to_bottom,#ffffff09_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-400/10 blur-[150px] rounded-full"></div>
+      </div>
+
+      <nav class="relative z-50 max-w-7xl mx-auto px-4 md:px-8 py-5 md:py-6 backdrop-blur-md">
+        <div class="flex items-center justify-between gap-3 md:gap-6">
+          <a class="flex items-center gap-3" href="/">
+            <img alt="Amnesia Logo" class="w-12 h-12 md:w-16 md:h-16 object-contain" src="/logo.svg" width="64" height="64" />
+            <div class="flex flex-col md:flex-row md:gap-2 text-2xl md:text-5xl font-black italic tracking-tighter uppercase leading-none">
+              <span>AMNESIA</span><span class="text-blue-500">WPN</span>
+            </div>
+          </a>
+
+          <div class="hidden min-[1201px]:flex flex-1 items-center justify-center gap-6 lg:gap-10 text-[10px] lg:text-[11px] font-black uppercase tracking-[0.18em] lg:tracking-[0.22em] text-gray-500">
+            <a class="hover:text-blue-500 transition-colors" href="/#locations">Локации</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#stats">Статистика</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#about">О нас</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#pricing">Тарифы</a>
+            <a class="text-blue-500 transition-all uppercase" href="/tg">TG — прокси</a>
+          </div>
+
+          <div class="hidden min-[1201px]:flex items-center">
+            <a class="px-4 md:px-6 py-2 rounded-lg font-black uppercase text-[10px] md:text-xs transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] whitespace-nowrap bg-white text-black hover:bg-blue-600 hover:text-black" href="/login">Войти</a>
+          </div>
+
+          <button id="menu-toggle" type="button" class="min-[1201px]:hidden inline-flex items-center justify-center w-11 h-11 rounded-xl border border-white/10 bg-white/[0.03] text-white" aria-label="Открыть меню" aria-controls="mobile-menu" aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <div id="mobile-menu-overlay" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-[1px] opacity-0 pointer-events-none transition-opacity duration-300 min-[1201px]:hidden"></div>
+      <aside id="mobile-menu" class="fixed top-0 right-0 z-50 h-full w-[86%] max-w-[360px] bg-[#08080a] border-l border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 min-[1201px]:hidden">
+        <div class="flex items-center justify-between px-4 py-5 border-b border-white/10">
+          <p class="text-sm font-black uppercase tracking-[0.22em] text-white">Меню</p>
+          <button id="menu-close" type="button" class="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-white/10 bg-white/[0.03] text-white" aria-label="Закрыть меню">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="p-4 space-y-2">
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#locations">Локации</a>
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#stats">Статистика</a>
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#about">О нас</a>
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#pricing">Тарифы</a>
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-blue-500 hover:bg-white/[0.05] transition-all" href="/tg">TG — прокси</a>
+          <a class="mt-4 block text-center px-3 py-3 rounded-xl font-black uppercase text-xs tracking-widest bg-white text-black hover:bg-blue-600 hover:text-black transition-all" href="/login">Войти</a>
+        </div>
+      </aside>
+
+      <section class="relative z-10 pt-14 md:pt-20 pb-24 md:pb-32 px-4 max-w-7xl mx-auto">
+        <div class="mb-12 md:mb-16">
+          <div class="mb-6 flex items-center gap-3">
+            <span class="h-[1px] w-8 bg-blue-500"></span>
+            <span class="text-[12px] md:text-[14px] font-black uppercase tracking-[0.28em] md:tracking-[0.4em] text-blue-500 text-sm">MTProto proxy</span>
+          </div>
+          <h1 class="text-5xl md:text-7xl font-black italic uppercase tracking-tighter mb-8 leading-[0.9]">
+            TELEGRAM <br /><span class="text-blue-500">PROXY</span>
+          </h1>
+          <p class="text-gray-400 text-base md:text-[18px] max-w-md font-medium leading-relaxed italic">
+            Бесплатные высокоскоростные прокси для обхода блокировок внутри мессенджера.
+          </p>
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+          <article class="bg-[#08080a] border border-white/5 p-8 md:p-12 rounded-[2.5rem] text-center">
+            <div class="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-blue-600/10 border border-blue-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 0 1 4-4h6"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h6v6"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3h9a2 2 0 0 1 2 2v2"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 21h9a2 2 0 0 0 2-2v-2"></path>
+              </svg>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-black italic uppercase tracking-tighter mb-4">Раздел в разработке</h3>
+            <p class="text-gray-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-8">
+              Сейчас мы обновляем список Telegram MTProto прокси. Совсем скоро здесь появятся актуальные и стабильные локации для быстрого подключения.
+            </p>
+            <a href="/" class="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-blue-600 font-black uppercase tracking-widest text-[11px] hover:bg-blue-500 transition-all">
+              Вернуться на главную
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <footer class="relative z-10">
+        <div class="w-full bg-white/[0.02] border-t border-white/5 backdrop-blur-2xl rounded-t-[3rem] pt-16 pb-10">
+          <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col lg:flex-row justify-between gap-12 mb-16">
+              <div class="max-w-xs">
+                <div class="flex items-center gap-3 mb-6">
+                  <img alt="Amnesia Logo" class="w-10 h-10" src="/logo.svg" width="40" height="40" />
+                  <div class="text-2xl font-black italic tracking-tighter uppercase leading-none">AMNESIA<span class="text-blue-500">WPN</span></div>
+                </div>
+                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest leading-relaxed opacity-60">
+                  Мощное решение для обеспечения абсолютной цифровой приватности. Наша инфраструктура позволяет с легкостью обходить преграды, гарантируя стабильный доступ и быструю скорость.
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-16">
+                <div>
+                  <h5 class="text-[11px] font-black uppercase tracking-[0.3em] text-white mb-6">Навигация</h5>
+                  <ul class="space-y-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">
+                    <li><a class="hover:text-blue-500 transition-colors" href="/#locations">Локации</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/#stats">Статистика</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/#about">О нас</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/#pricing">Тарифы</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/tg">TG — прокси</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+              <p class="text-[9px] text-gray-800 font-black uppercase tracking-[0.4em]">© 2026 Amnesia WPN. Все права защищены.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const closeBtn = document.getElementById('menu-close');
+        if (!toggle || !menu || !overlay || !closeBtn) return;
+
+        const openMenu = () => {
+          menu.classList.remove('translate-x-full');
+          overlay.classList.remove('opacity-0', 'pointer-events-none');
+          document.body.classList.add('overflow-hidden');
+          toggle.setAttribute('aria-expanded', 'true');
+        };
+
+        const closeMenu = () => {
+          menu.classList.add('translate-x-full');
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+          document.body.classList.remove('overflow-hidden');
+          toggle.setAttribute('aria-expanded', 'false');
+        };
+
+        toggle.addEventListener('click', () => {
+          const closed = menu.classList.contains('translate-x-full');
+          if (closed) openMenu();
+          else closeMenu();
+        });
+
+        menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+        overlay.addEventListener('click', closeMenu);
+        closeBtn.addEventListener('click', closeMenu);
+      })();
+    </script>
+  </body>
+</html>

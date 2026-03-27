@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background: #020205;
+  overflow-x: hidden;
+}
+
+* {
+  cursor: crosshair;
+}
+
+a,
+button,
+[role='button'],
+input[type='checkbox'],
+input[type='radio'],
+input[type='submit'],
+input[type='reset'],
+input[type='button'],
+select,
+summary {
+  cursor: pointer;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='search'],
+input[type='number'],
+input[type='tel'],
+input[type='url'],
+textarea {
+  cursor: text;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+img.emoji {
+  vertical-align: -0.1em;
+  width: 1em;
+  height: 1em;
+  margin: 0 0.05em 0 0.1em;
+  display: inline-block;
+}
+
+/* Global brand color replacement for previous blue utilities */
+:root {
+  --brand-primary: #b9fdec;
+  --brand-primary-soft: #cffff3;
+  --brand-primary-200: #dcfff7;
+}
+
+.text-blue-500 {
+  color: var(--brand-primary) !important;
+}
+
+.text-blue-200 {
+  color: var(--brand-primary-200) !important;
+}
+
+.bg-blue-500,
+.bg-blue-600 {
+  background-color: var(--brand-primary) !important;
+  color: #021511;
+}
+
+.bg-blue-600\/20 {
+  background-color: rgba(185, 253, 236, 0.2) !important;
+}
+
+.bg-blue-400\/10 {
+  background-color: rgba(185, 253, 236, 0.1) !important;
+}
+
+.hover\:bg-blue-500:hover,
+.hover\:bg-blue-600:hover {
+  background-color: var(--brand-primary-soft) !important;
+}
+
+.hover\:text-blue-500:hover {
+  color: var(--brand-primary) !important;
+}
+
+.hover\:border-blue-500\/30:hover {
+  border-color: rgba(185, 253, 236, 0.3) !important;
+}
+
+.group:hover .group-hover\:text-white {
+  color: #ffffff !important;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-pulse-soft {
+    animation: none;
+  }
+}

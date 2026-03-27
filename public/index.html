@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amnesia WPN | Ускоритель интернета</title>
+    <meta name="description" content="Amnesia WPN — приватный доступ в интернет без ограничений." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div
+      class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans"
+    >
+      <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div
+          class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff09_1px,transparent_1px),linear-gradient(to_bottom,#ffffff09_1px,transparent_1px)] bg-[size:40px_40px]"
+        ></div>
+        <div
+          class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full"
+        ></div>
+        <div
+          class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-400/10 blur-[150px] rounded-full"
+        ></div>
+      </div>
+
+      <nav class="relative z-50 max-w-7xl mx-auto px-4 md:px-8 py-5 md:py-6 backdrop-blur-md">
+        <div class="flex items-center justify-between gap-3 md:gap-6">
+          <div class="flex items-center gap-3">
+            <img
+              alt="Amnesia Logo"
+              class="w-12 h-12 md:w-16 md:h-16 object-contain"
+              src="/logo.svg"
+              width="64"
+              height="64"
+            />
+            <div
+              class="flex flex-col md:flex-row md:gap-2 text-2xl md:text-5xl font-black italic tracking-tighter uppercase leading-none"
+            >
+              <span>AMNESIA</span><span class="text-blue-500">WPN</span>
+            </div>
+          </div>
+
+          <div
+            class="hidden min-[1201px]:flex flex-1 items-center justify-center gap-6 lg:gap-10 text-[10px] lg:text-[11px] font-black uppercase tracking-[0.18em] lg:tracking-[0.22em] text-gray-500"
+          >
+            <a class="hover:text-blue-500 transition-colors" href="/#locations">Локации</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#stats">Статистика</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#about">О нас</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#pricing">Тарифы</a>
+            <a class="hover:text-white transition-all uppercase" href="/tg">TG — прокси</a>
+          </div>
+
+          <div class="hidden min-[1201px]:flex items-center">
+            <a
+              class="px-4 md:px-6 py-2 rounded-lg font-black uppercase text-[10px] md:text-xs transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] whitespace-nowrap bg-white text-black hover:bg-blue-600 hover:text-black"
+              href="/login"
+              >Войти</a
+            >
+          </div>
+
+          <button
+            id="menu-toggle"
+            type="button"
+            class="min-[1201px]:hidden inline-flex items-center justify-center w-11 h-11 rounded-xl border border-white/10 bg-white/[0.03] text-white"
+            aria-label="Открыть меню"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+      <div
+        id="mobile-menu-overlay"
+        class="fixed inset-0 z-40 bg-black/60 backdrop-blur-[1px] opacity-0 pointer-events-none transition-opacity duration-300 min-[1201px]:hidden"
+      ></div>
+      <aside
+        id="mobile-menu"
+        class="fixed top-0 right-0 z-50 h-full w-[86%] max-w-[360px] bg-[#08080a] border-l border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 min-[1201px]:hidden"
+      >
+        <div class="flex items-center justify-between px-4 py-5 border-b border-white/10">
+          <p class="text-sm font-black uppercase tracking-[0.22em] text-white">Меню</p>
+          <button
+            id="menu-close"
+            type="button"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-white/10 bg-white/[0.03] text-white"
+            aria-label="Закрыть меню"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="p-4 space-y-2">
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#locations">Локации</a>
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#stats">Статистика</a>
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#about">О нас</a>
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#pricing">Тарифы</a>
+          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/tg">TG — прокси</a>
+          <a class="mt-4 block text-center px-3 py-3 rounded-xl font-black uppercase text-xs tracking-widest bg-white text-black hover:bg-blue-600 hover:text-black transition-all" href="/login">Войти</a>
+        </div>
+      </aside>
+
+      <section class="relative z-10 pt-14 md:pt-20 pb-16 md:pb-20 px-4 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div>
+          <div class="mb-6 flex items-center gap-3">
+            <span class="h-[1px] w-8 bg-blue-500"></span>
+            <span class="text-[12px] md:text-[14px] font-black uppercase tracking-[0.28em] md:tracking-[0.4em] text-blue-500 text-sm"
+              >Web Private Network</span
+            >
+          </div>
+          <p class="text-gray-400 text-base md:text-[18px] max-w-md mb-8 md:mb-10 font-medium leading-relaxed">
+            Ваш ускоритель доступа в глобальную сеть.<br />
+            Децентрализованное облако для обхода любых преград на максимальной скорости.
+          </p>
+          <a
+            class="inline-flex items-center gap-3 bg-blue-600 px-7 md:px-10 py-4 md:py-5 rounded-2xl font-black uppercase tracking-wider md:tracking-widest hover:bg-blue-500 transition-all shadow-2xl"
+            href="/login"
+          >
+            Подключиться
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-5 h-5"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </a>
+        </div>
+
+        <div
+          id="locations"
+          class="bg-[#08080a] border border-white/5 rounded-[2.5rem] p-6 shadow-2xl backdrop-blur-3xl"
+        >
+          <div class="flex items-center justify-between mb-6 px-2">
+            <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 italic">
+              Инфраструктура
+            </h3>
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+              <span class="text-[10px] font-bold text-emerald-500 uppercase italic">Онлайн</span>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <!-- location rows -->
+            <article class="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] transition-all">
+              <div class="flex items-center gap-4">
+                <span
+                  class="text-3xl rounded-lg overflow-hidden leading-none grayscale-[0.3] group-hover:grayscale-0 transition-all"
+                  ><img
+                    draggable="false"
+                    class="emoji"
+                    alt="🇩🇪"
+                    src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1e9-1f1ea.svg"
+                /></span>
+                <div>
+                  <p class="text-sm font-black uppercase italic tracking-tighter">Frankfurt</p>
+                  <p class="text-[10px] text-gray-600 font-bold uppercase">DE · EU</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between sm:justify-end gap-8 text-right">
+                <div>
+                  <p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">
+                    Нагрузка
+                  </p>
+                  <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-600 transition-all duration-500" style="width: 32%"></div>
+                  </div>
+                </div>
+                <div class="w-16">
+                  <p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">
+                    Пинг
+                  </p>
+                  <p class="text-xs font-black italic text-emerald-500">42 мс</p>
+                </div>
+              </div>
+            </article>
+            <article class="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] transition-all">
+              <div class="flex items-center gap-4">
+                <span
+                  class="text-3xl rounded-lg overflow-hidden leading-none grayscale-[0.3] group-hover:grayscale-0 transition-all"
+                  ><img
+                    draggable="false"
+                    class="emoji"
+                    alt="🇳🇱"
+                    src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1f3-1f1f1.svg"
+                /></span>
+                <div>
+                  <p class="text-sm font-black uppercase italic tracking-tighter">Amsterdam</p>
+                  <p class="text-[10px] text-gray-600 font-bold uppercase">NL · EU</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between sm:justify-end gap-8 text-right">
+                <div>
+                  <p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">
+                    Нагрузка
+                  </p>
+                  <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-600 transition-all duration-500" style="width: 48%"></div>
+                  </div>
+                </div>
+                <div class="w-16">
+                  <p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">
+                    Пинг
+                  </p>
+                  <p class="text-xs font-black italic text-emerald-500">51 мс</p>
+                </div>
+              </div>
+            </article>
+            <article class="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] transition-all">
+              <div class="flex items-center gap-4">
+                <span
+                  class="text-3xl rounded-lg overflow-hidden leading-none grayscale-[0.3] group-hover:grayscale-0 transition-all"
+                  ><img
+                    draggable="false"
+                    class="emoji"
+                    alt="🇫🇮"
+                    src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1eb-1f1ee.svg"
+                /></span>
+                <div>
+                  <p class="text-sm font-black uppercase italic tracking-tighter">Helsinki</p>
+                  <p class="text-[10px] text-gray-600 font-bold uppercase">FI · EU</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between sm:justify-end gap-8 text-right">
+                <div>
+                  <p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">
+                    Нагрузка
+                  </p>
+                  <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-600 transition-all duration-500" style="width: 22%"></div>
+                  </div>
+                </div>
+                <div class="w-16">
+                  <p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">
+                    Пинг
+                  </p>
+                  <p class="text-xs font-black italic text-emerald-500">58 мс</p>
+                </div>
+              </div>
+            </article>
+            <article class="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] transition-all">
+              <div class="flex items-center gap-4">
+                <span
+                  class="text-3xl rounded-lg overflow-hidden leading-none grayscale-[0.3] group-hover:grayscale-0 transition-all"
+                  ><img
+                    draggable="false"
+                    class="emoji"
+                    alt="🇵🇱"
+                    src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1f5-1f1f1.svg"
+                /></span>
+                <div>
+                  <p class="text-sm font-black uppercase italic tracking-tighter">Warsaw</p>
+                  <p class="text-[10px] text-gray-600 font-bold uppercase">PL · EU</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between sm:justify-end gap-8 text-right">
+                <div>
+                  <p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">
+                    Нагрузка
+                  </p>
+                  <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-600 transition-all duration-500" style="width: 41%"></div>
+                  </div>
+                </div>
+                <div class="w-16">
+                  <p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">
+                    Пинг
+                  </p>
+                  <p class="text-xs font-black italic text-emerald-500">55 мс</p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="stats" class="relative z-10 py-16 md:py-20 px-4 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div
+            class="group relative flex items-center justify-between p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all"
+          >
+            <div class="flex items-center gap-4">
+              <div class="flex items-center justify-center">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              </div>
+              <span class="text-sm font-black italic uppercase tracking-wider text-white"
+                >Онлайн пользователи</span
+              >
+            </div>
+            <div
+              class="text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors"
+            >
+              —
+            </div>
+          </div>
+          <div
+            class="group relative flex items-center justify-between p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all"
+          >
+            <div class="flex items-center gap-4">
+              <div class="flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 text-blue-500"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+                  ></path>
+                </svg>
+              </div>
+              <span class="text-sm font-black italic uppercase tracking-wider text-white"
+                >Активные пользователи</span
+              >
+            </div>
+            <div
+              class="text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors"
+            >
+              —
+            </div>
+          </div>
+          <div
+            class="group relative flex items-center justify-between p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all"
+          >
+            <div class="flex items-center gap-4">
+              <div class="flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 text-blue-500"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                  <path d="M2 12h20"></path>
+                </svg>
+              </div>
+              <span class="text-sm font-black italic uppercase tracking-wider text-white"
+                >Общий трафик</span
+              >
+            </div>
+            <div
+              class="text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors"
+            >
+              —
+            </div>
+          </div>
+          <div
+            class="group relative flex items-center justify-between p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all"
+          >
+            <div class="flex items-center gap-4">
+              <div class="flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 text-blue-500"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                  ></path>
+                </svg>
+              </div>
+              <span class="text-sm font-black italic uppercase tracking-wider text-white"
+                >Доступно локаций</span
+              >
+            </div>
+            <div
+              class="text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors"
+            >
+              4+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="relative z-10 py-16 md:py-20 px-4 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <div class="mb-6 flex items-center gap-3">
+              <span class="h-[1px] w-8 bg-blue-500"></span>
+              <span class="text-[12px] font-black uppercase tracking-[0.4em] text-blue-500"
+                >На миссии свободы</span
+              >
+            </div>
+            <h2 class="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-8 leading-[0.9]">
+              БУДУЩЕЕ БЕЗ <br /><span class="text-blue-500">ЦЕНЗУРЫ</span>
+            </h2>
+            <p class="text-gray-400 text-lg font-medium leading-relaxed italic mb-8">
+              Мы строим децентрализованную экосистему доступа, где приватность и доступность — это
+              стандарт, а не привилегия.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div
+              class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all"
+            >
+              <h4 class="text-blue-500 font-black italic uppercase text-sm mb-1">No-Logs</h4>
+              <p class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Никаких следов</p>
+            </div>
+            <div
+              class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all"
+            >
+              <h4 class="text-blue-500 font-black italic uppercase text-sm mb-1">25 Gbps</h4>
+              <p class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Макс. скорость</p>
+            </div>
+            <div
+              class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all"
+            >
+              <h4 class="text-blue-500 font-black italic uppercase text-sm mb-1">Invisible</h4>
+              <p class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Скрытый трафик</p>
+            </div>
+            <div
+              class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all"
+            >
+              <h4 class="text-blue-500 font-black italic uppercase text-sm mb-1">24/7</h4>
+              <p class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Поддержка</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" class="relative z-10 py-16 md:py-20 px-4 max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+          <div
+            class="flex flex-col h-full bg-[#08080a] border border-white/5 p-8 md:p-12 rounded-[3rem] hover:border-blue-500/30 transition-all group"
+          >
+            <h3 class="text-2xl font-black italic uppercase mb-2">Тестовый период</h3>
+            <div class="text-5xl md:text-6xl font-black mb-8 italic text-blue-500">
+              0₽ <span class="text-sm text-gray-600 uppercase not-italic tracking-widest">/ 3 дня</span>
+            </div>
+            <ul class="space-y-4 mb-10">
+              <li
+                class="flex items-center gap-3 text-gray-400 font-bold uppercase text-[11px] tracking-widest"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-blue-500 w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Безлимитный трафик
+              </li>
+              <li
+                class="flex items-center gap-3 text-gray-400 font-bold uppercase text-[11px] tracking-widest"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-blue-500 w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Сверхбыстрая скорость
+              </li>
+              <li
+                class="flex items-center gap-3 text-gray-400 font-bold uppercase text-[11px] tracking-widest"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-blue-500 w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Доступ ко всем локациям
+              </li>
+              <li
+                class="flex items-center gap-3 text-gray-400 font-bold uppercase text-[11px] tracking-widest"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-blue-500 w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Кроссплатформенность
+              </li>
+              <li
+                class="flex items-center gap-3 text-gray-400 font-bold uppercase text-[11px] tracking-widest"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-blue-500 w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Быстрая поддержка
+              </li>
+            </ul>
+            <a
+              class="mt-auto block text-center w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+              href="/login"
+              >Попробовать</a
+            >
+          </div>
+          <div
+            class="flex flex-col h-full bg-blue-600 p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_rgba(37,99,235,0.3)] text-[#05231e]"
+          >
+            <h3 class="text-2xl font-black italic uppercase mb-2">Основной тариф</h3>
+            <div class="text-5xl md:text-6xl font-black mb-8 italic text-[#05231e]">
+              6₽ <span class="text-sm text-[#1d4a40] uppercase not-italic tracking-widest">/ сутки</span>
+            </div>
+            <ul class="space-y-4 mb-10 font-bold uppercase text-[11px] tracking-widest">
+              <li class="flex items-center gap-3 text-[#05231e]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Посуточное списание с баланса
+              </li>
+              <li class="flex items-center gap-3 text-[#05231e]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                До 10 устройств
+              </li>
+              <li class="flex items-center gap-3 text-[#05231e]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Безлимитный трафик
+              </li>
+              <li class="flex items-center gap-3 text-[#05231e]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Сверхбыстрая скорость
+              </li>
+              <li class="flex items-center gap-3 text-[#05231e]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Доступ ко всем локациям
+              </li>
+              <li class="flex items-center gap-3 text-[#05231e]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Кроссплатформенность
+              </li>
+              <li class="flex items-center gap-3 text-[#05231e]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                Быстрая поддержка
+              </li>
+            </ul>
+            <a
+              class="mt-auto block text-center w-full py-5 bg-[#05231e] text-[#b9fdec] rounded-2xl font-black uppercase tracking-widest hover:bg-[#07352d] transition-all"
+              href="/login"
+              >Подключить</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <footer class="relative z-10">
+        <div class="w-full bg-white/[0.02] border-t border-white/5 backdrop-blur-2xl rounded-t-[3rem] pt-16 pb-10">
+          <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col lg:flex-row justify-between gap-12 mb-16">
+              <div class="max-w-xs">
+                <div class="flex items-center gap-3 mb-6">
+                  <img
+                    alt="Amnesia Logo"
+                    class="w-10 h-10"
+                    src="/logo.svg"
+                    width="40"
+                    height="40"
+                  />
+                  <div class="text-2xl font-black italic tracking-tighter uppercase leading-none">
+                    AMNESIA<span class="text-blue-500">WPN</span>
+                  </div>
+                </div>
+                <p
+                  class="text-gray-500 text-[10px] font-bold uppercase tracking-widest leading-relaxed opacity-60"
+                >
+                  Мощное решение для обеспечения абсолютной цифровой приватности. Наша инфраструктура
+                  позволяет с легкостью обходить преграды, гарантируя стабильный доступ и быструю скорость.
+                </p>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-16">
+                <div>
+                  <h5 class="text-[11px] font-black uppercase tracking-[0.3em] text-white mb-6">
+                    Навигация
+                  </h5>
+                  <ul class="space-y-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">
+                    <li><a class="hover:text-blue-500 transition-colors" href="/#locations">Локации</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/#stats">Статистика</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/#about">О нас</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/#pricing">Тарифы</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/tg">TG — прокси</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 class="text-[11px] font-black uppercase tracking-[0.3em] text-white mb-5">Право</h5>
+                  <ul class="space-y-3 text-[10px] font-black uppercase text-gray-600 tracking-widest">
+                    <li><a class="hover:text-blue-500 transition-colors" href="/terms">Условия</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/privacy">Приватность</a></li>
+                    <li><a class="hover:text-blue-500 transition-colors" href="/support">Поддержка</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 class="text-[11px] font-black uppercase tracking-[0.3em] text-white mb-6">
+                    Соц. сети
+                  </h5>
+                  <ul class="space-y-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">
+                    <li>
+                      <a href="https://t.me/" class="hover:text-blue-500 transition-colors" rel="noopener"
+                        >Telegram канал</a
+                      >
+                    </li>
+                    <li>
+                      <a href="https://t.me/" class="hover:text-blue-500 transition-colors" rel="noopener"
+                        >Telegram бот</a
+                      >
+                    </li>
+                    <li>
+                      <a href="https://t.me/" class="hover:text-blue-500 transition-colors" rel="noopener"
+                        >Telegram поддержка</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div
+              class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4"
+            >
+              <p class="text-[9px] text-gray-800 font-black uppercase tracking-[0.4em]">
+                © 2026 Amnesia WPN. Все права защищены.
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
+      <button
+        id="scroll-top-btn"
+        type="button"
+        class="fixed bottom-5 right-5 z-50 w-12 h-12 rounded-full border border-white/15 bg-[#08080a]/80 text-blue-500 shadow-[0_10px_30px_rgba(185,253,236,0.18)] backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 hover:bg-white/10 hover:-translate-y-0.5"
+        aria-label="Наверх"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 15l-6-6-6 6"></path>
+        </svg>
+      </button>
+    </div>
+    <script>
+      (function () {
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const closeBtn = document.getElementById('menu-close');
+        if (!toggle || !menu || !overlay || !closeBtn) return;
+
+        const openMenu = () => {
+          menu.classList.remove('translate-x-full');
+          overlay.classList.remove('opacity-0', 'pointer-events-none');
+          document.body.classList.add('overflow-hidden');
+          toggle.setAttribute('aria-expanded', 'true');
+        };
+
+        const closeMenu = () => {
+          menu.classList.add('translate-x-full');
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+          document.body.classList.remove('overflow-hidden');
+          toggle.setAttribute('aria-expanded', 'false');
+        };
+
+        toggle.addEventListener('click', function () {
+          const isClosed = menu.classList.contains('translate-x-full');
+          if (isClosed) {
+            openMenu();
+          } else {
+            closeMenu();
+          }
+        });
+
+        menu.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', closeMenu);
+        });
+        overlay.addEventListener('click', closeMenu);
+        closeBtn.addEventListener('click', closeMenu);
+      })();
+
+      (function () {
+        const scrollBtn = document.getElementById('scroll-top-btn');
+        if (!scrollBtn) return;
+
+        const toggleScrollTopBtn = () => {
+          const visible = window.scrollY > 420;
+          scrollBtn.classList.toggle('opacity-0', !visible);
+          scrollBtn.classList.toggle('pointer-events-none', !visible);
+          scrollBtn.classList.toggle('animate-pulse-soft', visible);
+        };
+
+        window.addEventListener('scroll', toggleScrollTopBtn, { passive: true });
+        toggleScrollTopBtn();
+
+        scrollBtn.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      })();
+    </script>
+  </body>
+</html>
