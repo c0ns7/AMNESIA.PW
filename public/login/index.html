@@ -7,6 +7,12 @@
     <title>Amnesia WPN | Вход</title>
     <meta name="description" content="Вход в личный кабинет Amnesia WPN." />
     <link rel="stylesheet" href="/styles.css" />
+    <style>
+      /* reCAPTCHA v3 badge (Google) */
+      .grecaptcha-badge {
+        visibility: hidden !important;
+      }
+    </style>
   </head>
   <body>
     <div class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
@@ -100,7 +106,12 @@
 
               <div class="hidden" aria-hidden="true"></div>
 
-              <button type="submit" class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)]">
+              <button
+                id="btn-login"
+                type="submit"
+                disabled
+                class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+              >
                 <span>Войти</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path>
@@ -138,7 +149,12 @@
 
               <div class="hidden" aria-hidden="true"></div>
 
-              <button type="submit" class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)]">
+              <button
+                id="btn-register"
+                type="submit"
+                disabled
+                class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+              >
                 <span>Создать аккаунт</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path>
@@ -254,6 +270,10 @@
         var captchaReady = false;
         var siteKey = '';
         var recaptchaScriptLoaded = false;
+        var loginBusy = false;
+        var registerBusy = false;
+        var btnLogin = document.getElementById('btn-login');
+        var btnRegister = document.getElementById('btn-register');
 
         function showMessage(text, isError) {
           msgEl.textContent = text;
@@ -269,6 +289,41 @@
         function hideMessage() {
           msgEl.classList.add('hidden');
           msgEl.textContent = '';
+        }
+
+        function setDisabled(btn, disabled) {
+          if (!btn) return;
+          btn.disabled = Boolean(disabled);
+          btn.setAttribute('aria-disabled', String(Boolean(disabled)));
+        }
+
+        function canSubmitLogin() {
+          var u = document.getElementById('login-username');
+          var p = document.getElementById('login-password');
+          var username = u && typeof u.value === 'string' ? u.value.trim() : '';
+          var password = p && typeof p.value === 'string' ? p.value : '';
+          return Boolean(!loginBusy && captchaReady && username.length > 0 && password.length > 0);
+        }
+
+        function canSubmitRegister() {
+          var u = document.getElementById('register-username');
+          var p = document.getElementById('register-password');
+          var c = document.getElementById('register-confirm-password');
+          var username = u && typeof u.value === 'string' ? u.value.trim() : '';
+          var password = p && typeof p.value === 'string' ? p.value : '';
+          var confirm = c && typeof c.value === 'string' ? c.value : '';
+          return Boolean(
+            !registerBusy &&
+              captchaReady &&
+              username.length > 0 &&
+              password.length > 0 &&
+              confirm.length > 0
+          );
+        }
+
+        function refreshButtons() {
+          setDisabled(btnLogin, !canSubmitLogin());
+          setDisabled(btnRegister, !canSubmitRegister());
         }
 
         async function executeCaptcha(action) {
@@ -352,6 +407,7 @@
             }
 
             captchaReady = true;
+            refreshButtons();
           } catch (_) {
             showMessage('Не удалось загрузить капчу. Обновите страницу.', true);
           }
@@ -365,13 +421,19 @@
           if (!usernameEl || !passwordEl) return;
           var username = usernameEl.value.trim();
           var password = passwordEl.value;
+          if (!canSubmitLogin()) {
+            refreshButtons();
+            return;
+          }
+          loginBusy = true;
+          refreshButtons();
           var captchaToken = await executeCaptcha('login');
           if (!captchaReady || !captchaToken) {
             showMessage('Подтвердите, что вы не робот', true);
+            loginBusy = false;
+            refreshButtons();
             return;
           }
-          var btn = formLogin.querySelector('button[type="submit"]');
-          if (btn) btn.disabled = true;
           try {
             var res = await fetch('/api/auth/login', {
               method: 'POST',
@@ -393,7 +455,8 @@
           } catch (err) {
             showMessage('Сеть недоступна. Повторите позже.', true);
           } finally {
-            if (btn) btn.disabled = false;
+            loginBusy = false;
+            refreshButtons();
           }
         });
 
@@ -404,13 +467,19 @@
           var p = document.getElementById('register-password');
           var c = document.getElementById('register-confirm-password');
           if (!u || !p || !c) return;
+          if (!canSubmitRegister()) {
+            refreshButtons();
+            return;
+          }
+          registerBusy = true;
+          refreshButtons();
           var captchaToken = await executeCaptcha('register');
           if (!captchaReady || !captchaToken) {
             showMessage('Подтвердите, что вы не робот', true);
+            registerBusy = false;
+            refreshButtons();
             return;
           }
-          var btn = formRegister.querySelector('button[type="submit"]');
-          if (btn) btn.disabled = true;
           try {
             var res = await fetch('/api/auth/register', {
               method: 'POST',
@@ -433,10 +502,14 @@
           } catch (err) {
             showMessage('Сеть недоступна. Повторите позже.', true);
           } finally {
-            if (btn) btn.disabled = false;
+            registerBusy = false;
+            refreshButtons();
           }
         });
 
+        formLogin.addEventListener('input', refreshButtons, { passive: true });
+        formRegister.addEventListener('input', refreshButtons, { passive: true });
+        refreshButtons();
         initCaptcha();
       })();
     </script>
