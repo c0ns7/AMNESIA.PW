@@ -1,19 +1,15 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { createHash } from 'crypto';
 
 interface NormalizedNode {
   id: string;
-  name: string;
-  address: string;
   countryCode: string;
   countryName: string;
-  region: string;
-  flag: string;
+  name: string;
   online: boolean;
   loadPercent: number;
-  pingMs: number;
   usersOnline: number;
   activeUsers: number;
-  trafficBytes: number;
 }
 
 interface NodeSnapshot {
@@ -35,14 +31,18 @@ interface InfraStats {
 
 @Injectable()
 export class RemnawaveService {
+  private static readonly INFRA_CACHE_TTL_MS = 10 * 60 * 1000;
   private readonly baseUrl = (process.env.RW_API_BASE_URL ?? '').replace(/\/$/, '');
   private readonly token = process.env.RW_API_TOKEN ?? '';
+  private readonly publicIdSalt = process.env.INFRA_PUBLIC_ID_SALT ?? 'infra-public';
   private readonly countryNames: Record<string, string> = {
     NL: 'Нидерланды',
     RU: 'Россия',
     DE: 'Германия',
     US: 'США',
   };
+  private infraCache: { expiresAt: number; payload: unknown } | null = null;
+  private inFlightRefresh: Promise<unknown> | null = null;
 
   private makeUrl(path: string): string {
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
@@ -50,6 +50,13 @@ export class RemnawaveService {
       return `${this.baseUrl}${cleanPath.slice(4)}`;
     }
     return `${this.baseUrl}${cleanPath}`;
+  }
+
+  private toPublicId(rawId: string): string {
+    return createHash('sha256')
+      .update(`${this.publicIdSalt}:${rawId}`)
+      .digest('hex')
+      .slice(0, 16);
   }
 
   private async remnawaveGet(path: string) {
@@ -200,43 +207,6 @@ export class RemnawaveService {
     }
   }
 
-  private normalizeNode(node: Record<string, unknown>, idx: number): NormalizedNode {
-    const countryCode = this.readString(node, 'countryCode', 'country_code', 'country')
-      .slice(0, 2)
-      .toUpperCase();
-    const usersOnline = Math.max(0, Math.round(this.readNumber(node, 'usersOnline', 'onlineUsers')));
-    const connected = this.readBoolean(
-      node,
-      'isConnected',
-      'connected',
-      'isOnline',
-      'online',
-      'enabled',
-      'status',
-    );
-    const ping = this.readNumber(node, 'pingMs', 'ping', 'latency', 'latencyMs');
-
-    return {
-      id: this.readString(node, 'uuid', 'id') || `node-${idx + 1}`,
-      name: this.readString(node, 'name', 'remark', 'location') || `Node ${idx + 1}`,
-      address: this.readString(node, 'address', 'host', 'hostname'),
-      countryCode: countryCode || 'UN',
-      countryName: this.resolveCountryName(countryCode || 'UN'),
-      region: this.readString(node, 'region', 'zone') || this.resolveCountryName(countryCode || 'UN'),
-      flag: this.emojiFlag(countryCode),
-      online: connected,
-      // По требованию: usersOnline = 50 => 50%, usersOnline = 100 => 100%.
-      loadPercent: Math.max(0, Math.min(100, usersOnline)),
-      pingMs: connected ? Math.max(1, Math.round(ping || Math.floor(Math.random() * 30) + 35)) : 0,
-      usersOnline,
-      activeUsers: Math.max(0, Math.round(this.readNumber(node, 'activeUsers', 'usersActive'))),
-      trafficBytes: Math.max(
-        0,
-        this.readNumber(node, 'trafficUsedBytes', 'trafficBytes', 'usedTrafficBytes', 'traffic', 'bandwidthUsed'),
-      ),
-    };
-  }
-
   private normalizeNodeSnapshot(node: Record<string, unknown>): NodeSnapshot {
     return {
       uuid: this.readString(node, 'uuid', 'id'),
@@ -263,31 +233,22 @@ export class RemnawaveService {
     const connectedByNode = linked.some((n) => n.isConnected);
     const online = !this.readBoolean(host, 'isDisabled') && connectedByNode;
     const usersOnline = linked.reduce((sum, n) => sum + n.usersOnline, 0);
-    const trafficBytes = linked.reduce((sum, n) => sum + n.trafficUsedBytes, 0);
-    const avgPing =
-      linked.length > 0
-        ? Math.round(linked.reduce((sum, n) => sum + n.pingMs, 0) / linked.length)
-        : Math.round(this.readNumber(host, 'pingMs', 'ping') || 45);
-
     const firstNode = linked[0];
     const countryCode =
       (firstNode?.countryCode || this.readString(host, 'countryCode', 'country').slice(0, 2) || 'UN').toUpperCase();
+    const rawId = this.readString(host, 'uuid', 'id') || `host-${index + 1}`;
+    const displayName = this.readString(host, 'remark', 'name', 'tag') || `Host ${index + 1}`;
 
     return {
-      id: this.readString(host, 'uuid', 'id') || `host-${index + 1}`,
-      name: this.readString(host, 'remark', 'name', 'tag') || `Host ${index + 1}`,
-      address: this.readString(host, 'address', 'host'),
+      id: this.toPublicId(rawId),
       countryCode,
       countryName: this.resolveCountryName(countryCode),
-      region: this.resolveCountryName(countryCode),
-      flag: this.emojiFlag(countryCode),
+      name: displayName,
       online,
       // По ТЗ: usersOnline напрямую означает % нагрузки.
       loadPercent: Math.max(0, Math.min(100, usersOnline)),
-      pingMs: online ? Math.max(1, avgPing) : 0,
       usersOnline,
       activeUsers: usersOnline,
-      trafficBytes,
     };
   }
 
@@ -303,7 +264,7 @@ export class RemnawaveService {
     return `${size.toFixed(size >= 100 || unit === 0 ? 0 : 1)} ${units[unit]}`;
   }
 
-  async getInfrastructure() {
+  private async buildInfrastructurePayload(): Promise<unknown> {
     const [hostsRaw, nodesRaw, paginatedActiveUsers] = await Promise.all([
       this.getRawHosts(),
       this.getRawNodes(),
@@ -339,10 +300,42 @@ export class RemnawaveService {
       locations: nodesRows.length,
     };
 
+    const safeNodes = nodes.map((node) => ({
+      id: node.id,
+      name: node.name,
+      countryCode: node.countryCode,
+      countryName: node.countryName,
+      online: node.online,
+      loadPercent: node.loadPercent,
+    }));
+
     return {
-      nodes,
+      nodes: safeNodes,
       stats,
       updatedAt: new Date().toISOString(),
     };
+  }
+
+  async getInfrastructure(): Promise<unknown> {
+    const now = Date.now();
+    if (this.infraCache && this.infraCache.expiresAt > now) {
+      return this.infraCache.payload;
+    }
+
+    if (!this.inFlightRefresh) {
+      this.inFlightRefresh = this.buildInfrastructurePayload()
+        .then((payload) => {
+          this.infraCache = {
+            payload,
+            expiresAt: Date.now() + RemnawaveService.INFRA_CACHE_TTL_MS,
+          };
+          return payload;
+        })
+        .finally(() => {
+          this.inFlightRefresh = null;
+        });
+    }
+
+    return this.inFlightRefresh;
   }
 }
