@@ -7,10 +7,11 @@ import { APP_PIPE } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
+import { RemnawaveModule } from './remnawave/remnawave.module';
 import { SiteController } from './site.controller';
 
 @Module({
-  imports: [DatabaseModule, AuthModule],
+  imports: [DatabaseModule, AuthModule, RemnawaveModule],
   controllers: [AppController, SiteController],
   providers: [
     {

@@ -38,6 +38,28 @@ textarea {
 
 html {
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(185, 253, 236, 0.5) rgba(255, 255, 255, 0.04);
+}
+
+/* Thin branded scrollbar */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(185, 253, 236, 0.72), rgba(185, 253, 236, 0.45));
+  border-radius: 999px;
+  border: 2px solid rgba(2, 2, 5, 0.92);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(207, 255, 243, 0.9), rgba(185, 253, 236, 0.62));
 }
 
 img.emoji {

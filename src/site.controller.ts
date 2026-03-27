@@ -31,8 +31,4 @@ export class SiteController {
     return res.status(503).sendFile(join(this.publicDir, '503.html'));
   }
 
-  @Get('*')
-  notFound(@Res() res: Response) {
-    return res.status(404).sendFile(join(this.publicDir, '404.html'));
-  }
 }
