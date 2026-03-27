@@ -31,6 +31,7 @@ export class AuthService {
     '';
   private readonly recaptchaVerifyUrl =
     'https://www.google.com/recaptcha/api/siteverify';
+  private readonly recaptchaMinScore = Number(process.env.RECAPTCHA_MIN_SCORE || 0.5);
 
   private normalizeUsername(raw: string): string {
     return raw.trim().toLowerCase();
@@ -46,12 +47,13 @@ export class AuthService {
 
   getCaptchaConfig() {
     this.ensureCaptchaConfigured();
-    return { siteKey: this.recaptchaSiteKey };
+    return { siteKey: this.recaptchaSiteKey, version: 'v3', minScore: this.recaptchaMinScore };
   }
 
   private async verifyCaptcha(
     captchaToken: string,
     remoteIp?: string,
+    expectedAction?: string,
   ): Promise<void> {
     this.ensureCaptchaConfigured();
     const token = String(captchaToken || '').trim();
@@ -84,16 +86,46 @@ export class AuthService {
       'error-codes'?: string[];
       score?: number;
       action?: string;
+      hostname?: string;
     };
 
     const result = (await response.json().catch(() => ({}))) as RecaptchaResult;
     if (!response.ok || !result.success) {
+      const codes = Array.isArray(result['error-codes'])
+        ? result['error-codes'].map((c) => String(c))
+        : [];
+      const codeSet = new Set(codes);
+
+      // Common Google error codes:
+      // - invalid-input-secret: bad secret key (server side)
+      // - missing-input-secret: secret not provided
+      // - invalid-input-response: token invalid/expired (client side)
+      // - missing-input-response: token missing
+      if (codeSet.has('invalid-input-secret') || codeSet.has('missing-input-secret')) {
+        throw new ServiceUnavailableException('Капча настроена неверно (secret key)');
+      }
+      if (codeSet.has('invalid-input-response') || codeSet.has('missing-input-response')) {
+        throw new BadRequestException('Подтвердите, что вы не робот');
+      }
+
+      throw new BadRequestException('Проверка капчи не пройдена');
+    }
+
+    if (expectedAction) {
+      const action = typeof result.action === 'string' ? result.action : '';
+      if (action !== expectedAction) {
+        throw new BadRequestException('Проверка капчи не пройдена');
+      }
+    }
+
+    const score = typeof result.score === 'number' ? result.score : NaN;
+    if (!Number.isFinite(score) || score < this.recaptchaMinScore) {
       throw new BadRequestException('Проверка капчи не пройдена');
     }
   }
 
   async register(dto: RegisterDto, remoteIp?: string) {
-    await this.verifyCaptcha(dto.captchaToken, remoteIp);
+    await this.verifyCaptcha(dto.captchaToken, remoteIp, 'register');
     if (dto.password !== dto.confirmPassword) {
       throw new BadRequestException('Пароли не совпадают');
     }
@@ -114,7 +146,7 @@ export class AuthService {
   }
 
   async login(dto: LoginDto, remoteIp?: string) {
-    await this.verifyCaptcha(dto.captchaToken, remoteIp);
+    await this.verifyCaptcha(dto.captchaToken, remoteIp, 'login');
     const username = this.normalizeUsername(dto.username);
     const [rows] = await this.pool.execute<UserRow[]>(
       'SELECT id, username, password_hash FROM users WHERE username = ? LIMIT 1',

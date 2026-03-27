@@ -7,7 +7,7 @@
     <title>Amnesia WPN | Вход</title>
     <meta name="description" content="Вход в личный кабинет Amnesia WPN." />
     <link rel="stylesheet" href="/styles.css" />
-    <script src="https://www.google.com/recaptcha/api.js?onload=recaptchaOnload&render=explicit" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
   </head>
   <body>
     <div class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
@@ -99,9 +99,7 @@
                 <label for="login-password" class="absolute left-14 top-1/2 -translate-y-1/2 text-[11px] font-bold uppercase tracking-wider text-gray-500 transition-all duration-200 pointer-events-none peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-[9px] peer-focus:text-blue-500 peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[9px]">Пароль</label>
               </div>
 
-              <div class="flex justify-center py-4 overflow-hidden rounded-xl bg-white/[0.01] border border-white/5">
-                <div id="recaptcha-login"></div>
-              </div>
+              <div class="hidden" aria-hidden="true"></div>
 
               <button type="submit" class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)]">
                 <span>Войти</span>
@@ -139,9 +137,7 @@
                 <label for="register-confirm-password" class="absolute left-14 top-1/2 -translate-y-1/2 text-[11px] font-bold uppercase tracking-wider text-gray-500 transition-all duration-200 pointer-events-none peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-[9px] peer-focus:text-blue-500 peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[9px]">Повторите пароль</label>
               </div>
 
-              <div class="flex justify-center py-4 overflow-hidden rounded-xl bg-white/[0.01] border border-white/5">
-                <div id="recaptcha-register"></div>
-              </div>
+              <div class="hidden" aria-hidden="true"></div>
 
               <button type="submit" class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)]">
                 <span>Создать аккаунт</span>
@@ -257,8 +253,7 @@
         const formRegister = document.getElementById('form-register');
         if (!msgEl || !formLogin || !formRegister) return;
         var captchaReady = false;
-        var loginWidgetId = null;
-        var registerWidgetId = null;
+        var siteKey = '';
 
         function showMessage(text, isError) {
           msgEl.textContent = text;
@@ -276,22 +271,14 @@
           msgEl.textContent = '';
         }
 
-        function getCaptchaResponse(widgetId) {
-          if (widgetId === null) return '';
+        async function executeCaptcha(action) {
+          if (!captchaReady || !siteKey) return '';
           if (typeof window.grecaptcha === 'undefined' || !window.grecaptcha) return '';
           try {
-            return window.grecaptcha.getResponse(widgetId) || '';
+            return await window.grecaptcha.execute(siteKey, { action: action });
           } catch (_) {
             return '';
           }
-        }
-
-        function resetCaptcha(widgetId) {
-          if (widgetId === null) return;
-          if (typeof window.grecaptcha === 'undefined' || !window.grecaptcha) return;
-          try {
-            window.grecaptcha.reset(widgetId);
-          } catch (_) {}
         }
 
         function parseErrorPayload(data) {
@@ -328,15 +315,7 @@
               return;
             }
 
-            loginWidgetId = window.grecaptcha.render('recaptcha-login', {
-              sitekey: cfgData.siteKey,
-              theme: 'dark',
-            });
-            registerWidgetId = window.grecaptcha.render('recaptcha-register', {
-              sitekey: cfgData.siteKey,
-              theme: 'dark',
-            });
-
+            siteKey = String(cfgData.siteKey || '');
             captchaReady = true;
           } catch (_) {
             showMessage('Не удалось загрузить капчу. Обновите страницу.', true);
@@ -351,7 +330,7 @@
           if (!usernameEl || !passwordEl) return;
           var username = usernameEl.value.trim();
           var password = passwordEl.value;
-          var captchaToken = getCaptchaResponse(loginWidgetId);
+          var captchaToken = await executeCaptcha('login');
           if (!captchaReady || !captchaToken) {
             showMessage('Подтвердите, что вы не робот', true);
             return;
@@ -373,7 +352,6 @@
             });
             if (!res.ok) {
               showMessage(parseErrorPayload(data), true);
-              resetCaptcha(loginWidgetId);
               return;
             }
             showMessage('Добро пожаловать, ' + data.user.username + '.', false);
@@ -391,7 +369,7 @@
           var p = document.getElementById('register-password');
           var c = document.getElementById('register-confirm-password');
           if (!u || !p || !c) return;
-          var captchaToken = getCaptchaResponse(registerWidgetId);
+          var captchaToken = await executeCaptcha('register');
           if (!captchaReady || !captchaToken) {
             showMessage('Подтвердите, что вы не робот', true);
             return;
@@ -414,7 +392,6 @@
             });
             if (!res.ok) {
               showMessage(parseErrorPayload(data), true);
-              resetCaptcha(registerWidgetId);
               return;
             }
             showMessage(data.message || 'Регистрация успешна', false);
@@ -425,9 +402,7 @@
           }
         });
 
-        window.recaptchaOnload = function () {
-          initCaptcha();
-        };
+        initCaptcha();
       })();
     </script>
   </body>
