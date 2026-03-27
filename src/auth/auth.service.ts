@@ -105,10 +105,17 @@ export class AuthService {
         throw new ServiceUnavailableException('Капча настроена неверно (secret key)');
       }
       if (codeSet.has('invalid-input-response') || codeSet.has('missing-input-response')) {
-        throw new BadRequestException('Подтвердите, что вы не робот');
+        throw new BadRequestException(
+          'Подтвердите, что вы не робот' + (codes.length ? ` (${codes.join(', ')})` : ''),
+        );
+      }
+      if (codeSet.has('timeout-or-duplicate')) {
+        throw new BadRequestException('Подтвердите, что вы не робот (token expired)');
       }
 
-      throw new BadRequestException('Проверка капчи не пройдена');
+      throw new BadRequestException(
+        'Проверка капчи не пройдена' + (codes.length ? ` (${codes.join(', ')})` : ''),
+      );
     }
 
     if (expectedAction) {
@@ -120,7 +127,9 @@ export class AuthService {
 
     const score = typeof result.score === 'number' ? result.score : NaN;
     if (!Number.isFinite(score) || score < this.recaptchaMinScore) {
-      throw new BadRequestException('Проверка капчи не пройдена');
+      throw new BadRequestException(
+        `Проверка капчи не пройдена (score=${Number.isFinite(score) ? score.toFixed(2) : '—'})`,
+      );
     }
   }
 

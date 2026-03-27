@@ -7,7 +7,6 @@
     <title>Amnesia WPN | Вход</title>
     <meta name="description" content="Вход в личный кабинет Amnesia WPN." />
     <link rel="stylesheet" href="/styles.css" />
-    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
   </head>
   <body>
     <div class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
@@ -254,6 +253,7 @@
         if (!msgEl || !formLogin || !formRegister) return;
         var captchaReady = false;
         var siteKey = '';
+        var recaptchaScriptLoaded = false;
 
         function showMessage(text, isError) {
           msgEl.textContent = text;
@@ -275,7 +275,18 @@
           if (!captchaReady || !siteKey) return '';
           if (typeof window.grecaptcha === 'undefined' || !window.grecaptcha) return '';
           try {
-            return await window.grecaptcha.execute(siteKey, { action: action });
+            return await new Promise(function (resolve) {
+              window.grecaptcha.ready(function () {
+                window.grecaptcha
+                  .execute(siteKey, { action: action })
+                  .then(function (token) {
+                    resolve(token || '');
+                  })
+                  .catch(function () {
+                    resolve('');
+                  });
+              });
+            });
           } catch (_) {
             return '';
           }
@@ -300,6 +311,31 @@
               return;
             }
 
+            siteKey = String(cfgData.siteKey || '');
+            if (!siteKey) {
+              showMessage('Капча временно недоступна. Попробуйте позже.', true);
+              return;
+            }
+
+            if (!recaptchaScriptLoaded) {
+              recaptchaScriptLoaded = true;
+              await new Promise(function (resolve, reject) {
+                var script = document.createElement('script');
+                script.src =
+                  'https://www.google.com/recaptcha/api.js?render=' +
+                  encodeURIComponent(siteKey);
+                script.async = true;
+                script.defer = true;
+                script.onload = function () {
+                  resolve();
+                };
+                script.onerror = function () {
+                  reject(new Error('recaptcha load failed'));
+                };
+                document.head.appendChild(script);
+              });
+            }
+
             var tries = 0;
             while (
               (typeof window.grecaptcha === 'undefined' || !window.grecaptcha) &&
@@ -315,7 +351,6 @@
               return;
             }
 
-            siteKey = String(cfgData.siteKey || '');
             captchaReady = true;
           } catch (_) {
             showMessage('Не удалось загрузить капчу. Обновите страницу.', true);
