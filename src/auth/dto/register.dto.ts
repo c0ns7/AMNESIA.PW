@@ -14,4 +14,8 @@ export class RegisterDto {
   @IsString()
   @MinLength(8, { message: 'Повторите пароль' })
   confirmPassword!: string;
+
+  @IsString({ message: 'Подтвердите, что вы не робот' })
+  @MinLength(1, { message: 'Подтвердите, что вы не робот' })
+  captchaToken!: string;
 }

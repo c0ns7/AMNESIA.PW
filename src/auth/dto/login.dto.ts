@@ -10,4 +10,8 @@ export class LoginDto {
   @IsString()
   @MinLength(1, { message: 'Введите пароль' })
   password!: string;
+
+  @IsString({ message: 'Подтвердите, что вы не робот' })
+  @MinLength(1, { message: 'Подтвердите, что вы не робот' })
+  captchaToken!: string;
 }

@@ -7,6 +7,7 @@
     <title>Amnesia WPN | Вход</title>
     <meta name="description" content="Вход в личный кабинет Amnesia WPN." />
     <link rel="stylesheet" href="/styles.css" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   </head>
   <body>
     <div class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
@@ -99,7 +100,7 @@
               </div>
 
               <div class="flex justify-center py-4 overflow-hidden rounded-xl bg-white/[0.01] border border-white/5">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">reCAPTCHA будет подключена на backend</p>
+                <div id="turnstile-login"></div>
               </div>
 
               <button type="submit" class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)]">
@@ -139,7 +140,7 @@
               </div>
 
               <div class="flex justify-center py-4 overflow-hidden rounded-xl bg-white/[0.01] border border-white/5">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">reCAPTCHA будет подключена на backend</p>
+                <div id="turnstile-register"></div>
               </div>
 
               <button type="submit" class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)]">
@@ -255,6 +256,11 @@
         const formLogin = document.getElementById('form-login');
         const formRegister = document.getElementById('form-register');
         if (!msgEl || !formLogin || !formRegister) return;
+        var captchaReady = false;
+        var loginCaptchaToken = '';
+        var registerCaptchaToken = '';
+        var loginWidgetId = null;
+        var registerWidgetId = null;
 
         function showMessage(text, isError) {
           msgEl.textContent = text;
@@ -272,10 +278,83 @@
           msgEl.textContent = '';
         }
 
+        function resetCaptcha(widgetId) {
+          if (
+            widgetId !== null &&
+            typeof window.turnstile !== 'undefined' &&
+            window.turnstile &&
+            typeof window.turnstile.reset === 'function'
+          ) {
+            window.turnstile.reset(widgetId);
+          }
+        }
+
         function parseErrorPayload(data) {
           if (Array.isArray(data.message)) return data.message[0] || 'Ошибка запроса';
           if (typeof data.message === 'string') return data.message;
           return 'Ошибка запроса';
+        }
+
+        async function initCaptcha() {
+          try {
+            var cfgRes = await fetch('/api/auth/captcha-config', {
+              headers: { Accept: 'application/json' },
+            });
+            var cfgData = await cfgRes.json().catch(function () {
+              return {};
+            });
+            if (!cfgRes.ok || !cfgData.siteKey) {
+              showMessage(parseErrorPayload(cfgData), true);
+              return;
+            }
+
+            var tries = 0;
+            while (
+              (typeof window.turnstile === 'undefined' || !window.turnstile) &&
+              tries < 50
+            ) {
+              tries += 1;
+              await new Promise(function (resolve) {
+                setTimeout(resolve, 100);
+              });
+            }
+            if (typeof window.turnstile === 'undefined' || !window.turnstile) {
+              showMessage('Не удалось загрузить капчу. Обновите страницу.', true);
+              return;
+            }
+
+            loginWidgetId = window.turnstile.render('#turnstile-login', {
+              sitekey: cfgData.siteKey,
+              theme: 'dark',
+              callback: function (token) {
+                loginCaptchaToken = token || '';
+              },
+              'expired-callback': function () {
+                loginCaptchaToken = '';
+              },
+              'error-callback': function () {
+                loginCaptchaToken = '';
+              },
+            });
+
+            registerWidgetId = window.turnstile.render('#turnstile-register', {
+              sitekey: cfgData.siteKey,
+              theme: 'dark',
+              callback: function (token) {
+                registerCaptchaToken = token || '';
+              },
+              'expired-callback': function () {
+                registerCaptchaToken = '';
+              },
+              'error-callback': function () {
+                registerCaptchaToken = '';
+              },
+            });
+
+            captchaReady = true;
+          } catch (_) {
+            showMessage('Не удалось загрузить капчу. Обновите страницу.', true);
+          }
         }
 
         formLogin.addEventListener('submit', async function (e) {
@@ -286,19 +365,29 @@
           if (!usernameEl || !passwordEl) return;
           var username = usernameEl.value.trim();
           var password = passwordEl.value;
+          if (!captchaReady || !loginCaptchaToken) {
+            showMessage('Подтвердите, что вы не робот', true);
+            return;
+          }
           var btn = formLogin.querySelector('button[type="submit"]');
           if (btn) btn.disabled = true;
           try {
             var res = await fetch('/api/auth/login', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ username: username, password: password }),
+              body: JSON.stringify({
+                username: username,
+                password: password,
+                captchaToken: loginCaptchaToken,
+              }),
             });
             var data = await res.json().catch(function () {
               return {};
             });
             if (!res.ok) {
               showMessage(parseErrorPayload(data), true);
+              loginCaptchaToken = '';
+              resetCaptcha(loginWidgetId);
               return;
             }
             showMessage('Добро пожаловать, ' + data.user.username + '.', false);
@@ -316,6 +405,10 @@
           var p = document.getElementById('register-password');
           var c = document.getElementById('register-confirm-password');
           if (!u || !p || !c) return;
+          if (!captchaReady || !registerCaptchaToken) {
+            showMessage('Подтвердите, что вы не робот', true);
+            return;
+          }
           var btn = formRegister.querySelector('button[type="submit"]');
           if (btn) btn.disabled = true;
           try {
@@ -326,6 +419,7 @@
                 username: u.value.trim(),
                 password: p.value,
                 confirmPassword: c.value,
+                captchaToken: registerCaptchaToken,
               }),
             });
             var data = await res.json().catch(function () {
@@ -333,6 +427,8 @@
             });
             if (!res.ok) {
               showMessage(parseErrorPayload(data), true);
+              registerCaptchaToken = '';
+              resetCaptcha(registerWidgetId);
               return;
             }
             showMessage(data.message || 'Регистрация успешна', false);
@@ -342,6 +438,8 @@
             if (btn) btn.disabled = false;
           }
         });
+
+        initCaptcha();
       })();
     </script>
   </body>

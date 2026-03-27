@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amnesia WPN | Франшизы</title>
+    <meta name="description" content="Партнерские франшизы Amnesia WPN." />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
+      <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff09_1px,transparent_1px),linear-gradient(to_bottom,#ffffff09_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-400/10 blur-[150px] rounded-full"></div>
+      </div>
+
+      <nav class="relative z-50 max-w-7xl mx-auto px-4 md:px-8 py-5 md:py-6 backdrop-blur-md">
+        <div class="flex items-center justify-between gap-3 md:gap-6">
+          <a class="flex items-center gap-3" href="/">
+            <img alt="Amnesia Logo" class="w-12 h-12 md:w-16 md:h-16 object-contain" src="/logo.svg" width="64" height="64" />
+            <div class="flex flex-col md:flex-row md:gap-2 text-2xl md:text-5xl font-black italic tracking-tighter uppercase leading-none">
+              <span>AMNESIA</span><span class="text-blue-500">WPN</span>
+            </div>
+          </a>
+          <a class="px-4 md:px-6 py-2 rounded-lg font-black uppercase text-[10px] md:text-xs transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] whitespace-nowrap bg-white text-black hover:bg-blue-600 hover:text-black" href="/">На главную</a>
+        </div>
+      </nav>
+
+      <main class="relative z-10">
+        <section class="max-w-7xl mx-auto px-4 md:px-8 pt-10 md:pt-20 pb-10 text-center">
+          <div class="mb-6 flex items-center justify-center gap-3">
+            <span class="h-[1px] w-8 bg-blue-500"></span>
+            <span class="text-[12px] md:text-[14px] font-black uppercase tracking-[0.28em] md:tracking-[0.4em] text-blue-500">
+              Партнерская программа
+            </span>
+            <span class="h-[1px] w-8 bg-blue-500"></span>
+          </div>
+          <h1 class="text-4xl md:text-6xl font-black italic uppercase tracking-tighter leading-none">
+            ФРАНШИЗЫ <span class="text-blue-500">AMNESIA WPN</span>
+          </h1>
+          <p class="mt-4 max-w-2xl mx-auto text-gray-400 text-base md:text-lg font-medium leading-relaxed">
+            Партнерские боты с долей 50% от каждой активной подписки.
+            Выбирайте фильтр и переходите в нужный Telegram-бот.
+          </p>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-4 md:px-8 pb-24 md:pb-32">
+          <div class="max-w-4xl mx-auto mb-6 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              class="fr-filter-btn active px-4 py-2 rounded-full border border-white/15 bg-white/[0.03] text-gray-300 text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:bg-white/[0.05]"
+              data-filter="all"
+            >
+              Все
+            </button>
+            <button
+              type="button"
+              class="fr-filter-btn px-4 py-2 rounded-full border border-white/15 bg-white/[0.03] text-gray-300 text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:bg-white/[0.05]"
+              data-filter="active"
+            >
+              Включенные
+            </button>
+            <button
+              type="button"
+              class="fr-filter-btn px-4 py-2 rounded-full border border-white/15 bg-white/[0.03] text-gray-300 text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:bg-white/[0.05]"
+              data-filter="inactive"
+            >
+              Выключенные
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="fr-grid">
+            <div class="p-6 rounded-2xl border border-white/10 bg-white/[0.02] text-center text-gray-500 text-sm font-bold uppercase tracking-wider">
+              Загрузка франшиз...
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        var API_BASE = 'https://bot.amnesiavps.ru';
+        var grid = document.getElementById('fr-grid');
+        var filter = 'all';
+        var items = [];
+
+        function esc(v) {
+          return String(v)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+        }
+
+        function render() {
+          var filtered = items.filter(function (f) {
+            if (filter === 'all') return true;
+            if (filter === 'active') return Number(f.is_active) === 1;
+            if (filter === 'inactive') return Number(f.is_active) === 0;
+            return true;
+          });
+
+          if (filtered.length === 0) {
+            grid.innerHTML =
+              '<div class="p-6 rounded-2xl border border-white/10 bg-white/[0.02] text-center text-gray-500 text-sm font-bold uppercase tracking-wider">Нет франшиз по выбранному фильтру</div>';
+            return;
+          }
+
+          grid.innerHTML = filtered
+            .map(function (f) {
+              var username = String(f.bot_username || '').replace(/^@/, '') || 'bot';
+              var isActive = Number(f.is_active) === 1;
+              var users = Number(f.user_count || 0);
+              var url = 'https://t.me/' + username;
+              return (
+                '<a class="group block p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-blue-500/30 transition-all" href="' +
+                url +
+                '" target="_blank" rel="noopener">' +
+                '<div class="flex items-center justify-between gap-2">' +
+                '<div class="text-sm md:text-base font-black italic tracking-tighter text-white break-all">@' +
+                esc(username) +
+                '</div>' +
+                '<span class="inline-flex items-center rounded-full px-3 py-2 text-[10px] font-black uppercase tracking-[0.15em] ' +
+                (isActive
+                  ? 'border border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
+                  : 'border border-white/15 bg-white/[0.03] text-gray-500') +
+                '">' +
+                (isActive ? 'включена' : 'выключена') +
+                '</span>' +
+                '</div>' +
+                '<div class="mt-4 flex items-center justify-between gap-3">' +
+                '<p class="text-[10px] font-black uppercase tracking-widest text-gray-600">Пользователи</p>' +
+                '<p class="text-2xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors">' +
+                users +
+                '</p>' +
+                '</div>' +
+                '</a>'
+              );
+            })
+            .join('');
+        }
+
+        function setFilterButtons() {
+          document.querySelectorAll('.fr-filter-btn').forEach(function (btn) {
+            var isActive = btn.getAttribute('data-filter') === filter;
+            btn.classList.toggle('active', isActive);
+            btn.classList.toggle('bg-blue-600', isActive);
+            btn.classList.toggle('text-black', isActive);
+            btn.classList.toggle('border-white/15', !isActive);
+            btn.classList.toggle('bg-white/[0.03]', !isActive);
+            btn.classList.toggle('text-gray-300', !isActive);
+          });
+        }
+
+        document.querySelectorAll('.fr-filter-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            filter = btn.getAttribute('data-filter') || 'all';
+            setFilterButtons();
+            render();
+          });
+        });
+
+        async function load() {
+          try {
+            var res = await fetch(API_BASE + '/api/franchises', { headers: { Accept: 'application/json' } });
+            if (!res.ok) throw new Error('Ошибка загрузки');
+            var data = await res.json();
+            items = Array.isArray(data) ? data : [];
+          } catch (e) {
+            items = [];
+          }
+          setFilterButtons();
+          render();
+        }
+
+        load();
+      })();
+    </script>
+  </body>
+</html>
