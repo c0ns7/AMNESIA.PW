@@ -1,10 +1,15 @@
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { NextFunction, Request, Response } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+
+// Make env loading robust for systemd (cwd may differ).
+dotenv.config({ path: join(process.cwd(), '.env') });
+dotenv.config({ path: join(__dirname, '..', '.env') });
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

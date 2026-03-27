@@ -7,7 +7,7 @@
     <title>Amnesia WPN | Вход</title>
     <meta name="description" content="Вход в личный кабинет Amnesia WPN." />
     <link rel="stylesheet" href="/styles.css" />
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=recaptchaOnload&render=explicit" async defer></script>
   </head>
   <body>
     <div class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
@@ -100,7 +100,7 @@
               </div>
 
               <div class="flex justify-center py-4 overflow-hidden rounded-xl bg-white/[0.01] border border-white/5">
-                <div id="turnstile-login"></div>
+                <div id="recaptcha-login"></div>
               </div>
 
               <button type="submit" class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)]">
@@ -140,7 +140,7 @@
               </div>
 
               <div class="flex justify-center py-4 overflow-hidden rounded-xl bg-white/[0.01] border border-white/5">
-                <div id="turnstile-register"></div>
+                <div id="recaptcha-register"></div>
               </div>
 
               <button type="submit" class="w-full h-[64px] rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-500 transition-all duration-300 flex items-center justify-center gap-3 group relative overflow-hidden shadow-[0_10px_30px_rgba(37,99,235,0.2)]">
@@ -257,8 +257,6 @@
         const formRegister = document.getElementById('form-register');
         if (!msgEl || !formLogin || !formRegister) return;
         var captchaReady = false;
-        var loginCaptchaToken = '';
-        var registerCaptchaToken = '';
         var loginWidgetId = null;
         var registerWidgetId = null;
 
@@ -278,15 +276,22 @@
           msgEl.textContent = '';
         }
 
-        function resetCaptcha(widgetId) {
-          if (
-            widgetId !== null &&
-            typeof window.turnstile !== 'undefined' &&
-            window.turnstile &&
-            typeof window.turnstile.reset === 'function'
-          ) {
-            window.turnstile.reset(widgetId);
+        function getCaptchaResponse(widgetId) {
+          if (widgetId === null) return '';
+          if (typeof window.grecaptcha === 'undefined' || !window.grecaptcha) return '';
+          try {
+            return window.grecaptcha.getResponse(widgetId) || '';
+          } catch (_) {
+            return '';
           }
+        }
+
+        function resetCaptcha(widgetId) {
+          if (widgetId === null) return;
+          if (typeof window.grecaptcha === 'undefined' || !window.grecaptcha) return;
+          try {
+            window.grecaptcha.reset(widgetId);
+          } catch (_) {}
         }
 
         function parseErrorPayload(data) {
@@ -310,7 +315,7 @@
 
             var tries = 0;
             while (
-              (typeof window.turnstile === 'undefined' || !window.turnstile) &&
+              (typeof window.grecaptcha === 'undefined' || !window.grecaptcha) &&
               tries < 50
             ) {
               tries += 1;
@@ -318,37 +323,18 @@
                 setTimeout(resolve, 100);
               });
             }
-            if (typeof window.turnstile === 'undefined' || !window.turnstile) {
+            if (typeof window.grecaptcha === 'undefined' || !window.grecaptcha) {
               showMessage('Не удалось загрузить капчу. Обновите страницу.', true);
               return;
             }
 
-            loginWidgetId = window.turnstile.render('#turnstile-login', {
+            loginWidgetId = window.grecaptcha.render('recaptcha-login', {
               sitekey: cfgData.siteKey,
               theme: 'dark',
-              callback: function (token) {
-                loginCaptchaToken = token || '';
-              },
-              'expired-callback': function () {
-                loginCaptchaToken = '';
-              },
-              'error-callback': function () {
-                loginCaptchaToken = '';
-              },
             });
-
-            registerWidgetId = window.turnstile.render('#turnstile-register', {
+            registerWidgetId = window.grecaptcha.render('recaptcha-register', {
               sitekey: cfgData.siteKey,
               theme: 'dark',
-              callback: function (token) {
-                registerCaptchaToken = token || '';
-              },
-              'expired-callback': function () {
-                registerCaptchaToken = '';
-              },
-              'error-callback': function () {
-                registerCaptchaToken = '';
-              },
             });
 
             captchaReady = true;
@@ -365,7 +351,8 @@
           if (!usernameEl || !passwordEl) return;
           var username = usernameEl.value.trim();
           var password = passwordEl.value;
-          if (!captchaReady || !loginCaptchaToken) {
+          var captchaToken = getCaptchaResponse(loginWidgetId);
+          if (!captchaReady || !captchaToken) {
             showMessage('Подтвердите, что вы не робот', true);
             return;
           }
@@ -378,7 +365,7 @@
               body: JSON.stringify({
                 username: username,
                 password: password,
-                captchaToken: loginCaptchaToken,
+                captchaToken: captchaToken,
               }),
             });
             var data = await res.json().catch(function () {
@@ -386,7 +373,6 @@
             });
             if (!res.ok) {
               showMessage(parseErrorPayload(data), true);
-              loginCaptchaToken = '';
               resetCaptcha(loginWidgetId);
               return;
             }
@@ -405,7 +391,8 @@
           var p = document.getElementById('register-password');
           var c = document.getElementById('register-confirm-password');
           if (!u || !p || !c) return;
-          if (!captchaReady || !registerCaptchaToken) {
+          var captchaToken = getCaptchaResponse(registerWidgetId);
+          if (!captchaReady || !captchaToken) {
             showMessage('Подтвердите, что вы не робот', true);
             return;
           }
@@ -419,7 +406,7 @@
                 username: u.value.trim(),
                 password: p.value,
                 confirmPassword: c.value,
-                captchaToken: registerCaptchaToken,
+                captchaToken: captchaToken,
               }),
             });
             var data = await res.json().catch(function () {
@@ -427,7 +414,6 @@
             });
             if (!res.ok) {
               showMessage(parseErrorPayload(data), true);
-              registerCaptchaToken = '';
               resetCaptcha(registerWidgetId);
               return;
             }
@@ -439,7 +425,9 @@
           }
         });
 
-        initCaptcha();
+        window.recaptchaOnload = function () {
+          initCaptcha();
+        };
       })();
     </script>
   </body>

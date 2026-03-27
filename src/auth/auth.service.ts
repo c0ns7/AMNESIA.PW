@@ -21,17 +21,23 @@ interface UserRow extends RowDataPacket {
 @Injectable()
 export class AuthService {
   constructor(@Inject(MYSQL_POOL) private readonly pool: Pool) {}
-  private readonly turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim() || '';
-  private readonly turnstileSiteKey = process.env.TURNSTILE_SITE_KEY?.trim() || '';
-  private readonly turnstileVerifyUrl =
-    'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+  private readonly recaptchaSecret =
+    process.env.RECAPTCHA_SECRET_KEY?.trim() ||
+    process.env.RECAPTCHA_SECRET?.trim() ||
+    '';
+  private readonly recaptchaSiteKey =
+    process.env.RECAPTCHA_SITE_KEY?.trim() ||
+    process.env.RECAPTCHA_SITE?.trim() ||
+    '';
+  private readonly recaptchaVerifyUrl =
+    'https://www.google.com/recaptcha/api/siteverify';
 
   private normalizeUsername(raw: string): string {
     return raw.trim().toLowerCase();
   }
 
   private ensureCaptchaConfigured(): void {
-    if (!this.turnstileSecret || !this.turnstileSiteKey) {
+    if (!this.recaptchaSecret || !this.recaptchaSiteKey) {
       throw new ServiceUnavailableException(
         'Капча временно недоступна. Попробуйте позже.',
       );
@@ -40,7 +46,7 @@ export class AuthService {
 
   getCaptchaConfig() {
     this.ensureCaptchaConfigured();
-    return { siteKey: this.turnstileSiteKey };
+    return { siteKey: this.recaptchaSiteKey };
   }
 
   private async verifyCaptcha(
@@ -54,7 +60,7 @@ export class AuthService {
     }
 
     const payload = new URLSearchParams();
-    payload.set('secret', this.turnstileSecret);
+    payload.set('secret', this.recaptchaSecret);
     payload.set('response', token);
     if (remoteIp) {
       payload.set('remoteip', remoteIp);
@@ -62,7 +68,7 @@ export class AuthService {
 
     let response;
     try {
-      response = await fetch(this.turnstileVerifyUrl, {
+      response = await fetch(this.recaptchaVerifyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: payload.toString(),
@@ -73,12 +79,14 @@ export class AuthService {
       );
     }
 
-    type TurnstileResult = {
+    type RecaptchaResult = {
       success?: boolean;
       'error-codes'?: string[];
+      score?: number;
+      action?: string;
     };
 
-    const result = (await response.json().catch(() => ({}))) as TurnstileResult;
+    const result = (await response.json().catch(() => ({}))) as RecaptchaResult;
     if (!response.ok || !result.success) {
       throw new BadRequestException('Проверка капчи не пройдена');
     }
