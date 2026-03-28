@@ -63,9 +63,6 @@
             <p class="text-[9px] font-black uppercase tracking-widest text-gray-600">или</p>
             <div id="tg-widget-container" class="min-h-[48px] flex items-center justify-center"></div>
             <p id="tg-login-hint" class="text-[10px] text-gray-500 text-center max-w-xs leading-relaxed hidden"></p>
-            <p id="tg-domain-hint" class="text-[9px] text-gray-600 text-center max-w-sm leading-relaxed hidden">
-              Если появляется «Bot domain invalid»: в @BotFather откройте бота → Bot settings → Domain и укажите домен сайта (без https), например <span class="text-gray-400">amnesia.pw</span>.
-            </p>
           </div>
 
           <p class="mt-8 pt-6 border-t border-white/5 text-center text-[9px] text-gray-600 font-bold uppercase tracking-wider">
@@ -441,8 +438,6 @@
           s.setAttribute('data-onauth', 'onTelegramAuth(user)');
           c.appendChild(s);
           tgWidgetInjected = true;
-          var dh = document.getElementById('tg-domain-hint');
-          if (dh) dh.classList.remove('hidden');
         }
 
         /* Auth tabs */
@@ -473,8 +468,6 @@
             } else {
               tgWrap.classList.add('hidden');
               clearTelegramWidget();
-              var dh = document.getElementById('tg-domain-hint');
-              if (dh) dh.classList.add('hidden');
             }
           }
         }

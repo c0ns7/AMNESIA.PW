@@ -93,7 +93,6 @@ export class AuthService implements OnModuleInit {
     };
   }
 
-  /** Виджет входа Telegram: выключите WEB_TELEGRAM_WIDGET_ENABLED=0 пока в @BotFather не задан домен сайта. */
   getTelegramWidgetConfig() {
     const token = this.webTelegramBotToken;
     const disabled =

@@ -795,6 +795,11 @@
           );
         }
 
+        function shouldHideInfraNode(node) {
+          var n = String((node && node.name) || '').toLowerCase();
+          return n.indexOf('обход') !== -1;
+        }
+
         function loadMeterHtml(loadPercent) {
           var pct = Math.max(0, Math.min(100, Math.round(Number(loadPercent) || 0)));
           var segments = 12;
@@ -855,7 +860,7 @@
         function renderNodes(nodes, errorText) {
           var onlineNodes = Array.isArray(nodes)
             ? nodes.filter(function (node) {
-                return Boolean(node && node.online);
+                return Boolean(node && node.online) && !shouldHideInfraNode(node);
               })
             : [];
 
