@@ -1,10 +1,21 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Redirect, Res } from '@nestjs/common';
 import { join } from 'path';
 import { Response } from 'express';
 
 @Controller()
 export class SiteController {
   private readonly publicDir = join(__dirname, '..', 'public');
+
+  @Get('login')
+  @Redirect('/lk', 302)
+  redirectLogin() {
+    return;
+  }
+
+  @Get(['lk', 'lk/'])
+  pageLk(@Res() res: Response) {
+    return res.sendFile(join(this.publicDir, 'lk', 'index.html'));
+  }
 
   @Get('401')
   page401(@Res() res: Response) {

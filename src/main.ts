@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as cookieParser from 'cookie-parser';
 import { NextFunction, Request, Response } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
@@ -14,6 +15,7 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'), {
     index: ['index.html'],
     fallthrough: true,

@@ -1,12 +1,38 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { Request } from 'express';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
+import { AuthSessionGuard, RequestWithSession } from './auth-session.guard';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { TelegramWidgetDto } from './dto/telegram-widget.dto';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
+
+  private setCookie(res: Response, token: string) {
+    res.cookie(this.auth.getCookieName(), token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: this.auth.getJwtMaxAgeMs(),
+      path: '/',
+    });
+  }
+
+  private clearCookie(res: Response) {
+    res.clearCookie(this.auth.getCookieName(), { path: '/' });
+  }
 
   @Get('captcha-config')
   captchaConfig() {
@@ -14,12 +40,73 @@ export class AuthController {
   }
 
   @Post('register')
-  register(@Req() req: Request, @Body() body: RegisterDto) {
-    return this.auth.register(body, req.ip);
+  async register(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: RegisterDto,
+  ) {
+    const result = await this.auth.register(body, req.ip);
+    this.setCookie(res, result.token);
+    return { ok: true, message: result.message, user: result.user };
   }
 
   @Post('login')
-  login(@Req() req: Request, @Body() body: LoginDto) {
-    return this.auth.login(body, req.ip);
+  async login(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: LoginDto,
+  ) {
+    const result = await this.auth.login(body, req.ip);
+    this.setCookie(res, result.token);
+    return { ok: true, user: result.user };
+  }
+
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    this.clearCookie(res);
+    return { ok: true as const };
+  }
+
+  @Get('me')
+  @UseGuards(AuthSessionGuard)
+  async me(@Req() req: RequestWithSession) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.getMe(u.id);
+  }
+
+  @Post('password')
+  @UseGuards(AuthSessionGuard)
+  async password(
+    @Req() req: RequestWithSession,
+    @Body() body: ChangePasswordDto,
+  ) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.changePassword(
+      u.id,
+      body.currentPassword,
+      body.newPassword,
+      body.confirmPassword,
+    );
+  }
+
+  /** Telegram Login Widget (same-origin callback) */
+  @Post('telegram/widget')
+  async telegramWidget(
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: TelegramWidgetDto,
+  ) {
+    const result = await this.auth.loginWithTelegramWidget(body);
+    this.setCookie(res, result.token);
+    return { ok: true, user: result.user };
+  }
+
+  @Post('telegram/link-start')
+  @UseGuards(AuthSessionGuard)
+  async telegramLinkStart(@Req() req: RequestWithSession) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.startTelegramLink(u.id);
   }
 }
