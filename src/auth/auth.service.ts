@@ -16,6 +16,7 @@ import { ResultSetHeader } from 'mysql2';
 import { Pool, RowDataPacket } from 'mysql2/promise';
 import { MYSQL_POOL, VPN_DB_POOL } from '../database/database.module';
 import { RemnawaveService } from '../remnawave/remnawave.service';
+import { SubscriptionLinkService } from '../subscription/subscription-link.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TelegramWidgetDto } from './dto/telegram-widget.dto';
@@ -40,6 +41,7 @@ export class AuthService implements OnModuleInit {
     @Inject(MYSQL_POOL) private readonly pool: Pool,
     @Optional() @Inject(VPN_DB_POOL) private readonly vpnPool: Pool | null,
     private readonly remnawaveService: RemnawaveService,
+    private readonly subscriptionLinks: SubscriptionLinkService,
   ) {}
 
   private readonly recaptchaSecret =
@@ -355,7 +357,7 @@ export class AuthService implements OnModuleInit {
 
       const nodesCount = await this.remnawaveService.getLkNodesCount();
 
-      return {
+      const base: Record<string, unknown> = {
         balance,
         subscription_active: subscriptionActive,
         subscription_url: subscriptionUrl,
@@ -365,6 +367,7 @@ export class AuthService implements OnModuleInit {
         used_traffic_bytes: usedTrafficBytes,
         lifetime_used_traffic_bytes: lifetimeUsedTrafficBytes,
       };
+      return await this.subscriptionLinks.enrichServiceProfile(base);
     } catch {
       return null;
     }

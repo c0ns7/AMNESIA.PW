@@ -8,10 +8,11 @@ import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { RemnawaveModule } from './remnawave/remnawave.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 import { SiteController } from './site.controller';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, RemnawaveModule],
+  imports: [DatabaseModule, AuthModule, RemnawaveModule, SubscriptionModule],
   controllers: [AppController, SiteController],
   providers: [
     {
