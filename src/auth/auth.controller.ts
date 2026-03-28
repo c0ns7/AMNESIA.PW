@@ -39,6 +39,11 @@ export class AuthController {
     return this.auth.getCaptchaConfig();
   }
 
+  @Get('telegram-widget-config')
+  telegramWidgetConfig() {
+    return this.auth.getTelegramWidgetConfig();
+  }
+
   @Post('register')
   async register(
     @Req() req: Request,

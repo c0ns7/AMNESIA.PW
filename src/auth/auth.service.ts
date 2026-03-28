@@ -93,6 +93,20 @@ export class AuthService implements OnModuleInit {
     };
   }
 
+  /** Виджет входа Telegram: выключите WEB_TELEGRAM_WIDGET_ENABLED=0 пока в @BotFather не задан домен сайта. */
+  getTelegramWidgetConfig() {
+    const token = this.webTelegramBotToken;
+    const disabled =
+      process.env.WEB_TELEGRAM_WIDGET_ENABLED?.trim() === '0';
+    const botUsername = (
+      process.env.WEB_TELEGRAM_BOT_USERNAME?.trim() || 'AmnesiaWebBot'
+    ).replace(/^@/, '');
+    return {
+      enabled: Boolean(token && !disabled),
+      botUsername,
+    };
+  }
+
   private async verifyCaptcha(
     captchaToken: string,
     remoteIp?: string,
