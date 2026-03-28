@@ -14,14 +14,28 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // За nginx / TLS-терминацией — иначе req.ip / secure-куки ведут себя непредсказуемо.
+  if (
+    process.env.TRUST_PROXY === '1' ||
+    process.env.NODE_ENV === 'production'
+  ) {
+    app.set('trust proxy', 1);
+  }
   app.useGlobalFilters(new AllExceptionsFilter());
   app.use(cookieParser());
   // До static: иначе express.static отдаёт public/login/index.html и перекрывает @Get('login') в SiteController.
   app.use((req: Request, res: Response, next: NextFunction) => {
-    if (
-      req.method === 'GET' &&
-      (req.path === '/login' || req.path === '/login/')
-    ) {
+    if (req.method !== 'GET') {
+      return next();
+    }
+    const pathOnly = (req.path || '').split('?')[0];
+    const fromOriginal = (req.originalUrl || '').split('?')[0];
+    const isLogin =
+      pathOnly === '/login' ||
+      pathOnly === '/login/' ||
+      fromOriginal === '/login' ||
+      fromOriginal === '/login/';
+    if (isLogin) {
       return res.redirect(302, '/lk');
     }
     return next();
