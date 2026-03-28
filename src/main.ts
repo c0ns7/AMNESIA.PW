@@ -16,6 +16,16 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalFilters(new AllExceptionsFilter());
   app.use(cookieParser());
+  // До static: иначе express.static отдаёт public/login/index.html и перекрывает @Get('login') в SiteController.
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (
+      req.method === 'GET' &&
+      (req.path === '/login' || req.path === '/login/')
+    ) {
+      return res.redirect(302, '/lk');
+    }
+    return next();
+  });
   app.useStaticAssets(join(__dirname, '..', 'public'), {
     index: ['index.html'],
     fallthrough: true,
