@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Amnesia WPN | Ускоритель интернета</title>
     <meta name="description" content="Amnesia WPN — приватный доступ в интернет без ограничений." />
     <link rel="stylesheet" href="/styles.css" />
@@ -24,18 +24,20 @@
         ></div>
       </div>
 
-      <nav class="relative z-50 max-w-7xl mx-auto px-4 md:px-8 py-5 md:py-6 backdrop-blur-md">
-        <div class="flex items-center justify-between gap-3 md:gap-6">
-          <div class="flex items-center gap-3">
+      <nav
+        class="relative z-50 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-[max(1.25rem,env(safe-area-inset-top))] pb-5 md:pb-6 backdrop-blur-md"
+      >
+        <div class="flex items-center justify-between gap-2 sm:gap-3 md:gap-6 min-w-0">
+          <div class="flex items-center gap-2 sm:gap-3 min-w-0">
             <img
               alt="Amnesia Logo"
-              class="w-12 h-12 md:w-16 md:h-16 object-contain"
+              class="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain shrink-0"
               src="/logo.svg"
               width="64"
               height="64"
             />
             <div
-              class="flex flex-col md:flex-row md:gap-2 text-2xl md:text-5xl font-black italic tracking-tighter uppercase leading-none"
+              class="flex flex-col min-[400px]:flex-row min-[400px]:gap-2 text-[clamp(1.125rem,5vw,3rem)] md:text-5xl font-black italic tracking-tighter uppercase leading-none min-w-0"
             >
               <span>AMNESIA</span><span class="text-blue-500">WPN</span>
             </div>
@@ -62,7 +64,7 @@
           <button
             id="menu-toggle"
             type="button"
-            class="min-[1201px]:hidden inline-flex items-center justify-center w-11 h-11 rounded-xl border border-white/10 bg-white/[0.03] text-white"
+            class="min-[1201px]:hidden touch-target-min inline-flex items-center justify-center w-11 h-11 rounded-xl border border-white/10 bg-white/[0.03] text-white shrink-0"
             aria-label="Открыть меню"
             aria-controls="mobile-menu"
             aria-expanded="false"
@@ -94,30 +96,38 @@
             </svg>
           </button>
         </div>
-        <div class="p-4 space-y-2">
-          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#locations">Локации</a>
-          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#stats">Статистика</a>
-          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#about">О нас</a>
-          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#pricing">Тарифы</a>
-          <a class="block px-3 py-3 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/tg">TG — прокси</a>
-          <a class="mt-4 block text-center px-3 py-3 rounded-xl font-black uppercase text-xs tracking-widest bg-white text-black hover:bg-blue-600 hover:text-black transition-all" href="/login">Войти</a>
+        <div class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-5rem)] pb-[env(safe-area-inset-bottom)]">
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#locations">Локации</a>
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#stats">Статистика</a>
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#about">О нас</a>
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#pricing">Тарифы</a>
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/tg">TG — прокси</a>
+          <div class="my-3 border-t border-white/10 pt-3 space-y-1">
+            <a class="block px-3 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-white/[0.05] hover:text-blue-500 transition-all" href="/terms">Условия</a>
+            <a class="block px-3 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-white/[0.05] hover:text-blue-500 transition-all" href="/privacy">Приватность</a>
+            <a class="block px-3 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-white/[0.05] hover:text-blue-500 transition-all" href="/support">Поддержка</a>
+          </div>
+          <a class="mt-4 block text-center px-3 py-3.5 rounded-xl font-black uppercase text-xs tracking-widest bg-white text-black hover:bg-blue-600 hover:text-black transition-all" href="/login">Войти</a>
         </div>
       </aside>
 
-      <section class="relative z-10 pt-14 md:pt-20 pb-16 md:pb-20 px-4 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
-        <div>
+      <section
+        class="relative z-10 pt-14 md:pt-20 pb-16 md:pb-20 px-4 sm:px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 md:gap-12 items-center"
+      >
+        <div class="min-w-0">
           <div class="mb-6 flex items-center gap-3">
-            <span class="h-[1px] w-8 bg-blue-500"></span>
-            <span class="text-[12px] md:text-[14px] font-black uppercase tracking-[0.28em] md:tracking-[0.4em] text-blue-500 text-sm"
+            <span class="h-[1px] w-8 bg-blue-500 shrink-0"></span>
+            <span
+              class="text-[11px] sm:text-[12px] md:text-[14px] font-black uppercase tracking-[0.2em] sm:tracking-[0.28em] md:tracking-[0.4em] text-blue-500 text-sm break-words"
               >Web Private Network</span
             >
           </div>
-          <p class="text-gray-400 text-base md:text-[18px] max-w-md mb-8 md:mb-10 font-medium leading-relaxed">
+          <p class="text-gray-400 text-[15px] sm:text-base md:text-[18px] max-w-md mb-8 md:mb-10 font-medium leading-relaxed">
             Ваш ускоритель доступа в глобальную сеть.<br />
             Децентрализованное облако для обхода любых преград на максимальной скорости.
           </p>
           <a
-            class="inline-flex items-center gap-3 bg-blue-600 px-7 md:px-10 py-4 md:py-5 rounded-2xl font-black uppercase tracking-wider md:tracking-widest hover:bg-blue-500 transition-all shadow-2xl"
+            class="inline-flex items-center justify-center gap-3 w-full sm:w-auto min-h-[48px] bg-blue-600 px-7 md:px-10 py-4 md:py-5 rounded-2xl font-black uppercase tracking-wider md:tracking-widest hover:bg-blue-500 transition-all shadow-2xl text-center"
             href="/login"
           >
             Подключиться
@@ -141,7 +151,7 @@
 
         <div
           id="locations"
-          class="bg-[#08080a] border border-white/5 rounded-[2.5rem] p-6 shadow-2xl backdrop-blur-3xl"
+          class="bg-[#08080a] border border-white/5 rounded-[1.75rem] sm:rounded-[2.5rem] p-4 sm:p-6 shadow-2xl backdrop-blur-3xl min-w-0"
         >
           <div class="flex items-center justify-between mb-6 px-2">
             <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 italic">
@@ -156,31 +166,31 @@
         </div>
       </section>
 
-      <section id="stats" class="relative z-10 py-16 md:py-20 px-4 max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <section id="stats" class="relative z-10 py-16 md:py-20 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div
-            class="group relative flex items-center justify-between p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all"
+            class="group relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 sm:p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-white/[0.04] transition-all min-w-0"
           >
-            <div class="flex items-center gap-4">
-              <div class="flex items-center justify-center">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div class="flex items-center justify-center shrink-0">
                 <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
               </div>
-              <span class="text-sm font-black italic uppercase tracking-wider text-white"
+              <span class="text-xs sm:text-sm font-black italic uppercase tracking-wider text-white break-words"
                 >Онлайн пользователи</span
               >
             </div>
             <div
               id="stat-online-users"
-              class="text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors"
+              class="text-xl sm:text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors tabular-nums shrink-0 self-end sm:self-auto"
             >
               —
             </div>
           </div>
           <div
-            class="group relative flex items-center justify-between p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all"
+            class="group relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 sm:p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-white/[0.04] transition-all min-w-0"
           >
-            <div class="flex items-center gap-4">
-              <div class="flex items-center justify-center">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div class="flex items-center justify-center shrink-0">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -199,22 +209,22 @@
                   ></path>
                 </svg>
               </div>
-              <span class="text-sm font-black italic uppercase tracking-wider text-white"
+              <span class="text-xs sm:text-sm font-black italic uppercase tracking-wider text-white break-words"
                 >Активные пользователи</span
               >
             </div>
             <div
               id="stat-active-users"
-              class="text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors"
+              class="text-xl sm:text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors tabular-nums shrink-0 self-end sm:self-auto"
             >
               —
             </div>
           </div>
           <div
-            class="group relative flex items-center justify-between p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all"
+            class="group relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 sm:p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-white/[0.04] transition-all min-w-0"
           >
-            <div class="flex items-center gap-4">
-              <div class="flex items-center justify-center">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div class="flex items-center justify-center shrink-0">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -233,22 +243,22 @@
                   <path d="M2 12h20"></path>
                 </svg>
               </div>
-              <span class="text-sm font-black italic uppercase tracking-wider text-white"
+              <span class="text-xs sm:text-sm font-black italic uppercase tracking-wider text-white break-words"
                 >Общий трафик</span
               >
             </div>
             <div
               id="stat-total-traffic"
-              class="text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors"
+              class="text-xl sm:text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors tabular-nums shrink-0 self-end sm:self-auto"
             >
               —
             </div>
           </div>
           <div
-            class="group relative flex items-center justify-between p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[2rem] hover:bg-white/[0.04] transition-all"
+            class="group relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 sm:p-5 md:p-8 bg-white/[0.02] border border-white/5 rounded-[1.5rem] sm:rounded-[2rem] hover:bg-white/[0.04] transition-all min-w-0"
           >
-            <div class="flex items-center gap-4">
-              <div class="flex items-center justify-center">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div class="flex items-center justify-center shrink-0">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -267,13 +277,13 @@
                   ></path>
                 </svg>
               </div>
-              <span class="text-sm font-black italic uppercase tracking-wider text-white"
+              <span class="text-xs sm:text-sm font-black italic uppercase tracking-wider text-white break-words"
                 >Доступно серверов</span
               >
             </div>
             <div
               id="stat-locations"
-              class="text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors"
+              class="text-xl sm:text-2xl md:text-4xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors tabular-nums shrink-0 self-end sm:self-auto"
             >
               —
             </div>
@@ -281,44 +291,44 @@
         </div>
       </section>
 
-      <section id="about" class="relative z-10 py-16 md:py-20 px-4 max-w-7xl mx-auto">
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
-          <div>
+      <section id="about" class="relative z-10 py-16 md:py-20 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div class="min-w-0">
             <div class="mb-6 flex items-center gap-3">
-              <span class="h-[1px] w-8 bg-blue-500"></span>
-              <span class="text-[12px] font-black uppercase tracking-[0.4em] text-blue-500"
+              <span class="h-[1px] w-8 bg-blue-500 shrink-0"></span>
+              <span class="text-[11px] sm:text-[12px] font-black uppercase tracking-[0.25em] sm:tracking-[0.4em] text-blue-500 break-words"
                 >На миссии свободы</span
               >
             </div>
-            <h2 class="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-8 leading-[0.9]">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-8 leading-[0.95]">
               БУДУЩЕЕ БЕЗ <br /><span class="text-blue-500">ЦЕНЗУРЫ</span>
             </h2>
-            <p class="text-gray-400 text-lg font-medium leading-relaxed italic mb-8">
+            <p class="text-gray-400 text-base sm:text-lg font-medium leading-relaxed italic mb-8">
               Мы строим децентрализованную экосистему доступа, где приватность и доступность — это
               стандарт, а не привилегия.
             </p>
           </div>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-3 sm:gap-4">
             <div
-              class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all"
+              class="p-4 sm:p-6 bg-white/[0.02] border border-white/5 rounded-2xl sm:rounded-3xl hover:border-blue-500/30 transition-all min-w-0"
             >
               <h4 class="text-blue-500 font-black italic uppercase text-sm mb-1">No-Logs</h4>
               <p class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Никаких следов</p>
             </div>
             <div
-              class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all"
+              class="p-4 sm:p-6 bg-white/[0.02] border border-white/5 rounded-2xl sm:rounded-3xl hover:border-blue-500/30 transition-all min-w-0"
             >
               <h4 class="text-blue-500 font-black italic uppercase text-sm mb-1">25 Gbps</h4>
               <p class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Макс. скорость</p>
             </div>
             <div
-              class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all"
+              class="p-4 sm:p-6 bg-white/[0.02] border border-white/5 rounded-2xl sm:rounded-3xl hover:border-blue-500/30 transition-all min-w-0"
             >
               <h4 class="text-blue-500 font-black italic uppercase text-sm mb-1">Invisible</h4>
               <p class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Скрытый трафик</p>
             </div>
             <div
-              class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all"
+              class="p-4 sm:p-6 bg-white/[0.02] border border-white/5 rounded-2xl sm:rounded-3xl hover:border-blue-500/30 transition-all min-w-0"
             >
               <h4 class="text-blue-500 font-black italic uppercase text-sm mb-1">24/7</h4>
               <p class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Поддержка</p>
@@ -327,13 +337,13 @@
         </div>
       </section>
 
-      <section id="pricing" class="relative z-10 py-16 md:py-20 px-4 max-w-7xl mx-auto">
-        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+      <section id="pricing" class="relative z-10 py-16 md:py-20 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto items-stretch">
           <div
-            class="flex flex-col h-full bg-[#08080a] border border-white/5 p-8 md:p-12 rounded-[3rem] hover:border-blue-500/30 transition-all group"
+            class="flex flex-col h-full bg-[#08080a] border border-white/5 p-6 sm:p-8 md:p-12 rounded-[2rem] sm:rounded-[3rem] hover:border-blue-500/30 transition-all group min-w-0"
           >
-            <h3 class="text-2xl font-black italic uppercase mb-2">Тестовый период</h3>
-            <div class="text-5xl md:text-6xl font-black mb-8 italic text-blue-500">
+            <h3 class="text-xl sm:text-2xl font-black italic uppercase mb-2">Тестовый период</h3>
+            <div class="text-4xl sm:text-5xl md:text-6xl font-black mb-8 italic text-blue-500 break-words">
               0₽ <span class="text-sm text-gray-600 uppercase not-italic tracking-widest">/ 3 дня</span>
             </div>
             <ul class="space-y-4 mb-10">
@@ -439,16 +449,16 @@
               </li>
             </ul>
             <a
-              class="mt-auto block text-center w-full py-5 bg-white/5 border border-white/10 rounded-2xl font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+              class="mt-auto block text-center w-full min-h-[52px] flex items-center justify-center py-5 bg-white/5 border border-white/10 rounded-2xl font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all"
               href="/login"
               >Попробовать</a
             >
           </div>
           <div
-            class="flex flex-col h-full bg-blue-600 p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_rgba(37,99,235,0.3)] text-[#05231e]"
+            class="flex flex-col h-full bg-blue-600 p-6 sm:p-8 md:p-12 rounded-[2rem] sm:rounded-[3rem] shadow-[0_20px_50px_rgba(37,99,235,0.3)] text-[#05231e] min-w-0"
           >
-            <h3 class="text-2xl font-black italic uppercase mb-2">Основной тариф</h3>
-            <div class="text-5xl md:text-6xl font-black mb-8 italic text-[#05231e]">
+            <h3 class="text-xl sm:text-2xl font-black italic uppercase mb-2">Основной тариф</h3>
+            <div class="text-4xl sm:text-5xl md:text-6xl font-black mb-8 italic text-[#05231e] break-words">
               6₽ <span class="text-sm text-[#1d4a40] uppercase not-italic tracking-widest">/ сутки</span>
             </div>
             <ul class="space-y-4 mb-10 font-bold uppercase text-[11px] tracking-widest">
@@ -580,7 +590,7 @@
               </li>
             </ul>
             <a
-              class="mt-auto block text-center w-full py-5 bg-[#05231e] text-[#b9fdec] rounded-2xl font-black uppercase tracking-widest hover:bg-[#07352d] transition-all"
+              class="mt-auto block text-center w-full min-h-[52px] flex items-center justify-center py-5 bg-[#05231e] text-[#b9fdec] rounded-2xl font-black uppercase tracking-widest hover:bg-[#07352d] transition-all"
               href="/login"
               >Подключить</a
             >
@@ -588,9 +598,9 @@
         </div>
       </section>
 
-      <footer class="relative z-10">
-        <div class="w-full bg-white/[0.02] border-t border-white/5 backdrop-blur-2xl rounded-t-[3rem] pt-16 pb-10">
-          <div class="max-w-7xl mx-auto px-4 md:px-8">
+      <footer class="relative z-10 pb-[env(safe-area-inset-bottom)]">
+        <div class="w-full bg-white/[0.02] border-t border-white/5 backdrop-blur-2xl rounded-t-[2rem] md:rounded-t-[3rem] pt-12 sm:pt-16 pb-8 sm:pb-10">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div class="flex flex-col lg:flex-row justify-between gap-12 mb-16">
               <div class="max-w-xs">
                 <div class="flex items-center gap-3 mb-6">
@@ -639,18 +649,30 @@
                   </h5>
                   <ul class="space-y-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">
                     <li>
-                      <a href="https://t.me/" class="hover:text-blue-500 transition-colors" rel="noopener"
+                      <a
+                        href="https://t.me/AmnesiaCN"
+                        class="hover:text-blue-500 transition-colors"
+                        rel="noopener noreferrer"
+                        target="_blank"
                         >Telegram канал</a
                       >
                     </li>
                     <li>
-                      <a href="https://t.me/" class="hover:text-blue-500 transition-colors" rel="noopener"
+                      <a
+                        href="https://t.me/AmnesiaServiceBot"
+                        class="hover:text-blue-500 transition-colors"
+                        rel="noopener noreferrer"
+                        target="_blank"
                         >Telegram бот</a
                       >
                     </li>
                     <li>
-                      <a href="https://t.me/" class="hover:text-blue-500 transition-colors" rel="noopener"
-                        >Telegram поддержка</a
+                      <a
+                        href="https://t.me/hydrasp"
+                        class="hover:text-blue-500 transition-colors"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        >Поддержка</a
                       >
                     </li>
                   </ul>
@@ -670,7 +692,7 @@
       <button
         id="scroll-top-btn"
         type="button"
-        class="fixed bottom-5 right-5 z-50 w-12 h-12 rounded-full border border-white/15 bg-[#08080a]/80 text-blue-500 shadow-[0_10px_30px_rgba(185,253,236,0.18)] backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 hover:bg-white/10 hover:-translate-y-0.5"
+        class="fixed z-50 w-12 h-12 rounded-full border border-white/15 bg-[#08080a]/80 text-blue-500 shadow-[0_10px_30px_rgba(185,253,236,0.18)] backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 hover:bg-white/10 hover:-translate-y-0.5 touch-target-min bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))]"
         aria-label="Наверх"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -772,6 +794,63 @@
           );
         }
 
+        function loadMeterHtml(loadPercent) {
+          var pct = Math.max(0, Math.min(100, Math.round(Number(loadPercent) || 0)));
+          var segments = 12;
+          var tone =
+            pct <= 30
+              ? 'from-emerald-400/95 to-emerald-500 shadow-[0_0_10px_rgba(52,211,153,0.35)]'
+              : pct <= 65
+                ? 'from-cyan-300/90 to-blue-500 shadow-[0_0_10px_rgba(185,253,236,0.25)]'
+                : 'from-amber-400 to-orange-500 shadow-[0_0_10px_rgba(251,146,60,0.35)]';
+          var parts = [];
+          var i;
+          for (i = 0; i < segments; i++) {
+            var low = (i / segments) * 100;
+            var high = ((i + 1) / segments) * 100;
+            var w = 0;
+            if (pct >= high) w = 100;
+            else if (pct > low) w = ((pct - low) / (high - low)) * 100;
+            parts.push(
+              '<div class="flex-1 min-w-0 h-2.5 sm:h-2 rounded-[2px] bg-black/40 ring-1 ring-inset ring-white/[0.07] overflow-hidden relative">' +
+                '<div class="absolute inset-y-0 left-0 h-full rounded-[1px] bg-gradient-to-t ' +
+                tone +
+                ' transition-[width] duration-700 ease-out" style="width:' +
+                w +
+                '%"></div>' +
+                '</div>',
+            );
+          }
+          var ticks = [];
+          for (i = 0; i <= 4; i++) {
+            var v = i * 25;
+            ticks.push(
+              '<span class="flex flex-col items-center gap-0.5">' +
+                '<span class="w-px h-1 bg-white/[0.12] rounded-full"></span>' +
+                '<span class="text-[6px] leading-none text-gray-600 font-mono tabular-nums">' +
+                v +
+                '</span>' +
+                '</span>',
+            );
+          }
+          return (
+            '<div class="w-full min-w-0 sm:max-w-[200px]">' +
+              '<div class="flex items-end justify-between gap-2 mb-1.5">' +
+                '<span class="text-[8px] text-gray-500 font-black uppercase italic tracking-[0.2em]">Нагрузка</span>' +
+                '<span class="text-[11px] sm:text-xs font-black tabular-nums text-blue-500 leading-none tracking-tight">' +
+                pct +
+                '<span class="text-[9px] text-gray-600 font-bold ml-0.5">%</span></span>' +
+              '</div>' +
+              '<div class="flex gap-px w-full items-stretch mb-1">' +
+              parts.join('') +
+              '</div>' +
+              '<div class="flex justify-between items-start px-px select-none">' +
+              ticks.join('') +
+              '</div>' +
+              '</div>'
+          );
+        }
+
         function renderNodes(nodes, errorText) {
           var onlineNodes = Array.isArray(nodes)
             ? nodes.filter(function (node) {
@@ -794,31 +873,24 @@
               const load = Math.max(0, Math.min(100, Number(node.loadPercent || 0)));
 
               return (
-                '<article class="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] transition-all">' +
-                '<div class="flex items-center gap-4">' +
-                '<span class="text-3xl rounded-lg overflow-hidden leading-none">' +
+                '<article class="group flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] hover:border-white/10 transition-all">' +
+                '<div class="flex items-center gap-4 min-w-0 flex-1">' +
+                '<span class="text-3xl rounded-lg overflow-hidden leading-none shrink-0">' +
                 flagImageByCode(node.countryCode) +
                 '</span>' +
-                '<div>' +
-                '<p class="text-sm font-black uppercase italic tracking-tighter">' +
+                '<div class="min-w-0">' +
+                '<p class="text-sm font-black uppercase italic tracking-tighter truncate">' +
                 escapeHtml(node.name || 'Unknown') +
                 '</p>' +
-                '<p class="text-[10px] text-gray-600 font-bold uppercase">' +
+                '<p class="text-[10px] text-gray-600 font-bold uppercase truncate">' +
                 escapeHtml(node.countryCode || 'UN') +
                 ' · ' +
                 escapeHtml(node.countryName || node.region || 'GLOBAL') +
                 '</p>' +
                 '</div>' +
                 '</div>' +
-                '<div class="flex items-center justify-between sm:justify-end gap-8 text-right">' +
-                '<div>' +
-                '<p class="text-[8px] text-gray-600 font-black uppercase mb-1 italic tracking-widest">Нагрузка</p>' +
-                '<div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">' +
-                '<div class="h-full bg-blue-600 transition-all duration-500" style="width: ' +
-                load +
-                '%"></div>' +
-                '</div>' +
-                '</div>' +
+                '<div class="w-full sm:w-auto sm:shrink-0 sm:max-w-[200px] pl-0 sm:pl-2">' +
+                loadMeterHtml(load) +
                 '</div>' +
                 '</article>'
               );

@@ -2,14 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 html,
 body {
   background: #020205;
   overflow-x: hidden;
 }
 
+/* Safe area (notched phones, home indicator) */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
 * {
   cursor: crosshair;
+}
+
+@media (pointer: coarse) {
+  * {
+    cursor: auto;
+  }
 }
 
 a,
@@ -139,5 +156,19 @@ img.emoji {
 
   .animate-pulse-soft {
     animation: none;
+  }
+}
+
+/* Legal / long-form readability on narrow screens */
+.prose-mobile {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Minimum touch target ~44px where we use compact controls */
+@media (pointer: coarse) {
+  .touch-target-min {
+    min-height: 44px;
+    min-width: 44px;
   }
 }

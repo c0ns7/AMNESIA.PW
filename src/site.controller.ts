@@ -31,4 +31,18 @@ export class SiteController {
     return res.status(503).sendFile(join(this.publicDir, '503.html'));
   }
 
+  @Get('terms')
+  pageTerms(@Res() res: Response) {
+    return res.sendFile(join(this.publicDir, 'terms', 'index.html'));
+  }
+
+  @Get('privacy')
+  pagePrivacy(@Res() res: Response) {
+    return res.sendFile(join(this.publicDir, 'privacy', 'index.html'));
+  }
+
+  @Get('support')
+  pageSupport(@Res() res: Response) {
+    return res.sendFile(join(this.publicDir, 'support', 'index.html'));
+  }
 }
