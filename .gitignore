@@ -1,5 +1,7 @@
 node_modules/
 dist/
 .env
+# Генерируется `npm run build:css` — иначе на сервере конфликтует с git pull
+public/styles.css
 coveraeg/
 npm-debug.log*
