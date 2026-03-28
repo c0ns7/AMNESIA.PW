@@ -371,7 +371,7 @@
           if (!sp) {
             if (hint) {
               hint.textContent =
-                'Не удалось загрузить данные сервиса. Убедитесь, что на сервере заданы BOT_API_BASE_URL и тот же WEB_BOT_INTERNAL_SECRET, что у бота.';
+                'Не удалось загрузить данные сервиса. Укажите в .env сайта DB_NAME (БД бота), DB_HOST и учётные данные, а также RW_API_BASE_URL и RW_API_TOKEN.';
               hint.classList.remove('hidden');
             }
             return;
@@ -432,7 +432,7 @@
           if (!sp) {
             if (hint) {
               hint.textContent =
-                'Данные сервиса недоступны. Проверьте настройку BOT_API_BASE_URL на сервере сайта.';
+                'Данные сервиса недоступны. Проверьте DB_* и RW_API_* в .env на сервере.';
               hint.classList.remove('hidden');
             }
             if (subWrap) subWrap.classList.add('hidden');

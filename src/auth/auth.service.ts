@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
   OnModuleInit,
+  Optional,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -13,7 +14,8 @@ import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import { ResultSetHeader } from 'mysql2';
 import { Pool, RowDataPacket } from 'mysql2/promise';
-import { MYSQL_POOL } from '../database/database.module';
+import { MYSQL_POOL, VPN_DB_POOL } from '../database/database.module';
+import { RemnawaveService } from '../remnawave/remnawave.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TelegramWidgetDto } from './dto/telegram-widget.dto';
@@ -34,7 +36,11 @@ interface AmnesiaJwtPayload {
 
 @Injectable()
 export class AuthService implements OnModuleInit {
-  constructor(@Inject(MYSQL_POOL) private readonly pool: Pool) {}
+  constructor(
+    @Inject(MYSQL_POOL) private readonly pool: Pool,
+    @Optional() @Inject(VPN_DB_POOL) private readonly vpnPool: Pool | null,
+    private readonly remnawaveService: RemnawaveService,
+  ) {}
 
   private readonly recaptchaSecret =
     process.env.RECAPTCHA_SECRET_KEY?.trim() ||
@@ -304,25 +310,61 @@ export class AuthService implements OnModuleInit {
     };
   }
 
-  private async fetchBotTelegramProfile(
+  /** Баланс из БД бота + детали Remnawave по remnawave_user_id (без HTTP к боту). */
+  private async loadServiceProfileFromVpnDb(
     telegramId: string,
   ): Promise<Record<string, unknown> | null> {
-    const base = process.env.BOT_API_BASE_URL?.trim().replace(/\/$/, '');
-    const secret = process.env.WEB_BOT_INTERNAL_SECRET?.trim();
-    if (!base || !secret) {
+    if (!this.vpnPool) {
       return null;
     }
     try {
-      const url = new URL(`${base}/api/web/telegram-profile`);
-      url.searchParams.set('telegram_id', telegramId);
-      const res = await fetch(url.toString(), {
-        headers: { 'X-Web-Bot-Secret': secret },
-        signal: AbortSignal.timeout(12000),
-      });
-      if (!res.ok) {
+      const [rows] = await this.vpnPool.execute<RowDataPacket[]>(
+        'SELECT balance, remnawave_user_id FROM users WHERE user_id = ? LIMIT 1',
+        [Number(telegramId)],
+      );
+      const row = rows[0];
+      if (!row) {
         return null;
       }
-      return (await res.json()) as Record<string, unknown>;
+      const balance = Number(row.balance ?? 0);
+      const subscriptionActive = balance >= 7;
+      const remnawaveUuid =
+        row.remnawave_user_id != null
+          ? String(row.remnawave_user_id)
+          : null;
+
+      let subscriptionUrl: string | null = null;
+      let devices: Array<{ id: string; name: string }> = [];
+      let devicesLimit: number | null = null;
+      let usedTrafficBytes: number | null = null;
+      let lifetimeUsedTrafficBytes: number | null = null;
+
+      if (remnawaveUuid) {
+        const rw =
+          await this.remnawaveService.getLkUserRemnawaveDetails(
+            remnawaveUuid,
+          );
+        if (rw) {
+          subscriptionUrl = rw.subscription_url;
+          devices = rw.devices;
+          devicesLimit = rw.devices_limit;
+          usedTrafficBytes = rw.used_traffic_bytes;
+          lifetimeUsedTrafficBytes = rw.lifetime_used_traffic_bytes;
+        }
+      }
+
+      const nodesCount = await this.remnawaveService.getLkNodesCount();
+
+      return {
+        balance,
+        subscription_active: subscriptionActive,
+        subscription_url: subscriptionUrl,
+        devices,
+        devices_limit: devicesLimit,
+        nodes_count: nodesCount,
+        used_traffic_bytes: usedTrafficBytes,
+        lifetime_used_traffic_bytes: lifetimeUsedTrafficBytes,
+      };
     } catch {
       return null;
     }
@@ -339,7 +381,7 @@ export class AuthService implements OnModuleInit {
     }
     let serviceProfile: Record<string, unknown> | null = null;
     if (row.telegram_id != null) {
-      serviceProfile = await this.fetchBotTelegramProfile(
+      serviceProfile = await this.loadServiceProfileFromVpnDb(
         String(row.telegram_id),
       );
     }

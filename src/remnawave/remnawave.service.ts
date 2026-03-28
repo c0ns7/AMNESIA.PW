@@ -34,6 +34,11 @@ export class RemnawaveService {
   private static readonly INFRA_CACHE_TTL_MS = 10 * 60 * 1000;
   private readonly baseUrl = (process.env.RW_API_BASE_URL ?? '').replace(/\/$/, '');
   private readonly token = process.env.RW_API_TOKEN ?? '';
+  private readonly subBase = (
+    process.env.RW_SUB_BASE ||
+    process.env.REMNAWAVE_SUB_BASE ||
+    'https://sub.amnesia.pw'
+  ).replace(/\/$/, '');
   private readonly publicIdSalt = process.env.INFRA_PUBLIC_ID_SALT ?? 'infra-public';
   private readonly countryNames: Record<string, string> = {
     NL: 'Нидерланды',
@@ -337,5 +342,168 @@ export class RemnawaveService {
     }
 
     return this.inFlightRefresh;
+  }
+
+  /** Запрос к API без исключений — для ЛК */
+  private async remnawaveFetchOptional(path: string): Promise<unknown | null> {
+    if (!this.baseUrl || !this.token) {
+      return null;
+    }
+    try {
+      const response = await fetch(this.makeUrl(path), {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/json',
+        },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!response.ok) {
+        return null;
+      }
+      return await response.json().catch(() => null);
+    } catch {
+      return null;
+    }
+  }
+
+  private unwrapRwRecord(data: unknown): Record<string, unknown> | null {
+    if (!data || typeof data !== 'object') {
+      return null;
+    }
+    const p = data as Record<string, unknown>;
+    const r = p.response;
+    if (r && typeof r === 'object' && !Array.isArray(r)) {
+      return r as Record<string, unknown>;
+    }
+    return p;
+  }
+
+  /**
+   * Данные подписчика Remnawave по UUID (как в боте) — для ЛК после чтения remnawave_user_id из БД бота.
+   */
+  async getLkUserRemnawaveDetails(remnawaveUserUuid: string): Promise<{
+    subscription_url: string | null;
+    devices: Array<{ id: string; name: string }>;
+    devices_limit: number | null;
+    used_traffic_bytes: number | null;
+    lifetime_used_traffic_bytes: number | null;
+  } | null> {
+    if (!remnawaveUserUuid) {
+      return null;
+    }
+    const raw = await this.remnawaveFetchOptional(
+      `/api/users/${encodeURIComponent(remnawaveUserUuid)}`,
+    );
+    const u = this.unwrapRwRecord(raw);
+    if (!u) {
+      return null;
+    }
+
+    let subscriptionUrl: string | null = null;
+    const directUrl =
+      (typeof u.subscriptionUrl === 'string' && u.subscriptionUrl) ||
+      (typeof u.subscription_url === 'string' && u.subscription_url) ||
+      (typeof u.subscriptionLink === 'string' && u.subscriptionLink) ||
+      null;
+    if (directUrl) {
+      subscriptionUrl = directUrl.trim();
+    }
+    if (!subscriptionUrl && u.links && typeof u.links === 'object') {
+      const sub = (u.links as Record<string, unknown>).subscription;
+      if (typeof sub === 'string' && sub.trim()) {
+        subscriptionUrl = sub.trim();
+      }
+    }
+    if (!subscriptionUrl) {
+      const shortUuid =
+        (typeof u.shortUuid === 'string' && u.shortUuid) ||
+        (typeof u.short_uuid === 'string' && u.short_uuid) ||
+        '';
+      if (shortUuid) {
+        subscriptionUrl = `${this.subBase}/${shortUuid}`;
+      }
+    }
+
+    let devices: Array<{ id: string; name: string }> = [];
+    if (Array.isArray(u.devices)) {
+      for (const d of u.devices) {
+        if (typeof d === 'string') {
+          devices.push({ id: d, name: d });
+          continue;
+        }
+        if (!d || typeof d !== 'object') {
+          continue;
+        }
+        const o = d as Record<string, unknown>;
+        const hwid = String(o.hwid || o.id || '');
+        const name = String(
+          o.deviceModel || o.platform || o.name || 'Устройство',
+        );
+        devices.push({ id: hwid, name: name.trim() || 'Устройство' });
+      }
+    }
+
+    const limit = u.hwidDeviceLimit;
+    let devicesLimit: number | null = null;
+    if (limit != null && limit !== '') {
+      const n = parseInt(String(limit), 10);
+      devicesLimit = Number.isNaN(n) ? null : n;
+    }
+
+    let usedTrafficBytes: number | null = null;
+    let lifetimeUsedTrafficBytes: number | null = null;
+    const traffic = u.userTraffic;
+    if (traffic && typeof traffic === 'object') {
+      const t = traffic as Record<string, unknown>;
+      if (t.usedTrafficBytes != null) {
+        usedTrafficBytes = Number(t.usedTrafficBytes);
+      }
+      if (t.lifetimeUsedTrafficBytes != null) {
+        lifetimeUsedTrafficBytes = Number(t.lifetimeUsedTrafficBytes);
+      }
+    }
+
+    if (!devices.length) {
+      const hwRaw = await this.remnawaveFetchOptional(
+        `/api/hwid/devices/${encodeURIComponent(remnawaveUserUuid)}`,
+      );
+      const wrap = this.unwrapRwRecord(hwRaw);
+      const list =
+        wrap && Array.isArray(wrap.devices)
+          ? (wrap.devices as unknown[])
+          : [];
+      devices = list.map((item) => {
+        const o = item as Record<string, unknown>;
+        const hwid = String(o.hwid || o.id || '');
+        const shortName =
+          String(o.deviceModel || o.platform || '').trim() || 'Устройство';
+        return { id: hwid, name: shortName };
+      });
+    }
+
+    return {
+      subscription_url: subscriptionUrl,
+      devices,
+      devices_limit: devicesLimit,
+      used_traffic_bytes: usedTrafficBytes,
+      lifetime_used_traffic_bytes: lifetimeUsedTrafficBytes,
+    };
+  }
+
+  async getLkNodesCount(): Promise<number | null> {
+    const raw = await this.remnawaveFetchOptional('/api/nodes');
+    if (!raw || typeof raw !== 'object') {
+      return null;
+    }
+    const p = raw as Record<string, unknown>;
+    const wrap = (
+      p.response && typeof p.response === 'object' ? p.response : p
+    ) as Record<string, unknown>;
+    const list = Array.isArray(wrap.nodes)
+      ? wrap.nodes
+      : Array.isArray(raw)
+        ? raw
+        : [];
+    return Array.isArray(list) ? list.length : null;
   }
 }
