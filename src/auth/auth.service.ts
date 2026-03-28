@@ -512,6 +512,21 @@ export class AuthService implements OnModuleInit {
     return { ok: true as const, url, token, expiresAt: expires.toISOString() };
   }
 
+  async unlinkTelegram(userId: number) {
+    const [rows] = await this.pool.execute<UserRow[]>(
+      'SELECT id FROM users WHERE id = ? LIMIT 1',
+      [userId],
+    );
+    if (!rows[0]) {
+      throw new UnauthorizedException();
+    }
+    await this.pool.execute(
+      'UPDATE users SET telegram_id = NULL, telegram_username = NULL WHERE id = ?',
+      [userId],
+    );
+    return { ok: true as const };
+  }
+
   async completeTelegramLinkFromBot(
     token: string,
     telegramIdStr: string,

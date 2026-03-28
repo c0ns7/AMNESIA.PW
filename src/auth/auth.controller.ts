@@ -114,4 +114,12 @@ export class AuthController {
     if (!u) throw new UnauthorizedException();
     return this.auth.startTelegramLink(u.id);
   }
+
+  @Post('telegram/unlink')
+  @UseGuards(AuthSessionGuard)
+  async telegramUnlink(@Req() req: RequestWithSession) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.unlinkTelegram(u.id);
+  }
 }
