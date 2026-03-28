@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Amnesia WPN | Ускоритель интернета</title>
-    <meta name="description" content="Amnesia WPN — приватный доступ в интернет без ограничений." />
+    <meta name="description" content="Amnesia WPN — приватный доступ в интернет." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -124,7 +124,7 @@
           </div>
           <p class="text-gray-400 text-[15px] sm:text-base md:text-[18px] max-w-md mb-8 md:mb-10 font-medium leading-relaxed">
             Ваш ускоритель доступа в глобальную сеть.<br />
-            Децентрализованное облако для обхода любых преград на максимальной скорости.
+            Децентрализованное облако для стабильной работы в сети на максимальной скорости.
           </p>
           <a
             class="inline-flex items-center justify-center gap-3 w-full sm:w-auto min-h-[48px] bg-blue-600 px-7 md:px-10 py-4 md:py-5 rounded-2xl font-black uppercase tracking-wider md:tracking-widest hover:bg-blue-500 transition-all shadow-2xl text-center"
@@ -618,8 +618,8 @@
                 <p
                   class="text-gray-500 text-[10px] font-bold uppercase tracking-widest leading-relaxed opacity-60"
                 >
-                  Мощное решение для обеспечения абсолютной цифровой приватности. Наша инфраструктура
-                  позволяет с легкостью обходить преграды, гарантируя стабильный доступ и быструю скорость.
+                  Мощное решение для цифровой приватности. Наша инфраструктура обеспечивает стабильный
+                  доступ и высокую скорость.
                 </p>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-16">
@@ -795,11 +795,6 @@
           );
         }
 
-        function shouldHideInfraNode(node) {
-          var n = String((node && node.name) || '').toLowerCase();
-          return n.indexOf('обход') !== -1;
-        }
-
         function loadMeterHtml(loadPercent) {
           var pct = Math.max(0, Math.min(100, Math.round(Number(loadPercent) || 0)));
           var segments = 12;
@@ -860,7 +855,7 @@
         function renderNodes(nodes, errorText) {
           var onlineNodes = Array.isArray(nodes)
             ? nodes.filter(function (node) {
-                return Boolean(node && node.online) && !shouldHideInfraNode(node);
+                return Boolean(node && node.online);
               })
             : [];
 

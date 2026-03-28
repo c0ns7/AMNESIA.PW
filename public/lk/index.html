@@ -97,16 +97,29 @@
         </div>
 
         <section id="tab-overview" class="tab-panel space-y-4">
+          <p id="overview-hint" class="text-xs text-gray-500 leading-relaxed hidden"></p>
           <div class="grid sm:grid-cols-2 gap-4">
             <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
               <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Подписка</p>
-              <p class="text-2xl font-black text-white">Демо</p>
-              <p class="text-xs text-gray-500 mt-2">Статические данные — скоро синхронизация с сервисом.</p>
+              <p id="overview-sub" class="text-2xl font-black text-white">—</p>
+              <p id="overview-sub-detail" class="text-xs text-gray-500 mt-2">—</p>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Трафик</p>
-              <p class="text-2xl font-black text-blue-500">—</p>
-              <p class="text-xs text-gray-500 mt-2">Заглушка до подключения API.</p>
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Баланс</p>
+              <p id="overview-balance" class="text-2xl font-black text-blue-500">—</p>
+              <p id="overview-balance-detail" class="text-xs text-gray-500 mt-2">—</p>
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Трафик (период)</p>
+              <p id="overview-traffic" class="text-2xl font-black text-white">—</p>
+              <p id="overview-traffic-detail" class="text-xs text-gray-500 mt-2">—</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Сеть</p>
+              <p id="overview-nodes" class="text-2xl font-black text-white">—</p>
+              <p id="overview-devices" class="text-xs text-gray-500 mt-2">—</p>
             </div>
           </div>
           <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
@@ -118,8 +131,25 @@
         </section>
 
         <section id="tab-services" class="tab-panel hidden space-y-4">
-          <div class="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-8 text-center text-gray-500 text-sm">
-            Раздел «Сервисы» в разработке. Здесь появятся ключи и конфигурации.
+          <p id="services-hint" class="text-xs text-gray-500 leading-relaxed hidden"></p>
+          <div id="services-empty" class="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-8 text-center text-gray-500 text-sm">
+            Привяжите Telegram в разделе «Интеграции», чтобы отображались ссылка подписки и устройства.
+          </div>
+          <div id="services-content" class="hidden space-y-4">
+            <div id="services-no-sub" class="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-gray-400 hidden">
+              Ссылка подписки появится после активации сервиса в боте.
+            </div>
+            <div id="services-sub-wrap" class="rounded-2xl border border-white/10 bg-white/[0.02] p-6 space-y-3 hidden">
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Ссылка подписки</p>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input id="services-sub-url" readonly class="flex-1 min-w-0 bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-xs text-gray-300 font-mono" value="" />
+                <button id="services-copy-url" type="button" class="shrink-0 px-4 py-3 rounded-xl bg-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-500">Копировать</button>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Устройства (HWID)</p>
+              <p id="services-devices-summary" class="text-sm text-gray-300">—</p>
+            </div>
           </div>
         </section>
 
@@ -300,6 +330,137 @@
           }
         }
 
+        function formatBytes(n) {
+          if (n == null || n === '') return '—';
+          var v = Number(n);
+          if (!Number.isFinite(v) || v < 0) return '—';
+          if (v < 1024) return Math.round(v) + ' Б';
+          var u = ['КБ', 'МБ', 'ГБ', 'ТБ'];
+          var i = -1;
+          do {
+            v /= 1024;
+            i++;
+          } while (v >= 1024 && i < u.length - 1);
+          return (v >= 10 || i === 0 ? v.toFixed(0) : v.toFixed(1)) + ' ' + u[i];
+        }
+
+        function setOverviewDash() {
+          ['overview-sub', 'overview-balance', 'overview-traffic', 'overview-nodes'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = '—';
+          });
+          ['overview-sub-detail', 'overview-balance-detail', 'overview-traffic-detail', 'overview-devices'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = '—';
+          });
+        }
+
+        function renderOverview(user) {
+          var sp = user && user.serviceProfile;
+          var tg = user && user.telegram;
+          var hint = document.getElementById('overview-hint');
+          setOverviewDash();
+          if (!tg) {
+            if (hint) {
+              hint.textContent =
+                'Привяжите Telegram в разделе «Интеграции», чтобы видеть подписку и трафик из вашего аккаунта в боте.';
+              hint.classList.remove('hidden');
+            }
+            return;
+          }
+          if (!sp) {
+            if (hint) {
+              hint.textContent =
+                'Не удалось загрузить данные сервиса. Убедитесь, что на сервере заданы BOT_API_BASE_URL и тот же WEB_BOT_INTERNAL_SECRET, что у бота.';
+              hint.classList.remove('hidden');
+            }
+            return;
+          }
+          if (hint) hint.classList.add('hidden');
+          var subOn = !!sp.subscription_active;
+          var subEl = document.getElementById('overview-sub');
+          if (subEl) subEl.textContent = subOn ? 'Активна' : 'Не активна';
+          var sd = document.getElementById('overview-sub-detail');
+          if (sd)
+            sd.textContent = subOn
+              ? 'Доступ к сервису оформлен.'
+              : 'Пополните баланс в боте (от 7 ₽ для активации).';
+          var bal = sp.balance;
+          var be = document.getElementById('overview-balance');
+          if (be) be.textContent = bal != null && bal !== '' ? String(bal) + ' ₽' : '—';
+          var bd = document.getElementById('overview-balance-detail');
+          if (bd) bd.textContent = 'Как в боте / мини-приложении.';
+          var te = document.getElementById('overview-traffic');
+          if (te) te.textContent = formatBytes(sp.used_traffic_bytes);
+          var td = document.getElementById('overview-traffic-detail');
+          if (td) {
+            var lt = sp.lifetime_used_traffic_bytes;
+            td.textContent = lt != null ? 'За всё время: ' + formatBytes(lt) : 'Статистика из панели.';
+          }
+          var ne = document.getElementById('overview-nodes');
+          if (ne) ne.textContent = sp.nodes_count != null ? String(sp.nodes_count) : '—';
+          var devs = Array.isArray(sp.devices) ? sp.devices : [];
+          var lim = sp.devices_limit;
+          var de = document.getElementById('overview-devices');
+          if (de) {
+            de.textContent =
+              String(devs.length) + (lim != null ? ' / ' + String(lim) : '') + ' устройств';
+          }
+        }
+
+        function renderServices(user) {
+          var sp = user && user.serviceProfile;
+          var tg = user && user.telegram;
+          var empty = document.getElementById('services-empty');
+          var content = document.getElementById('services-content');
+          var hint = document.getElementById('services-hint');
+          var subWrap = document.getElementById('services-sub-wrap');
+          var noSub = document.getElementById('services-no-sub');
+          var urlIn = document.getElementById('services-sub-url');
+          var sum = document.getElementById('services-devices-summary');
+          if (hint) {
+            hint.classList.add('hidden');
+            hint.textContent = '';
+          }
+          if (!tg) {
+            if (empty) empty.classList.remove('hidden');
+            if (content) content.classList.add('hidden');
+            return;
+          }
+          if (empty) empty.classList.add('hidden');
+          if (content) content.classList.remove('hidden');
+          if (!sp) {
+            if (hint) {
+              hint.textContent =
+                'Данные сервиса недоступны. Проверьте настройку BOT_API_BASE_URL на сервере сайта.';
+              hint.classList.remove('hidden');
+            }
+            if (subWrap) subWrap.classList.add('hidden');
+            if (noSub) noSub.classList.remove('hidden');
+            if (sum) sum.textContent = '—';
+            return;
+          }
+          var url = sp.subscription_url;
+          if (url && String(url).trim()) {
+            if (subWrap) subWrap.classList.remove('hidden');
+            if (noSub) noSub.classList.add('hidden');
+            if (urlIn) urlIn.value = String(url);
+          } else {
+            if (subWrap) subWrap.classList.add('hidden');
+            if (noSub) noSub.classList.remove('hidden');
+            if (urlIn) urlIn.value = '';
+          }
+          var devs = Array.isArray(sp.devices) ? sp.devices : [];
+          var dlim = sp.devices_limit;
+          if (sum) {
+            sum.textContent = devs.length
+              ? 'Зарегистрировано устройств: ' +
+                devs.length +
+                (dlim != null ? ' (лимит ' + dlim + ')' : '')
+              : 'Устройства пока не подключались по подписке.';
+          }
+        }
+
         async function refreshMe() {
           var res = await fetch('/api/auth/me', { credentials: 'include', headers: { Accept: 'application/json' } });
           if (!res.ok) return null;
@@ -312,7 +473,17 @@
           if (panelUsername) panelUsername.textContent = user.username;
           if (overviewLogin) overviewLogin.textContent = user.username;
           renderIntegration(user);
+          renderOverview(user);
+          renderServices(user);
         }
+
+        document.getElementById('services-copy-url')?.addEventListener('click', function () {
+          var el = document.getElementById('services-sub-url');
+          if (!el || !el.value) return;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(el.value).catch(function () {});
+          }
+        });
 
         document.getElementById('btn-logout')?.addEventListener('click', async function () {
           await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });

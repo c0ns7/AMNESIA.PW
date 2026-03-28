@@ -304,6 +304,30 @@ export class AuthService implements OnModuleInit {
     };
   }
 
+  private async fetchBotTelegramProfile(
+    telegramId: string,
+  ): Promise<Record<string, unknown> | null> {
+    const base = process.env.BOT_API_BASE_URL?.trim().replace(/\/$/, '');
+    const secret = process.env.WEB_BOT_INTERNAL_SECRET?.trim();
+    if (!base || !secret) {
+      return null;
+    }
+    try {
+      const url = new URL(`${base}/api/web/telegram-profile`);
+      url.searchParams.set('telegram_id', telegramId);
+      const res = await fetch(url.toString(), {
+        headers: { 'X-Web-Bot-Secret': secret },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!res.ok) {
+        return null;
+      }
+      return (await res.json()) as Record<string, unknown>;
+    } catch {
+      return null;
+    }
+  }
+
   async getMe(userId: number) {
     const [rows] = await this.pool.execute<UserRow[]>(
       'SELECT id, username, telegram_id, telegram_username FROM users WHERE id = ? LIMIT 1',
@@ -312,6 +336,12 @@ export class AuthService implements OnModuleInit {
     const row = rows[0];
     if (!row) {
       throw new UnauthorizedException();
+    }
+    let serviceProfile: Record<string, unknown> | null = null;
+    if (row.telegram_id != null) {
+      serviceProfile = await this.fetchBotTelegramProfile(
+        String(row.telegram_id),
+      );
     }
     return {
       ok: true as const,
@@ -324,6 +354,7 @@ export class AuthService implements OnModuleInit {
               username: row.telegram_username || null,
             }
           : null,
+        serviceProfile,
       },
     };
   }
