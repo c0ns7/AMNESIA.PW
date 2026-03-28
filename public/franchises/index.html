@@ -2,84 +2,354 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Amnesia WPN | Франшизы</title>
-    <meta name="description" content="Партнерские франшизы Amnesia WPN." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Amnesia WPN | Франшизы — заработок с партнёрского бота</title>
+    <meta
+      name="description"
+      content="Подключите своего Telegram-бота к AMNESIA и получайте долю с каждого пополнения через вашего бота. Подключение бесплатно."
+    />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <div class="min-h-screen bg-[#020205] text-white selection:bg-blue-500/30 overflow-x-hidden font-sans">
       <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff09_1px,transparent_1px),linear-gradient(to_bottom,#ffffff09_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-400/10 blur-[150px] rounded-full"></div>
+        <div
+          class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff09_1px,transparent_1px),linear-gradient(to_bottom,#ffffff09_1px,transparent_1px)] bg-[size:40px_40px]"
+        ></div>
+        <div class="absolute top-[-15%] right-[-20%] w-[min(90vw,520px)] h-[420px] bg-blue-600/15 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[5%] left-[-15%] w-[min(85vw,480px)] h-[380px] bg-emerald-500/10 blur-[140px] rounded-full"></div>
       </div>
 
-      <nav class="relative z-50 max-w-7xl mx-auto px-4 md:px-8 py-5 md:py-6 backdrop-blur-md">
-        <div class="flex items-center justify-between gap-3 md:gap-6">
-          <a class="flex items-center gap-3" href="/">
-            <img alt="Amnesia Logo" class="w-12 h-12 md:w-16 md:h-16 object-contain" src="/logo.svg" width="64" height="64" />
-            <div class="flex flex-col md:flex-row md:gap-2 text-2xl md:text-5xl font-black italic tracking-tighter uppercase leading-none">
-              <span>AMNESIA</span><span class="text-blue-500">WPN</span>
+      <nav
+        class="relative z-50 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-[max(1.25rem,env(safe-area-inset-top))] pb-5 md:pb-6 backdrop-blur-md"
+      >
+        <div class="flex items-center justify-between gap-3 sm:gap-4 min-w-0">
+          <a class="flex items-center gap-2 sm:gap-3 min-w-0 shrink" href="/">
+            <img
+              alt="Amnesia Logo"
+              class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain shrink-0"
+              src="/logo.svg"
+              width="64"
+              height="64"
+            />
+            <div
+              class="flex flex-col min-[400px]:flex-row min-[400px]:gap-2 text-2xl sm:text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-none min-w-0"
+            >
+              <span class="whitespace-nowrap">AMNESIA</span><span class="text-blue-500 whitespace-nowrap">WPN</span>
             </div>
           </a>
-          <a class="px-4 md:px-6 py-2 rounded-lg font-black uppercase text-[10px] md:text-xs transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] whitespace-nowrap bg-white text-black hover:bg-blue-600 hover:text-black" href="/">На главную</a>
+
+          <div
+            class="hidden min-[1201px]:flex flex-1 items-center justify-center gap-6 text-[10px] xl:text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 whitespace-nowrap min-w-0 px-2"
+          >
+            <a class="hover:text-blue-500 transition-colors" href="/#locations">Локации</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#stats">Статистика</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#about">О нас</a>
+            <a class="hover:text-blue-500 transition-colors" href="/#pricing">Тарифы</a>
+            <a class="hover:text-white transition-all uppercase" href="/tg">TG — прокси</a>
+          </div>
+
+          <div class="hidden min-[1201px]:flex items-center shrink-0">
+            <a
+              class="px-4 md:px-5 py-2 rounded-lg font-black uppercase text-[10px] md:text-xs transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] whitespace-nowrap bg-white text-black hover:bg-blue-600 hover:text-black"
+              href="/login"
+              >Войти</a
+            >
+          </div>
+
+          <button
+            id="menu-toggle"
+            type="button"
+            class="min-[1201px]:hidden touch-target-min inline-flex items-center justify-center w-11 h-11 rounded-xl border border-white/10 bg-white/[0.03] text-white shrink-0"
+            aria-label="Открыть меню"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"></path>
+            </svg>
+          </button>
         </div>
       </nav>
 
-      <main class="relative z-10">
-        <section class="max-w-7xl mx-auto px-4 md:px-8 pt-10 md:pt-20 pb-10 text-center">
-          <div class="mb-6 flex items-center justify-center gap-3">
-            <span class="h-[1px] w-8 bg-blue-500"></span>
-            <span class="text-[12px] md:text-[14px] font-black uppercase tracking-[0.28em] md:tracking-[0.4em] text-blue-500">
-              Партнерская программа
-            </span>
-            <span class="h-[1px] w-8 bg-blue-500"></span>
+      <div
+        id="mobile-menu-overlay"
+        class="fixed inset-0 z-40 bg-black/60 backdrop-blur-[1px] opacity-0 pointer-events-none transition-opacity duration-300 min-[1201px]:hidden"
+      ></div>
+      <aside
+        id="mobile-menu"
+        class="fixed top-0 right-0 z-50 h-full w-[86%] max-w-[360px] bg-[#08080a] border-l border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 min-[1201px]:hidden"
+      >
+        <div class="flex items-center justify-between px-4 py-5 border-b border-white/10">
+          <p class="text-sm font-black uppercase tracking-[0.22em] text-white">Меню</p>
+          <button
+            id="menu-close"
+            type="button"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-white/10 bg-white/[0.03] text-white"
+            aria-label="Закрыть меню"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-5rem)] pb-[env(safe-area-inset-bottom)]">
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#locations">Локации</a>
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#stats">Статистика</a>
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#about">О нас</a>
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/#pricing">Тарифы</a>
+          <a class="block px-3 py-3.5 rounded-lg text-sm font-black uppercase tracking-wider text-gray-300 hover:bg-white/[0.05] hover:text-white transition-all" href="/tg">TG — прокси</a>
+          <div class="my-3 border-t border-white/10 pt-3 space-y-1">
+            <a class="block px-3 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-white/[0.05] hover:text-blue-500 transition-all" href="/terms">Условия</a>
+            <a class="block px-3 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-white/[0.05] hover:text-blue-500 transition-all" href="/privacy">Приватность</a>
+            <a class="block px-3 py-3 rounded-lg text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-white/[0.05] hover:text-blue-500 transition-all" href="/support">Поддержка</a>
           </div>
-          <h1 class="text-4xl md:text-6xl font-black italic uppercase tracking-tighter leading-none">
-            ФРАНШИЗЫ <span class="text-blue-500">AMNESIA WPN</span>
-          </h1>
-          <p class="mt-4 max-w-2xl mx-auto text-gray-400 text-base md:text-lg font-medium leading-relaxed">
-            Партнерские боты с долей 50% от каждой активной подписки.
-            Выбирайте фильтр и переходите в нужный Telegram-бот.
-          </p>
+          <a class="mt-4 block text-center px-3 py-3.5 rounded-xl font-black uppercase text-xs tracking-widest bg-white text-black hover:bg-blue-600 hover:text-black transition-all" href="/login">Войти</a>
+        </div>
+      </aside>
+
+      <main class="relative z-10">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 md:pt-16 pb-12 md:pb-20">
+          <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/25 bg-blue-500/5 mb-6">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.25em] text-blue-500">Партнёрская программа</span>
+            </div>
+            <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black italic uppercase tracking-tighter leading-[0.95] mb-6">
+              Зарабатывайте с <span class="text-blue-500">каждого пополнения</span>
+            </h1>
+            <p class="text-gray-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium mb-8">
+              Подключите <b class="text-gray-300">своего Telegram-бота</b> к сервису AMNESIA через официального бота
+              <a href="https://t.me/AmnesiaServiceBot" class="text-blue-500 hover:text-white underline decoration-white/30 underline-offset-2 transition-colors">@AmnesiaServiceBot</a> —
+              и получайте долю с каждой оплаты, которую пользователи совершают через <b class="text-gray-300">вашего</b> бота.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="https://t.me/AmnesiaServiceBot"
+                class="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[52px] px-8 py-4 rounded-2xl bg-blue-600 text-[#021511] font-black uppercase tracking-[0.12em] text-[11px] sm:text-xs hover:bg-blue-500 transition-all shadow-[0_10px_40px_rgba(185,253,236,0.2)]"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"
+                  />
+                </svg>
+                Открыть AmnesiaServiceBot
+              </a>
+              <a
+                href="#franchise-list"
+                class="inline-flex items-center justify-center w-full sm:w-auto min-h-[52px] px-8 py-4 rounded-2xl border border-white/15 bg-white/[0.03] text-[11px] sm:text-xs font-black uppercase tracking-[0.12em] text-gray-300 hover:bg-white/[0.06] hover:border-white/25 transition-all"
+              >
+                Список партнёрских ботов
+              </a>
+            </div>
+          </div>
         </section>
 
-        <section class="max-w-7xl mx-auto px-4 md:px-8 pb-24 md:pb-32">
-          <div class="max-w-4xl mx-auto mb-6 flex items-center justify-center gap-2">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 pb-16 md:pb-24">
+          <div class="grid md:grid-cols-2 gap-6 lg:gap-10 items-stretch">
+            <div
+              class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.06] to-transparent p-8 sm:p-10"
+            >
+              <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full pointer-events-none"></div>
+              <p class="text-[10px] font-black uppercase tracking-[0.35em] text-blue-500 mb-4">Модель дохода</p>
+              <p class="text-2xl sm:text-3xl md:text-4xl font-black italic uppercase tracking-tighter mb-4 leading-none">
+                до <span class="text-blue-500">50%</span> с суммы
+              </p>
+              <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                Доля рассчитывается от суммы пополнения, которую пользователь оплатил через вашего бота. Процент может быть настроен в системе; по умолчанию в партнёрской программе
+                фигурирует <b class="text-gray-300">50%</b> от каждой успешной оплаты — как в описании команды в боте.
+              </p>
+            </div>
+            <div
+              class="rounded-[2rem] border border-white/10 bg-[#08080a]/80 backdrop-blur-xl p-8 sm:p-10 flex flex-col justify-center"
+            >
+              <ul class="space-y-5 text-sm text-gray-400 leading-relaxed">
+                <li class="flex gap-4">
+                  <span class="shrink-0 w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-lg font-black text-emerald-400">✓</span>
+                  <span><b class="text-white">Один сервис AMNESIA</b> — ваш бот работает как отдельный «витринный» вход: тот же VPN, те же тарифы.</span>
+                </li>
+                <li class="flex gap-4">
+                  <span class="shrink-0 w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-lg font-black text-blue-500">✓</span>
+                  <span><b class="text-white">Инфраструктура на нас</b> — серверы, поддержка пользователей и платежи обрабатываются платформой.</span>
+                </li>
+                <li class="flex gap-4">
+                  <span class="shrink-0 w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-lg font-black text-blue-500">✓</span>
+                  <span><b class="text-white">Уведомления и вывод</b> — владелец франшизы получает уведомления о платежах и может выводить накопленное через раздел «Моя франшиза» в боте.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 pb-16 md:pb-24">
+          <div class="text-center mb-12 md:mb-16">
+            <span class="text-[12px] font-black uppercase tracking-[0.35em] text-blue-500">Как подключить</span>
+            <h2 class="mt-3 text-3xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tighter">Четыре шага</h2>
+          </div>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div class="group p-6 rounded-[1.75rem] border border-white/10 bg-white/[0.02] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all">
+              <div class="text-4xl font-black text-white/20 group-hover:text-blue-500/40 transition-colors mb-4">01</div>
+              <h3 class="text-sm font-black uppercase tracking-wider text-white mb-2">BotFather</h3>
+              <p class="text-[13px] text-gray-500 leading-relaxed">
+                Создайте нового бота в <code class="text-gray-400">@BotFather</code>, задайте имя и получите <b class="text-gray-400">токен</b> вида <code class="text-[11px] break-all">123456789:ABC...</code>.
+              </p>
+            </div>
+            <div class="group p-6 rounded-[1.75rem] border border-white/10 bg-white/[0.02] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all">
+              <div class="text-4xl font-black text-white/20 group-hover:text-blue-500/40 transition-colors mb-4">02</div>
+              <h3 class="text-sm font-black uppercase tracking-wider text-white mb-2">AmnesiaServiceBot</h3>
+              <p class="text-[13px] text-gray-500 leading-relaxed">
+                Откройте <a href="https://t.me/AmnesiaServiceBot" class="text-blue-500 hover:text-white underline decoration-white/20">@AmnesiaServiceBot</a>, раздел <b class="text-gray-400">«Франшиза»</b> и следуйте инструкции — отправьте токен боту для привязки.
+              </p>
+            </div>
+            <div class="group p-6 rounded-[1.75rem] border border-white/10 bg-white/[0.02] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all">
+              <div class="text-4xl font-black text-white/20 group-hover:text-blue-500/40 transition-colors mb-4">03</div>
+              <h3 class="text-sm font-black uppercase tracking-wider text-white mb-2">Активация</h3>
+              <p class="text-[13px] text-gray-500 leading-relaxed">
+                Система привяжет вашего бота к AMNESIA. Пользователи смогут пополнять баланс и покупать подписку <b class="text-gray-400">через вашего бота</b> — платёж будет учтён в вашу пользу.
+              </p>
+            </div>
+            <div class="group p-6 rounded-[1.75rem] border border-white/10 bg-white/[0.02] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all">
+              <div class="text-4xl font-black text-white/20 group-hover:text-blue-500/40 transition-colors mb-4">04</div>
+              <h3 class="text-sm font-black uppercase tracking-wider text-white mb-2">Доход</h3>
+              <p class="text-[13px] text-gray-500 leading-relaxed">
+                С каждой успешной оплаты начисляется ваша доля. Статистика и вывод — в пункте <b class="text-gray-400">«Моя франшиза»</b> в том же боте.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 pb-20 md:pb-28">
+          <div
+            class="relative overflow-hidden rounded-[2.5rem] border border-blue-500/20 bg-gradient-to-br from-blue-500/10 via-transparent to-emerald-500/10 px-6 sm:px-10 py-12 sm:py-14 text-center"
+          >
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(185,253,236,0.08),transparent_70%)] pointer-events-none"></div>
+            <div class="relative z-10 max-w-2xl mx-auto">
+              <p class="text-[11px] font-black uppercase tracking-[0.3em] text-blue-500 mb-3">Старт</p>
+              <p class="text-xl sm:text-2xl md:text-3xl font-black italic uppercase tracking-tighter mb-4">Подключение бесплатное</p>
+              <p class="text-gray-400 text-sm sm:text-base leading-relaxed mb-8">
+                Вам не нужно платить за активацию франшизы в боте. Подробные правила и команды — внутри
+                <a href="https://t.me/AmnesiaServiceBot" class="text-blue-500 hover:text-white underline decoration-white/20">@AmnesiaServiceBot</a>
+                (команда <code class="text-gray-400">/franchise</code> или меню «Франшиза»).
+              </p>
+              <a
+                href="https://t.me/AmnesiaServiceBot"
+                class="inline-flex items-center justify-center gap-2 min-h-[52px] px-10 py-4 rounded-2xl bg-white text-black font-black uppercase tracking-[0.15em] text-[11px] hover:bg-blue-600 hover:text-black transition-all shadow-xl"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Перейти в бота
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="franchise-list" class="max-w-7xl mx-auto px-4 sm:px-6 pb-16 md:pb-24 scroll-mt-24">
+          <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8 md:mb-10">
+            <div>
+              <span class="text-[12px] font-black uppercase tracking-[0.35em] text-blue-500">Каталог</span>
+              <h2 class="mt-2 text-3xl sm:text-4xl font-black italic uppercase tracking-tighter">Партнёрские боты</h2>
+              <p class="mt-2 text-gray-500 text-sm max-w-xl">
+                Активные публичные франшизы. Нажмите на карточку — откроется бот в Telegram. Данные обновляются с сервера партнёрской программы.
+              </p>
+            </div>
+          </div>
+
+          <div class="max-w-4xl mx-auto mb-8 flex flex-wrap items-center justify-center gap-2">
             <button
               type="button"
-              class="fr-filter-btn active px-4 py-2 rounded-full border border-white/15 bg-white/[0.03] text-gray-300 text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:bg-white/[0.05]"
+              class="fr-filter-btn active px-5 py-2.5 rounded-full border text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all"
               data-filter="all"
             >
               Все
             </button>
             <button
               type="button"
-              class="fr-filter-btn px-4 py-2 rounded-full border border-white/15 bg-white/[0.03] text-gray-300 text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:bg-white/[0.05]"
+              class="fr-filter-btn px-5 py-2.5 rounded-full border text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all"
               data-filter="active"
             >
-              Включенные
+              Активные
             </button>
             <button
               type="button"
-              class="fr-filter-btn px-4 py-2 rounded-full border border-white/15 bg-white/[0.03] text-gray-300 text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:bg-white/[0.05]"
+              class="fr-filter-btn px-5 py-2.5 rounded-full border text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all"
               data-filter="inactive"
             >
-              Выключенные
+              Неактивные
             </button>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="fr-grid">
-            <div class="p-6 rounded-2xl border border-white/10 bg-white/[0.02] text-center text-gray-500 text-sm font-bold uppercase tracking-wider">
-              Загрузка франшиз...
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" id="fr-grid">
+            <div
+              class="p-8 rounded-[2rem] border border-white/10 bg-white/[0.02] text-center text-gray-500 text-sm font-bold uppercase tracking-wider col-span-full"
+            >
+              Загрузка списка…
             </div>
           </div>
         </section>
       </main>
+
+      <footer class="relative z-10 pb-[env(safe-area-inset-bottom)]">
+        <div class="w-full bg-white/[0.02] border-t border-white/5 backdrop-blur-2xl rounded-t-[2rem] md:rounded-t-[3rem] pt-12 sm:pt-16 pb-8 sm:pb-10">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+              <a href="/" class="flex items-center gap-3">
+                <img alt="Amnesia" class="w-9 h-9" src="/logo.svg" width="36" height="36" />
+                <span class="text-xl font-black italic uppercase tracking-tighter">AMNESIA<span class="text-blue-500">WPN</span></span>
+              </a>
+              <div class="flex flex-wrap justify-center gap-x-8 gap-y-2 text-[10px] font-black uppercase tracking-widest text-gray-600">
+                <a href="/" class="hover:text-blue-500 transition-colors">Главная</a>
+                <a href="/franchises" class="text-blue-500">Франшизы</a>
+                <a href="/support" class="hover:text-blue-500 transition-colors">Поддержка</a>
+                <a href="/terms" class="hover:text-blue-500 transition-colors">Условия</a>
+              </div>
+            </div>
+            <p class="mt-8 pt-8 border-t border-white/5 text-center text-[9px] text-gray-800 font-black uppercase tracking-[0.35em]">
+              © 2026 Amnesia WPN
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
 
     <script>
+      (function () {
+        var toggle = document.getElementById('menu-toggle');
+        var menu = document.getElementById('mobile-menu');
+        var overlay = document.getElementById('mobile-menu-overlay');
+        var closeBtn = document.getElementById('menu-close');
+        if (!toggle || !menu || !overlay || !closeBtn) return;
+
+        function openMenu() {
+          menu.classList.remove('translate-x-full');
+          overlay.classList.remove('opacity-0', 'pointer-events-none');
+          document.body.classList.add('overflow-hidden');
+          toggle.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeMenu() {
+          menu.classList.add('translate-x-full');
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+          document.body.classList.remove('overflow-hidden');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+
+        toggle.addEventListener('click', function () {
+          if (menu.classList.contains('translate-x-full')) openMenu();
+          else closeMenu();
+        });
+        menu.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', closeMenu);
+        });
+        overlay.addEventListener('click', closeMenu);
+        closeBtn.addEventListener('click', closeMenu);
+      })();
+
       (function () {
         var API_BASE = 'https://bot.amnesiavps.ru';
         var grid = document.getElementById('fr-grid');
@@ -105,7 +375,7 @@
 
           if (filtered.length === 0) {
             grid.innerHTML =
-              '<div class="p-6 rounded-2xl border border-white/10 bg-white/[0.02] text-center text-gray-500 text-sm font-bold uppercase tracking-wider">Нет франшиз по выбранному фильтру</div>';
+              '<div class="p-10 rounded-[2rem] border border-dashed border-white/15 bg-white/[0.02] text-center text-gray-500 text-sm font-bold uppercase tracking-wider col-span-full">Нет ботов по выбранному фильтру</div>';
             return;
           }
 
@@ -113,30 +383,27 @@
             .map(function (f) {
               var username = String(f.bot_username || '').replace(/^@/, '') || 'bot';
               var isActive = Number(f.is_active) === 1;
-              var users = Number(f.user_count || 0);
               var url = 'https://t.me/' + username;
               return (
-                '<a class="group block p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-blue-500/30 transition-all" href="' +
+                '<a class="group relative flex flex-col h-full rounded-[1.75rem] border border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent p-6 hover:border-blue-500/40 hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-300" href="' +
                 url +
-                '" target="_blank" rel="noopener">' +
-                '<div class="flex items-center justify-between gap-2">' +
-                '<div class="text-sm md:text-base font-black italic tracking-tighter text-white break-all">@' +
+                '" target="_blank" rel="noopener noreferrer">' +
+                '<div class="flex items-start justify-between gap-3">' +
+                '<div class="min-w-0">' +
+                '<p class="text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Telegram</p>' +
+                '<p class="text-base sm:text-lg font-black italic tracking-tighter text-white break-all group-hover:text-blue-500 transition-colors">@' +
                 esc(username) +
-                '</div>' +
-                '<span class="inline-flex items-center rounded-full px-3 py-2 text-[10px] font-black uppercase tracking-[0.15em] ' +
-                (isActive
-                  ? 'border border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-                  : 'border border-white/15 bg-white/[0.03] text-gray-500') +
-                '">' +
-                (isActive ? 'включена' : 'выключена') +
-                '</span>' +
-                '</div>' +
-                '<div class="mt-4 flex items-center justify-between gap-3">' +
-                '<p class="text-[10px] font-black uppercase tracking-widest text-gray-600">Пользователи</p>' +
-                '<p class="text-2xl font-black italic tracking-tighter text-blue-500 group-hover:text-white transition-colors">' +
-                users +
                 '</p>' +
                 '</div>' +
+                '<span class="shrink-0 inline-flex items-center rounded-full px-3 py-1.5 text-[9px] font-black uppercase tracking-wider ' +
+                (isActive
+                  ? 'border border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
+                  : 'border border-white/15 bg-white/[0.04] text-gray-500') +
+                '">' +
+                (isActive ? 'Активна' : 'Выкл.') +
+                '</span>' +
+                '</div>' +
+                '<div class="absolute top-[-1px] left-8 right-8 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>' +
                 '</a>'
               );
             })
@@ -151,7 +418,8 @@
             btn.classList.toggle('text-black', isActive);
             btn.classList.toggle('border-white/15', !isActive);
             btn.classList.toggle('bg-white/[0.03]', !isActive);
-            btn.classList.toggle('text-gray-300', !isActive);
+            btn.classList.toggle('text-gray-400', !isActive);
+            btn.classList.toggle('border-transparent', isActive);
           });
         }
 
@@ -171,6 +439,9 @@
             items = Array.isArray(data) ? data : [];
           } catch (e) {
             items = [];
+            grid.innerHTML =
+              '<div class="p-10 rounded-[2rem] border border-red-500/20 bg-red-500/5 text-center text-red-300/90 text-sm col-span-full">Не удалось загрузить список. Проверьте соединение или попробуйте позже.</div>';
+            return;
           }
           setFilterButtons();
           render();

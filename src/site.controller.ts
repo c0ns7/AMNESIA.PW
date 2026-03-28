@@ -45,4 +45,9 @@ export class SiteController {
   pageSupport(@Res() res: Response) {
     return res.sendFile(join(this.publicDir, 'support', 'index.html'));
   }
+
+  @Get('franchises')
+  pageFranchises(@Res() res: Response) {
+    return res.sendFile(join(this.publicDir, 'franchises', 'index.html'));
+  }
 }
