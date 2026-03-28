@@ -40,6 +40,73 @@
       details.lk-device > summary::-webkit-details-marker {
         display: none;
       }
+      .lk-plat-ico {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 0.75rem;
+        flex-shrink: 0;
+      }
+      .lk-plat-ico img {
+        width: 1.65rem;
+        height: 1.65rem;
+      }
+      .lk-plat-ico--apple {
+        background: linear-gradient(145deg, #555 0%, #1a1a1a 100%);
+      }
+      .lk-plat-ico--apple img {
+        filter: brightness(0) invert(1);
+        opacity: 0.95;
+      }
+      .lk-plat-ico--android {
+        background: linear-gradient(145deg, #3ddc84 0%, #073042 100%);
+      }
+      .lk-plat-ico--windows {
+        background: linear-gradient(145deg, #00a4ef 0%, #0078d4 100%);
+      }
+      .lk-plat-ico--windows img {
+        filter: brightness(0) invert(1);
+      }
+      .lk-plat-ico--linux {
+        background: linear-gradient(145deg, #2b2b2b 0%, #111 100%);
+      }
+      .lk-plat-ico--linux img {
+        filter: brightness(0) invert(1);
+        opacity: 0.92;
+      }
+      .lk-plat-ico--si-dark {
+        background: linear-gradient(145deg, #2a2a32 0%, #121218 100%);
+      }
+      .lk-plat-ico--si-dark img {
+        filter: brightness(0) invert(1);
+        opacity: 0.9;
+      }
+      details.lk-device.lk-device-current {
+        border-color: rgba(59, 130, 246, 0.45);
+        box-shadow:
+          0 0 0 1px rgba(59, 130, 246, 0.25),
+          0 8px 32px -8px rgba(59, 130, 246, 0.35);
+      }
+      #lk-platform-select {
+        background-color: rgba(10, 10, 14, 0.95);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.25rem;
+      }
+      .lk-step-num {
+        flex-shrink: 0;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        font-weight: 900;
+      }
     </style>
   </head>
   <body>
@@ -110,12 +177,11 @@
             <div class="flex items-center gap-4 min-w-0">
               <div class="relative shrink-0">
                 <img alt="" class="w-14 h-14 sm:w-16 sm:h-16" src="/logo.svg" width="64" height="64" />
-                <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-[#08080c]" title="Сессия активна"></span>
+                <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-[#08080c]"></span>
               </div>
               <div class="min-w-0">
                 <p class="text-[10px] font-black uppercase tracking-[0.25em] text-blue-500 mb-1">Личный кабинет</p>
                 <p id="panel-username" class="text-xl sm:text-2xl font-black italic uppercase tracking-tighter text-white truncate">—</p>
-                <p class="text-[11px] text-gray-500 mt-1 font-medium">Управление подпиской и подключением</p>
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
@@ -181,18 +247,21 @@
             </div>
             <div class="group relative rounded-2xl border border-white/10 bg-white/[0.03] p-5 overflow-hidden">
               <div class="relative flex items-start justify-between gap-2">
-                <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Сеть / устройства</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Сеть</p>
                 <span class="rounded-lg bg-white/5 p-2 text-cyan-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg></span>
               </div>
-              <p id="overview-nodes" class="relative text-2xl font-black text-white mt-3">—</p>
-              <p id="overview-devices" class="relative text-xs text-gray-500 mt-2">—</p>
+              <div class="relative mt-4 space-y-4">
+                <div>
+                  <p class="text-[9px] font-bold uppercase tracking-wider text-gray-600">Ноды</p>
+                  <p id="overview-nodes" class="text-2xl font-black text-white tabular-nums">—</p>
+                  <p id="overview-nodes-hint" class="text-[10px] text-gray-600 mt-1 leading-snug">Ноды (панель)</p>
+                </div>
+                <div class="pt-3 border-t border-white/5">
+                  <p class="text-[9px] font-bold uppercase tracking-wider text-gray-600">Устройства</p>
+                  <p id="overview-devices" class="text-lg font-black text-white mt-1 tabular-nums">—</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent p-6 sm:p-8">
-            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Аккаунт</p>
-            <p class="text-base text-gray-300">
-              Вы вошли как <span id="overview-login" class="text-white font-black">—</span>
-            </p>
           </div>
         </section>
 
@@ -202,11 +271,11 @@
             <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-white/5 flex items-center justify-center text-gray-500">
               <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             </div>
-            <p class="text-gray-400 text-sm max-w-md mx-auto leading-relaxed">Привяжите Telegram в разделе «Интеграции», чтобы здесь появились защищённая ссылка подписки, импорт в Happ и список устройств.</p>
+            <p class="text-gray-400 text-sm max-w-md mx-auto leading-relaxed">Сначала привяжите Telegram в «Интеграции».</p>
           </div>
           <div id="setup-content" class="hidden space-y-6">
             <div id="setup-no-sub" class="rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center text-gray-400 text-sm hidden">
-              Ссылка подписки появится после активации сервиса в боте (баланс от 7 ₽).
+              Подписка недоступна. Активируйте сервис в боте.
             </div>
             <div id="setup-has-sub" class="hidden space-y-6">
               <div class="grid lg:grid-cols-2 gap-6">
@@ -216,12 +285,11 @@
                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     </span>
                     <div>
-                      <h3 class="text-sm font-black uppercase tracking-widest text-white">Защищённая ссылка</h3>
-                      <p class="text-[11px] text-gray-500 mt-0.5">Подпись HMAC — исходный URL не светится в открытом виде</p>
+                      <h3 class="text-sm font-black uppercase tracking-widest text-white">Ссылка подписки</h3>
                     </div>
                   </div>
                   <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Скопировать в Happ / клиент</label>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Импорт</label>
                     <div class="flex flex-col sm:flex-row gap-2">
                       <input id="setup-url-proxy" readonly class="flex-1 min-w-0 bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-[11px] text-gray-200 font-mono leading-snug" value="" />
                       <button id="setup-copy-proxy" type="button" class="lk-copy-btn group inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest transition-all border border-transparent">
@@ -239,11 +307,9 @@
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
                       </span>
                       <div>
-                        <h3 class="text-sm font-black uppercase tracking-widest text-white">Открыть в Happ</h3>
-                        <p class="text-[11px] text-gray-500 mt-0.5">Одним тапом через страницу подключения</p>
+                        <h3 class="text-sm font-black uppercase tracking-widest text-white">Happ</h3>
                       </div>
                     </div>
-                    <p class="text-xs text-gray-500 leading-relaxed mb-4">Ссылка передаётся в зашифрованном виде (happ://…), как в боте.</p>
                   </div>
                   <a id="setup-happ-open" href="#" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-3 w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black uppercase text-[11px] tracking-widest shadow-lg shadow-emerald-900/30 transition-all">
                     <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
@@ -254,7 +320,7 @@
 
               <details class="lk-device rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden group">
                 <summary class="cursor-pointer px-6 py-4 flex items-center justify-between gap-4 text-left hover:bg-white/[0.03] transition-colors">
-                  <span class="text-sm font-bold text-gray-300">Прямая ссылка панели (для отладки)</span>
+                  <span class="text-sm font-bold text-gray-300">Прямая ссылка</span>
                   <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </summary>
                 <div class="px-6 pb-6 pt-0 border-t border-white/5">
@@ -273,113 +339,256 @@
                 <div class="flex items-center gap-3 mb-6">
                   <span class="rounded-xl bg-violet-500/15 p-2.5 text-violet-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg></span>
                   <div>
-                    <h3 class="text-sm font-black uppercase tracking-widest text-white">Устройства по подписке</h3>
-                    <p class="text-[11px] text-gray-500">HWID в панели Remnawave</p>
+                    <h3 class="text-sm font-black uppercase tracking-widest text-white">Устройства</h3>
                   </div>
                 </div>
                 <p id="setup-devices-summary" class="text-sm text-gray-300 leading-relaxed">—</p>
               </div>
 
-              <div>
-                <h3 class="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4 flex items-center gap-2">
-                  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                  Установка Happ по платформам
-                </h3>
-                <div class="grid sm:grid-cols-2 gap-4">
-                  <details class="lk-device rounded-2xl border border-white/10 bg-[#0a0a0d] open:border-blue-500/30">
-                    <summary class="px-5 py-4 flex items-center gap-3 cursor-pointer select-none">
-                      <span class="text-2xl" aria-hidden="true">🍎</span>
-                      <div class="min-w-0 flex-1">
-                        <p class="font-black text-white text-sm">iPhone / iPad</p>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">App Store</p>
+              <div class="rounded-3xl border border-white/10 bg-[#060608] overflow-hidden shadow-xl shadow-black/40">
+                <div class="px-5 py-5 sm:px-8 sm:py-6 border-b border-white/10 bg-gradient-to-br from-blue-500/[0.07] via-transparent to-violet-500/[0.04]">
+                  <h3 class="text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Happ
+                  </h3>
+                  <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Система</label>
+                  <label class="relative block max-w-xl">
+                    <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 z-10" id="lk-platform-select-icon" aria-hidden="true"></span>
+                    <select
+                      id="lk-platform-select"
+                      class="block w-full max-w-xl appearance-none rounded-2xl border border-white/10 py-4 pl-14 pr-12 text-sm font-bold text-white shadow-inner focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    >
+                      <option value="windows">Windows</option>
+                      <option value="macos">macOS</option>
+                      <option value="linux">Linux</option>
+                      <option value="ios">iPhone / iPad</option>
+                      <option value="android">Android</option>
+                      <option value="tv">TV</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div id="lk-platform-panels" class="p-5 sm:p-8">
+                  <!-- Windows -->
+                  <div class="lk-inst-panel space-y-6 hidden" data-lk-platform="windows">
+                    <div class="flex flex-wrap items-center gap-4 pb-4 border-b border-white/10">
+                      <span class="lk-plat-ico lk-plat-ico--windows" style="width:3.25rem;height:3.25rem;border-radius:1rem"
+                        ><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/windows.svg" alt=""
+                      /></span>
+                      <div>
+                        <h4 class="text-lg font-black text-white tracking-tight">Windows</h4>
                       </div>
-                    </summary>
-                    <div class="px-5 pb-5 pt-0 text-xs text-gray-400 space-y-3 leading-relaxed border-t border-white/5">
-                      <ol class="list-decimal list-inside space-y-2 pl-1">
-                        <li>Установите <a class="text-blue-400 hover:underline" href="https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973" target="_blank" rel="noopener">Happ из App Store</a>.</li>
-                        <li>Скопируйте защищённую ссылку выше или нажмите «Подключить в Happ».</li>
-                        <li>В Happ: <b class="text-gray-300">+</b> → «Импорт из буфера обмена» или откройте ссылку с страницы подключения.</li>
-                      </ol>
                     </div>
-                  </details>
-                  <details class="lk-device rounded-2xl border border-white/10 bg-[#0a0a0d]">
-                    <summary class="px-5 py-4 flex items-center gap-3 cursor-pointer select-none">
-                      <span class="text-2xl" aria-hidden="true">🤖</span>
-                      <div class="min-w-0 flex-1">
-                        <p class="font-black text-white text-sm">Android</p>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Google Play · APK</p>
+                    <a
+                      href="https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe"
+                      target="_blank"
+                      rel="noopener"
+                      class="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[48px] px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-emerald-900/30 transition-all"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                      Скачать Happ
+                    </a>
+                    <div class="space-y-3">
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-blue-500/20 text-blue-400">1</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Установите приложение</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Запустите установщик и завершите установку.</p>
+                        </div>
                       </div>
-                    </summary>
-                    <div class="px-5 pb-5 pt-0 text-xs text-gray-400 space-y-3 leading-relaxed border-t border-white/5">
-                      <p class="flex flex-wrap gap-2">
-                        <a class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/5 text-[10px] font-bold uppercase text-emerald-400 hover:bg-white/10" href="https://play.google.com/store/apps/details?id=com.happproxy" target="_blank" rel="noopener">Google Play</a>
-                        <a class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/5 text-[10px] font-bold uppercase text-gray-400 hover:bg-white/10" href="https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk" target="_blank" rel="noopener">APK</a>
-                      </p>
-                      <ol class="list-decimal list-inside space-y-2 pl-1">
-                        <li>Установите Happ.</li>
-                        <li>Импортируйте подписку из буфера или через кнопку на странице подключения.</li>
-                      </ol>
-                    </div>
-                  </details>
-                  <details class="lk-device rounded-2xl border border-white/10 bg-[#0a0a0d]">
-                    <summary class="px-5 py-4 flex items-center gap-3 cursor-pointer select-none">
-                      <span class="text-2xl" aria-hidden="true">💻</span>
-                      <div class="min-w-0 flex-1">
-                        <p class="font-black text-white text-sm">macOS</p>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Desktop</p>
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-blue-500/20 text-blue-400">2</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Откройте Happ</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Запуск из меню «Пуск» или с рабочего стола.</p>
+                        </div>
                       </div>
-                    </summary>
-                    <div class="px-5 pb-5 pt-0 text-xs text-gray-400 space-y-3 leading-relaxed border-t border-white/5">
-                      <a class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/5 text-[10px] font-bold uppercase text-gray-300 hover:bg-white/10" href="https://github.com/Happ-proxy/happ-desktop/releases/latest" target="_blank" rel="noopener">Релизы Happ Desktop</a>
-                      <ol class="list-decimal list-inside space-y-2 pl-1">
-                        <li>Скачайте сборку для macOS (.dmg), перетащите в «Программы».</li>
-                        <li>Откройте Happ и импортируйте защищённую ссылку из буфера.</li>
-                      </ol>
-                    </div>
-                  </details>
-                  <details class="lk-device rounded-2xl border border-white/10 bg-[#0a0a0d]">
-                    <summary class="px-5 py-4 flex items-center gap-3 cursor-pointer select-none">
-                      <span class="text-2xl" aria-hidden="true">🪟</span>
-                      <div class="min-w-0 flex-1">
-                        <p class="font-black text-white text-sm">Windows</p>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Desktop</p>
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-blue-500/20 text-blue-400">3</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Подписка</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Вставьте <strong class="text-gray-400">ссылку подписки</strong> с этой страницы в Happ (импорт по URL).</p>
+                        </div>
                       </div>
-                    </summary>
-                    <div class="px-5 pb-5 pt-0 text-xs text-gray-400 space-y-3 leading-relaxed border-t border-white/5">
-                      <a class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/5 text-[10px] font-bold uppercase text-blue-400 hover:bg-white/10" href="https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe" target="_blank" rel="noopener">Скачать установщик</a>
-                      <ol class="list-decimal list-inside space-y-2 pl-1">
-                        <li>Установите Happ, запустите приложение.</li>
-                        <li>Вставьте защищённую ссылку подписки (клиент подтянет конфиг по редиректу).</li>
-                      </ol>
                     </div>
-                  </details>
-                  <details class="lk-device rounded-2xl border border-white/10 bg-[#0a0a0d]">
-                    <summary class="px-5 py-4 flex items-center gap-3 cursor-pointer select-none">
-                      <span class="text-2xl" aria-hidden="true">🐧</span>
-                      <div class="min-w-0 flex-1">
-                        <p class="font-black text-white text-sm">Linux</p>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">.deb</p>
+                  </div>
+
+                  <!-- macOS -->
+                  <div class="lk-inst-panel space-y-6 hidden" data-lk-platform="macos">
+                    <div class="flex flex-wrap items-center gap-4 pb-4 border-b border-white/10">
+                      <span class="lk-plat-ico lk-plat-ico--apple" style="width:3.25rem;height:3.25rem;border-radius:1rem"
+                        ><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/apple.svg" alt=""
+                      /></span>
+                      <div>
+                        <h4 class="text-lg font-black text-white tracking-tight">macOS</h4>
                       </div>
-                    </summary>
-                    <div class="px-5 pb-5 pt-0 text-xs text-gray-400 space-y-3 leading-relaxed border-t border-white/5">
-                      <a class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/5 text-[10px] font-bold uppercase text-orange-400 hover:bg-white/10" href="https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.deb" target="_blank" rel="noopener">Скачать .deb</a>
-                      <p>Установите пакет и импортируйте подписку из буфера обмена.</p>
                     </div>
-                  </details>
-                  <details class="lk-device rounded-2xl border border-white/10 bg-[#0a0a0d] sm:col-span-2">
-                    <summary class="px-5 py-4 flex items-center gap-3 cursor-pointer select-none">
-                      <span class="text-2xl" aria-hidden="true">📺</span>
-                      <div class="min-w-0 flex-1">
-                        <p class="font-black text-white text-sm">Android TV</p>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Приставка</p>
+                    <a
+                      href="https://github.com/Happ-proxy/happ-desktop/releases/latest"
+                      target="_blank"
+                      rel="noopener"
+                      class="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[48px] px-6 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/[0.14] text-white text-[11px] font-black uppercase tracking-widest transition-all"
+                    >
+                      Открыть релизы
+                    </a>
+                    <div class="space-y-3">
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-white/10 text-gray-300">1</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Скачайте .dmg</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Откройте образ и перетащите Happ в «Программы».</p>
+                        </div>
                       </div>
-                    </summary>
-                    <div class="px-5 pb-5 pt-0 text-xs text-gray-400 space-y-3 leading-relaxed border-t border-white/5">
-                      <a class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/5 text-[10px] font-bold uppercase text-violet-400 hover:bg-white/10" href="https://play.google.com/store/apps/details?id=com.happproxy" target="_blank" rel="noopener">Google Play (TV)</a>
-                      <a class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/5 text-[10px] font-bold uppercase text-gray-400 hover:bg-white/10 ml-2" href="https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274" target="_blank" rel="noopener">Apple TV</a>
-                      <p>Установите версию для TV, затем импортируйте подписку тем же способом.</p>
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-white/10 text-gray-300">2</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Запуск</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">При необходимости разрешите разработчика в настройках. Вставьте ссылку подписки из буфера.</p>
+                        </div>
+                      </div>
                     </div>
-                  </details>
+                  </div>
+
+                  <!-- Linux -->
+                  <div class="lk-inst-panel space-y-6 hidden" data-lk-platform="linux">
+                    <div class="flex flex-wrap items-center gap-4 pb-4 border-b border-white/10">
+                      <span class="lk-plat-ico lk-plat-ico--linux" style="width:3.25rem;height:3.25rem;border-radius:1rem"
+                        ><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linux.svg" alt=""
+                      /></span>
+                      <div>
+                        <h4 class="text-lg font-black text-white tracking-tight">Linux</h4>
+                      </div>
+                    </div>
+                    <a
+                      href="https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.deb"
+                      target="_blank"
+                      rel="noopener"
+                      class="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[48px] px-6 rounded-2xl bg-orange-600/90 hover:bg-orange-500 text-white text-[11px] font-black uppercase tracking-widest transition-all"
+                    >
+                      Скачать .deb
+                    </a>
+                    <div class="space-y-3">
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-orange-500/20 text-orange-300">1</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Установите пакет</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Через центр приложений или <code class="text-[10px] bg-black/40 px-1.5 py-0.5 rounded">sudo dpkg -i Happ*.deb</code></p>
+                        </div>
+                      </div>
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-orange-500/20 text-orange-300">2</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Подписка</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Вставьте ссылку подписки из буфера.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- iOS -->
+                  <div class="lk-inst-panel space-y-6 hidden" data-lk-platform="ios">
+                    <div class="flex flex-wrap items-center gap-4 pb-4 border-b border-white/10">
+                      <span class="lk-plat-ico lk-plat-ico--apple" style="width:3.25rem;height:3.25rem;border-radius:1rem"
+                        ><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/apple.svg" alt=""
+                      /></span>
+                      <div>
+                        <h4 class="text-lg font-black text-white tracking-tight">iPhone / iPad</h4>
+                      </div>
+                    </div>
+                    <a
+                      href="https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973"
+                      target="_blank"
+                      rel="noopener"
+                      class="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[48px] px-6 rounded-2xl bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-400 hover:to-gray-600 text-white text-[11px] font-black uppercase tracking-widest"
+                    >
+                      App Store
+                    </a>
+                    <div class="space-y-3">
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-blue-500/20 text-blue-400">1</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Установите приложение</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Загрузите Happ из App Store.</p>
+                        </div>
+                      </div>
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-blue-500/20 text-blue-400">2</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Подписка</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Скопируйте ссылку выше или нажмите «Подключить в Happ». В приложении: <strong class="text-gray-400">+</strong> → импорт из буфера.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Android -->
+                  <div class="lk-inst-panel space-y-6 hidden" data-lk-platform="android">
+                    <div class="flex flex-wrap items-center gap-4 pb-4 border-b border-white/10">
+                      <span class="lk-plat-ico lk-plat-ico--android" style="width:3.25rem;height:3.25rem;border-radius:1rem"
+                        ><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/android.svg" alt=""
+                      /></span>
+                      <div>
+                        <h4 class="text-lg font-black text-white tracking-tight">Android</h4>
+                      </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      <a href="https://play.google.com/store/apps/details?id=com.happproxy" target="_blank" rel="noopener" class="inline-flex items-center justify-center min-h-[44px] px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest">Google Play</a>
+                      <a href="https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk" target="_blank" rel="noopener" class="inline-flex items-center justify-center min-h-[44px] px-5 rounded-xl border border-white/15 text-[10px] font-black uppercase tracking-widest text-gray-300 hover:bg-white/5">APK</a>
+                    </div>
+                    <div class="space-y-3">
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-emerald-500/20 text-emerald-400">1</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Установите Happ</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Из магазина или APK.</p>
+                        </div>
+                      </div>
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-emerald-500/20 text-emerald-400">2</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Подписка</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Вставьте ссылку или откройте «Подключить в Happ».</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- TV -->
+                  <div class="lk-inst-panel space-y-6 hidden" data-lk-platform="tv">
+                    <div class="flex flex-wrap items-center gap-4 pb-4 border-b border-white/10">
+                      <span class="flex items-center gap-2">
+                        <span class="lk-plat-ico lk-plat-ico--android" style="width:2.75rem;height:2.75rem"
+                          ><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/android.svg" alt=""
+                        /></span>
+                        <span class="lk-plat-ico lk-plat-ico--si-dark" style="width:2.75rem;height:2.75rem"
+                          ><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/appletv.svg" alt=""
+                        /></span>
+                      </span>
+                      <div>
+                        <h4 class="text-lg font-black text-white tracking-tight">TV</h4>
+                      </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      <a href="https://play.google.com/store/apps/details?id=com.happproxy" target="_blank" rel="noopener" class="inline-flex items-center justify-center min-h-[44px] px-5 rounded-xl bg-violet-600/90 hover:bg-violet-500 text-white text-[10px] font-black uppercase tracking-widest">Google Play (TV)</a>
+                      <a href="https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274" target="_blank" rel="noopener" class="inline-flex items-center justify-center min-h-[44px] px-5 rounded-xl border border-white/15 text-[10px] font-black uppercase tracking-widest text-gray-300 hover:bg-white/5">Apple TV</a>
+                    </div>
+                    <div class="space-y-3">
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-violet-500/20 text-violet-300">1</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Установите Happ</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Через магазин на приставке.</p>
+                        </div>
+                      </div>
+                      <div class="flex gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5">
+                        <span class="lk-step-num bg-violet-500/20 text-violet-300">2</span>
+                        <div>
+                          <p class="text-sm font-bold text-gray-200">Подписка</p>
+                          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Импорт с телефона (буфер / QR) или ввод ссылки.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -394,7 +603,6 @@
               </span>
               <div>
                 <h2 class="text-base font-black uppercase tracking-widest text-white">Telegram</h2>
-                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Один аккаунт с ботом: баланс и подписка подтягиваются после привязки.</p>
               </div>
             </div>
             <div id="tg-linked" class="hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
@@ -402,10 +610,10 @@
               <p id="tg-linked-text" class="text-white font-bold text-sm">—</p>
             </div>
             <div id="tg-not-linked" class="rounded-2xl border border-white/10 bg-black/20 p-5">
-              <p class="text-sm text-gray-400 mb-4 leading-relaxed">Привяжите Telegram для входа через виджет и синхронизации с ботом.</p>
+              <p class="text-sm text-gray-400 mb-4 leading-relaxed">Нужен для входа и данных подписки.</p>
               <button id="btn-tg-link" type="button" class="inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-xl bg-[#229ED9] hover:bg-[#1e8fc4] text-white font-black uppercase text-[10px] tracking-widest transition-all shadow-lg shadow-[#229ED9]/20">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-                Открыть бота для привязки
+                Привязать в боте
               </button>
               <p id="tg-link-msg" class="mt-3 text-xs text-gray-500 hidden"></p>
             </div>
@@ -435,7 +643,6 @@
         var viewPanel = document.getElementById('view-panel');
         var bootLoading = document.getElementById('boot-loading');
         var panelUsername = document.getElementById('panel-username');
-        var overviewLogin = document.getElementById('overview-login');
         var authMsg = document.getElementById('auth-message');
         var captchaReady = false;
         var siteKey = '';
@@ -595,8 +802,15 @@
           });
           ['overview-sub-detail', 'overview-balance-detail', 'overview-traffic-detail', 'overview-devices'].forEach(function (id) {
             var el = document.getElementById(id);
-            if (el) el.textContent = '—';
+            if (el) {
+              el.textContent = '—';
+              el.classList.remove('hidden');
+            }
           });
+          var nh = document.getElementById('overview-nodes-hint');
+          if (nh) {
+            nh.textContent = 'Ноды (панель)';
+          }
         }
 
         function renderOverview(user) {
@@ -606,16 +820,14 @@
           setOverviewDash();
           if (!tg) {
             if (hint) {
-              hint.textContent =
-                'Привяжите Telegram в разделе «Интеграции», чтобы видеть подписку и трафик из вашего аккаунта в боте.';
+              hint.textContent = 'Привяжите Telegram в «Интеграции».';
               hint.classList.remove('hidden');
             }
             return;
           }
           if (!sp) {
             if (hint) {
-              hint.textContent =
-                'Не удалось загрузить данные сервиса. Укажите в .env сайта DB_NAME (БД бота), DB_HOST и учётные данные, а также RW_API_BASE_URL и RW_API_TOKEN.';
+              hint.textContent = 'Данные сервиса временно недоступны.';
               hint.classList.remove('hidden');
             }
             return;
@@ -625,30 +837,58 @@
           var subEl = document.getElementById('overview-sub');
           if (subEl) subEl.textContent = subOn ? 'Активна' : 'Не активна';
           var sd = document.getElementById('overview-sub-detail');
-          if (sd)
-            sd.textContent = subOn
-              ? 'Доступ к сервису оформлен.'
-              : 'Пополните баланс в боте (от 7 ₽ для активации).';
+          if (sd) {
+            if (subOn) {
+              sd.textContent = '';
+              sd.classList.add('hidden');
+            } else {
+              sd.textContent = 'Пополните баланс в боте.';
+              sd.classList.remove('hidden');
+            }
+          }
           var bal = sp.balance;
           var be = document.getElementById('overview-balance');
           if (be) be.textContent = bal != null && bal !== '' ? String(bal) + ' ₽' : '—';
           var bd = document.getElementById('overview-balance-detail');
-          if (bd) bd.textContent = 'Как в боте / мини-приложении.';
+          if (bd) {
+            bd.textContent = '';
+            bd.classList.add('hidden');
+          }
           var te = document.getElementById('overview-traffic');
           if (te) te.textContent = formatBytes(sp.used_traffic_bytes);
           var td = document.getElementById('overview-traffic-detail');
           if (td) {
             var lt = sp.lifetime_used_traffic_bytes;
-            td.textContent = lt != null ? 'За всё время: ' + formatBytes(lt) : 'Статистика из панели.';
+            if (lt != null) {
+              td.textContent = 'Всего: ' + formatBytes(lt);
+              td.classList.remove('hidden');
+            } else {
+              td.textContent = '';
+              td.classList.add('hidden');
+            }
           }
           var ne = document.getElementById('overview-nodes');
           if (ne) ne.textContent = sp.nodes_count != null ? String(sp.nodes_count) : '—';
+          var nh = document.getElementById('overview-nodes-hint');
+          if (nh) {
+            var nc = sp.nodes_count;
+            if (nc == null || nc === '') {
+              nh.textContent = 'Ноды не получены';
+            } else if (Number(nc) === 0) {
+              nh.textContent = 'Список нод пуст';
+            } else {
+              nh.textContent = 'Ноды (панель)';
+            }
+          }
           var devs = Array.isArray(sp.devices) ? sp.devices : [];
           var lim = sp.devices_limit;
           var de = document.getElementById('overview-devices');
           if (de) {
-            de.textContent =
-              String(devs.length) + (lim != null ? ' / ' + String(lim) : '') + ' устройств';
+            if (lim != null) {
+              de.textContent = String(devs.length) + ' из ' + String(lim) + ' слотов';
+            } else {
+              de.textContent = String(devs.length) + ' устройств';
+            }
           }
         }
 
@@ -694,8 +934,7 @@
           if (content) content.classList.remove('hidden');
           if (!sp) {
             if (hint) {
-              hint.textContent =
-                'Данные сервиса недоступны. Проверьте DB_* и RW_API_* в .env на сервере.';
+              hint.textContent = 'Данные сервиса временно недоступны.';
               hint.classList.remove('hidden');
             }
             if (noSub) noSub.classList.remove('hidden');
@@ -726,12 +965,13 @@
           var devs = Array.isArray(sp.devices) ? sp.devices : [];
           var dlim = sp.devices_limit;
           if (sum) {
-            sum.textContent = devs.length
-              ? 'Зарегистрировано устройств: ' +
-                devs.length +
-                (dlim != null ? ' (лимит ' + dlim + ')' : '') +
-                '.'
-              : 'Устройства пока не подключались по подписке.';
+            if (!devs.length) {
+              sum.textContent = 'Нет устройств.';
+            } else if (dlim != null) {
+              sum.textContent = devs.length + ' из ' + dlim + ' слотов';
+            } else {
+              sum.textContent = 'Устройств: ' + devs.length;
+            }
           }
         }
 
@@ -742,13 +982,91 @@
           return data && data.user ? data.user : null;
         }
 
+        function detectLkPlatform() {
+          var ua = navigator.userAgent || '';
+          var p = navigator.platform || '';
+          if (/iPhone|iPad|iPod/.test(ua)) return 'ios';
+          if (/Mac/.test(p) && !/iPhone|iPad|iPod/.test(ua)) return 'macos';
+          if (/Android/.test(ua)) {
+            if (/Android TV|TV;|BRAVIA|AFTV|AFTB|AFTM|AFTS|AFTT|CrKey|Smart TV|MiTV|HisiTV/i.test(ua)) {
+              return 'tv';
+            }
+            return 'android';
+          }
+          if (/Win/.test(p)) return 'windows';
+          if (/Linux/.test(p) && !/Android/.test(ua)) return 'linux';
+          return 'windows';
+        }
+
+        function updatePlatformSelectIcon() {
+          var wrap = document.getElementById('lk-platform-select-icon');
+          var sel = document.getElementById('lk-platform-select');
+          if (!wrap || !sel) return;
+          var v = sel.value;
+          var base = 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/';
+          var html = '';
+          if (v === 'windows') {
+            html =
+              '<span class="lk-plat-ico lk-plat-ico--windows w-10 h-10 rounded-xl"><img src="' +
+              base +
+              'windows.svg" alt=""/></span>';
+          } else if (v === 'macos' || v === 'ios') {
+            html =
+              '<span class="lk-plat-ico lk-plat-ico--apple w-10 h-10 rounded-xl"><img src="' +
+              base +
+              'apple.svg" alt=""/></span>';
+          } else if (v === 'linux') {
+            html =
+              '<span class="lk-plat-ico lk-plat-ico--linux w-10 h-10 rounded-xl"><img src="' +
+              base +
+              'linux.svg" alt=""/></span>';
+          } else if (v === 'android') {
+            html =
+              '<span class="lk-plat-ico lk-plat-ico--android w-10 h-10 rounded-xl"><img src="' +
+              base +
+              'android.svg" alt=""/></span>';
+          } else if (v === 'tv') {
+            html =
+              '<span class="flex items-center gap-1">' +
+              '<span class="lk-plat-ico lk-plat-ico--android !w-9 !h-9 rounded-lg"><img src="' +
+              base +
+              'android.svg" alt=""/></span>' +
+              '<span class="lk-plat-ico lk-plat-ico--si-dark !w-9 !h-9 rounded-lg"><img src="' +
+              base +
+              'appletv.svg" alt=""/></span></span>';
+          }
+          wrap.innerHTML = html;
+        }
+
+        function syncPlatformInstructionPanels() {
+          var sel = document.getElementById('lk-platform-select');
+          if (!sel) return;
+          var v = sel.value;
+          document.querySelectorAll('.lk-inst-panel').forEach(function (p) {
+            var match = p.getAttribute('data-lk-platform') === v;
+            p.classList.toggle('hidden', !match);
+          });
+          updatePlatformSelectIcon();
+        }
+
+        function initPlatformInstallUi() {
+          var sel = document.getElementById('lk-platform-select');
+          if (!sel) return;
+          if (!sel.dataset.lkBound) {
+            sel.dataset.lkBound = '1';
+            sel.addEventListener('change', syncPlatformInstructionPanels);
+          }
+          sel.value = detectLkPlatform();
+          syncPlatformInstructionPanels();
+        }
+
         async function applyPanel(user) {
           currentUser = user;
           if (panelUsername) panelUsername.textContent = user.username;
-          if (overviewLogin) overviewLogin.textContent = user.username;
           renderIntegration(user);
           renderOverview(user);
           renderSetup(user);
+          initPlatformInstallUi();
         }
 
         bindCopyFeedback(document.getElementById('setup-copy-proxy'), function () {
