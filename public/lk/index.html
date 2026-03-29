@@ -139,6 +139,9 @@
       .lk-float-wrap:focus-within .lk-float-label {
         color: rgb(96 165 250 / 0.95);
       }
+      .lk-tgl-knob {
+        transition: transform 0.2s ease;
+      }
     </style>
   </head>
   <body>
@@ -170,15 +173,38 @@
           </div>
           <p id="auth-message" class="hidden mb-4 rounded-2xl border px-4 py-3 text-center text-[11px] font-bold uppercase tracking-wider" role="status"></p>
 
-          <form id="form-login" class="space-y-4">
-            <div class="relative group/input">
-              <input id="login-username" autocomplete="username" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Логин" type="text" maxlength="32" />
-            </div>
-            <div class="relative group/input">
-              <input id="login-password" autocomplete="current-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Пароль" type="password" />
-            </div>
-            <button id="btn-login" type="submit" disabled class="w-full h-14 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-blue-500 transition-all disabled:opacity-50">Войти</button>
-          </form>
+          <div id="login-step-credentials">
+            <form id="form-login" class="space-y-4">
+              <div class="relative group/input">
+                <input id="login-username" autocomplete="username" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Логин" type="text" maxlength="32" />
+              </div>
+              <div class="relative group/input">
+                <input id="login-password" autocomplete="current-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Пароль" type="password" />
+              </div>
+              <button id="btn-login" type="submit" disabled class="w-full h-14 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-blue-500 transition-all disabled:opacity-50">Войти</button>
+            </form>
+          </div>
+
+          <div id="login-step-otp" class="hidden space-y-4">
+            <p class="text-sm text-gray-400 text-center leading-relaxed">
+              Код отправлен в Telegram. Введите <span class="text-white font-bold">6 цифр</span> из сообщения бота.
+            </p>
+            <input
+              id="login-otp-code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-center text-2xl font-black tracking-[0.5em] text-white outline-none focus:border-emerald-500/40 font-mono"
+              placeholder="······"
+            />
+            <button id="btn-login-otp-submit" type="button" class="w-full h-14 rounded-2xl bg-emerald-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-emerald-500 transition-all disabled:opacity-50" disabled>
+              Подтвердить вход
+            </button>
+            <button id="btn-login-otp-back" type="button" class="w-full py-3 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
+              ← Назад к логину
+            </button>
+          </div>
 
           <form id="form-register" class="space-y-4 hidden">
             <input id="register-username" autocomplete="username" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Логин" type="text" maxlength="32" />
@@ -656,6 +682,24 @@
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
               </div>
+              <div id="tg-login-otp-wrap" class="mt-5 pt-5 border-t border-emerald-500/15">
+                <div class="flex items-center justify-between gap-4">
+                  <div class="min-w-0 pr-2">
+                    <p class="text-sm font-bold text-white">Код из Telegram при входе</p>
+                    <p class="text-[11px] text-gray-500 mt-1 leading-snug">После логина и пароля запросим одноразовый код из бота.</p>
+                  </div>
+                  <button
+                    type="button"
+                    id="tg-login-otp-toggle"
+                    class="relative h-9 w-[3.35rem] shrink-0 rounded-full bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:ring-offset-2 focus:ring-offset-[#0a1620]"
+                    role="switch"
+                    aria-checked="false"
+                    aria-label="Требовать код из Telegram при входе по паролю"
+                  >
+                    <span class="lk-tgl-knob absolute left-1 top-1 h-7 w-7 rounded-full bg-white shadow-md"></span>
+                  </button>
+                </div>
+              </div>
             </div>
             <div id="tg-not-linked" class="rounded-2xl border border-white/10 bg-black/20 p-5">
               <p class="text-sm text-gray-400 mb-4 leading-relaxed">Нужен для входа и данных подписки.</p>
@@ -769,6 +813,40 @@
         var telegramWidgetEnabled = false;
         var telegramBotUsername = 'AmnesiaWebBot';
         var tgWidgetInjected = false;
+        var loginChallengeId = null;
+
+        function syncOtpToggleUi(on) {
+          var btn = document.getElementById('tg-login-otp-toggle');
+          var knob = btn && btn.querySelector('.lk-tgl-knob');
+          if (!btn) return;
+          btn.setAttribute('aria-checked', on ? 'true' : 'false');
+          btn.classList.toggle('bg-emerald-600', on);
+          btn.classList.toggle('bg-gray-700', !on);
+          if (knob) knob.style.transform = on ? 'translateX(1.35rem)' : 'translateX(0)';
+        }
+
+        function resetLoginOtpUi() {
+          loginChallengeId = null;
+          var cred = document.getElementById('login-step-credentials');
+          var otp = document.getElementById('login-step-otp');
+          var otpIn = document.getElementById('login-otp-code');
+          var tgWrap = document.getElementById('tg-login-wrap');
+          if (cred) cred.classList.remove('hidden');
+          if (otp) otp.classList.add('hidden');
+          if (otpIn) otpIn.value = '';
+          refreshLoginOtpSubmitBtn();
+          if (tgWrap && !tgWrap.classList.contains('hidden')) {
+            /* keep widget */
+          }
+        }
+
+        function refreshLoginOtpSubmitBtn() {
+          var otpIn = document.getElementById('login-otp-code');
+          var b = document.getElementById('btn-login-otp-submit');
+          if (!otpIn || !b) return;
+          var ok = /^[0-9]{6}$/.test((otpIn.value || '').trim());
+          b.disabled = !ok;
+        }
 
         function showAuthMessage(text, isError) {
           if (!authMsg) return;
@@ -929,6 +1007,7 @@
             wrapNot.classList.add('hidden');
             var un = linked.username ? '@' + linked.username : 'без username';
             txt.textContent = 'ID ' + linked.id + ' · ' + un;
+            syncOtpToggleUi(!!linked.loginOtpEnabled);
           } else if (wrapLinked && wrapNot) {
             wrapLinked.classList.add('hidden');
             wrapNot.classList.remove('hidden');
@@ -1220,6 +1299,29 @@
           location.reload();
         });
 
+        document.getElementById('tg-login-otp-toggle')?.addEventListener('click', async function () {
+          var on = this.getAttribute('aria-checked') !== 'true';
+          try {
+            var res = await fetch('/api/auth/telegram/login-otp-enabled', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ enabled: on }),
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) {
+              alert(parseErrorPayload(data));
+              return;
+            }
+            syncOtpToggleUi(on);
+            if (currentUser && currentUser.telegram) {
+              currentUser.telegram.loginOtpEnabled = on;
+            }
+          } catch (_) {
+            alert('Ошибка сети');
+          }
+        });
+
         document.getElementById('btn-tg-unlink')?.addEventListener('click', async function () {
           if (!confirm('Отвязать Telegram от аккаунта?')) return;
           try {
@@ -1376,6 +1478,7 @@
         var title = document.getElementById('auth-title');
         function setMode(mode) {
           hideAuthMessage();
+          resetLoginOtpUi();
           var isLogin = mode === 'login';
           var tgWrap = document.getElementById('tg-login-wrap');
           if (formLogin) formLogin.classList.toggle('hidden', !isLogin);
@@ -1446,6 +1549,65 @@
               credentials: 'include',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ username: username, password: password, captchaToken: token }),
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) {
+              showAuthMessage(parseErrorPayload(data), true);
+              return;
+            }
+            if (data.needsTelegramOtp && data.challengeId) {
+              loginChallengeId = data.challengeId;
+              var cred = document.getElementById('login-step-credentials');
+              var otp = document.getElementById('login-step-otp');
+              var tgWrap = document.getElementById('tg-login-wrap');
+              if (cred) cred.classList.add('hidden');
+              if (otp) otp.classList.remove('hidden');
+              if (tgWrap) tgWrap.classList.add('hidden');
+              var otpIn = document.getElementById('login-otp-code');
+              if (otpIn) {
+                otpIn.value = '';
+                otpIn.focus();
+              }
+              refreshLoginOtpSubmitBtn();
+              return;
+            }
+            location.reload();
+          } catch (_) {
+            showAuthMessage('Сеть недоступна', true);
+          }
+        });
+
+        document.getElementById('login-otp-code')?.addEventListener('input', function () {
+          this.value = (this.value || '').replace(/\D/g, '').slice(0, 6);
+          refreshLoginOtpSubmitBtn();
+        });
+        document.getElementById('login-otp-code')?.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            var btn = document.getElementById('btn-login-otp-submit');
+            if (btn && !btn.disabled) btn.click();
+          }
+        });
+
+        document.getElementById('btn-login-otp-back')?.addEventListener('click', function () {
+          resetLoginOtpUi();
+          var tgWrap = document.getElementById('tg-login-wrap');
+          if (tgWrap && telegramWidgetEnabled) {
+            tgWrap.classList.remove('hidden');
+            injectTelegramWidget();
+          }
+        });
+
+        document.getElementById('btn-login-otp-submit')?.addEventListener('click', async function () {
+          hideAuthMessage();
+          var code = document.getElementById('login-otp-code')?.value.trim() || '';
+          if (!loginChallengeId || !/^[0-9]{6}$/.test(code)) return;
+          try {
+            var res = await fetch('/api/auth/login/telegram-otp', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ challengeId: loginChallengeId, code: code }),
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok) {

@@ -12,8 +12,10 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthSessionGuard, RequestWithSession } from './auth-session.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { LoginTelegramOtpDto } from './dto/login-telegram-otp.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { TelegramLoginOtpPrefDto } from './dto/telegram-login-otp-pref.dto';
 import { TelegramWidgetDto } from './dto/telegram-widget.dto';
 
 @Controller('api/auth')
@@ -62,6 +64,26 @@ export class AuthController {
     @Body() body: LoginDto,
   ) {
     const result = await this.auth.login(body, req.ip);
+    if ('needsTelegramOtp' in result && result.needsTelegramOtp) {
+      return {
+        ok: true,
+        needsTelegramOtp: true,
+        challengeId: result.challengeId,
+      };
+    }
+    this.setCookie(res, result.token);
+    return { ok: true, user: result.user };
+  }
+
+  @Post('login/telegram-otp')
+  async loginTelegramOtp(
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: LoginTelegramOtpDto,
+  ) {
+    const result = await this.auth.completeTelegramLoginOtp(
+      body.challengeId,
+      body.code,
+    );
     this.setCookie(res, result.token);
     return { ok: true, user: result.user };
   }
@@ -121,5 +143,16 @@ export class AuthController {
     const u = req.sessionUser;
     if (!u) throw new UnauthorizedException();
     return this.auth.unlinkTelegram(u.id);
+  }
+
+  @Post('telegram/login-otp-enabled')
+  @UseGuards(AuthSessionGuard)
+  async telegramLoginOtpPref(
+    @Req() req: RequestWithSession,
+    @Body() body: TelegramLoginOtpPrefDto,
+  ) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.setTelegramLoginOtpEnabled(u.id, body.enabled);
   }
 }

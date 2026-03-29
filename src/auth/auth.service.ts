@@ -28,6 +28,7 @@ interface UserRow extends RowDataPacket {
   password_hash: string;
   telegram_id: number | null;
   telegram_username: string | null;
+  telegram_login_otp_enabled?: number | boolean | null;
 }
 
 interface AmnesiaJwtPayload {
@@ -236,6 +237,60 @@ export class AuthService implements OnModuleInit {
         INDEX idx_tlt_user (user_id)
       )
     `);
+    try {
+      await this.pool.execute(
+        'ALTER TABLE users ADD COLUMN telegram_login_otp_enabled TINYINT(1) NOT NULL DEFAULT 0',
+      );
+    } catch (_) {
+      /* exists */
+    }
+    await this.pool.execute(`
+      CREATE TABLE IF NOT EXISTS telegram_login_challenges (
+        id VARCHAR(64) NOT NULL PRIMARY KEY,
+        user_id INT NOT NULL,
+        code_hash VARCHAR(255) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_tlc_user (user_id),
+        INDEX idx_tlc_exp (expires_at)
+      )
+    `);
+  }
+
+  private async sendTelegramLoginCode(chatId: string, code: string): Promise<void> {
+    if (!this.webTelegramBotToken) {
+      throw new ServiceUnavailableException('Telegram-бот для сайта не настроен');
+    }
+    const text =
+      `<tg-emoji emoji-id="5422439311196834318">💡</tg-emoji> <b>Код входа в личный кабинет:</b> <code>${code}</code>\n\n` +
+      `Действителен 10 минут. Если это не вы — смените пароль.`;
+    const url = `https://api.telegram.org/bot${encodeURIComponent(this.webTelegramBotToken)}/sendMessage`;
+    const body = new URLSearchParams({
+      chat_id: String(chatId),
+      text,
+      parse_mode: 'HTML',
+    });
+    let response;
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      });
+    } catch {
+      throw new ServiceUnavailableException(
+        'Не удалось связаться с Telegram. Попробуйте позже.',
+      );
+    }
+    const data = (await response.json().catch(() => ({}))) as {
+      ok?: boolean;
+      description?: string;
+    };
+    if (!response.ok || !data.ok) {
+      throw new ServiceUnavailableException(
+        data.description || 'Не удалось отправить код в Telegram',
+      );
+    }
   }
 
   createAuthToken(user: SessionUser): string {
@@ -292,7 +347,7 @@ export class AuthService implements OnModuleInit {
     await this.verifyCaptcha(dto.captchaToken, remoteIp, 'login');
     const username = this.normalizeUsername(dto.username);
     const [rows] = await this.pool.execute<UserRow[]>(
-      'SELECT id, username, password_hash FROM users WHERE username = ? LIMIT 1',
+      'SELECT id, username, password_hash, telegram_id, telegram_login_otp_enabled FROM users WHERE username = ? LIMIT 1',
       [username],
     );
     const row = rows[0];
@@ -303,6 +358,37 @@ export class AuthService implements OnModuleInit {
     if (!match) {
       throw new UnauthorizedException('Неверный логин или пароль');
     }
+    const otpOn =
+      Number(row.telegram_login_otp_enabled) === 1 &&
+      row.telegram_id != null;
+    if (otpOn) {
+      await this.pool.execute(
+        'DELETE FROM telegram_login_challenges WHERE user_id = ?',
+        [row.id],
+      );
+      const code = String(crypto.randomInt(100000, 1000000));
+      const codeHash = await bcrypt.hash(code, 10);
+      const challengeId = crypto.randomBytes(32).toString('hex');
+      const expires = new Date(Date.now() + 10 * 60 * 1000);
+      await this.pool.execute(
+        'INSERT INTO telegram_login_challenges (id, user_id, code_hash, expires_at) VALUES (?, ?, ?, ?)',
+        [challengeId, row.id, codeHash, expires],
+      );
+      try {
+        await this.sendTelegramLoginCode(String(row.telegram_id), code);
+      } catch (e) {
+        await this.pool.execute(
+          'DELETE FROM telegram_login_challenges WHERE id = ?',
+          [challengeId],
+        );
+        throw e;
+      }
+      return {
+        ok: true as const,
+        needsTelegramOtp: true as const,
+        challengeId,
+      };
+    }
     const user: SessionUser = { id: row.id, username: row.username };
     const token = this.createAuthToken(user);
     return {
@@ -310,6 +396,67 @@ export class AuthService implements OnModuleInit {
       token,
       user,
     };
+  }
+
+  async completeTelegramLoginOtp(challengeId: string, code: string) {
+    const cleanId = String(challengeId || '').trim();
+    if (!cleanId) {
+      throw new BadRequestException('Нет сессии входа');
+    }
+    const [rows] = await this.pool.execute<RowDataPacket[]>(
+      'SELECT user_id, code_hash, expires_at FROM telegram_login_challenges WHERE id = ? LIMIT 1',
+      [cleanId],
+    );
+    const r = rows[0];
+    if (!r) {
+      throw new BadRequestException('Сессия входа недействительна. Войдите снова.');
+    }
+    if (new Date(String(r.expires_at)) < new Date()) {
+      await this.pool.execute(
+        'DELETE FROM telegram_login_challenges WHERE id = ?',
+        [cleanId],
+      );
+      throw new BadRequestException('Код истёк. Войдите снова.');
+    }
+    const okCode = await bcrypt.compare(String(code).trim(), String(r.code_hash));
+    if (!okCode) {
+      throw new UnauthorizedException('Неверный код');
+    }
+    await this.pool.execute(
+      'DELETE FROM telegram_login_challenges WHERE id = ?',
+      [cleanId],
+    );
+    const userId = Number(r.user_id);
+    const [users] = await this.pool.execute<UserRow[]>(
+      'SELECT id, username FROM users WHERE id = ? LIMIT 1',
+      [userId],
+    );
+    const u = users[0];
+    if (!u) {
+      throw new UnauthorizedException();
+    }
+    const user: SessionUser = { id: u.id, username: u.username };
+    const token = this.createAuthToken(user);
+    return { ok: true as const, token, user };
+  }
+
+  async setTelegramLoginOtpEnabled(userId: number, enabled: boolean) {
+    const [rows] = await this.pool.execute<UserRow[]>(
+      'SELECT id, telegram_id FROM users WHERE id = ? LIMIT 1',
+      [userId],
+    );
+    const row = rows[0];
+    if (!row) {
+      throw new UnauthorizedException();
+    }
+    if (row.telegram_id == null) {
+      throw new BadRequestException('Сначала привяжите Telegram');
+    }
+    await this.pool.execute(
+      'UPDATE users SET telegram_login_otp_enabled = ? WHERE id = ?',
+      [enabled ? 1 : 0, userId],
+    );
+    return { ok: true as const, telegramLoginOtpEnabled: enabled };
   }
 
   /** Баланс из БД бота + детали Remnawave по remnawave_user_id (без HTTP к боту). */
@@ -375,7 +522,7 @@ export class AuthService implements OnModuleInit {
 
   async getMe(userId: number) {
     const [rows] = await this.pool.execute<UserRow[]>(
-      'SELECT id, username, telegram_id, telegram_username FROM users WHERE id = ? LIMIT 1',
+      'SELECT id, username, telegram_id, telegram_username, telegram_login_otp_enabled FROM users WHERE id = ? LIMIT 1',
       [userId],
     );
     const row = rows[0];
@@ -397,6 +544,7 @@ export class AuthService implements OnModuleInit {
           ? {
               id: String(row.telegram_id),
               username: row.telegram_username || null,
+              loginOtpEnabled: Number(row.telegram_login_otp_enabled) === 1,
             }
           : null,
         serviceProfile,
@@ -521,7 +669,7 @@ export class AuthService implements OnModuleInit {
       throw new UnauthorizedException();
     }
     await this.pool.execute(
-      'UPDATE users SET telegram_id = NULL, telegram_username = NULL WHERE id = ?',
+      'UPDATE users SET telegram_id = NULL, telegram_username = NULL, telegram_login_otp_enabled = 0 WHERE id = ?',
       [userId],
     );
     return { ok: true as const };
