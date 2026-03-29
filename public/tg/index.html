@@ -107,28 +107,62 @@
           </p>
         </div>
 
-        <div class="max-w-4xl mx-auto">
-          <article class="bg-[#08080a] border border-white/5 p-5 sm:p-8 md:p-12 rounded-[1.75rem] sm:rounded-[2.5rem] text-center min-w-0">
-            <div class="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-2xl bg-blue-600/10 border border-blue-500/20">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 0 1 4-4h6"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h6v6"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3h9a2 2 0 0 1 2 2v2"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 21h9a2 2 0 0 0 2-2v-2"></path>
-              </svg>
+        <div class="max-w-md mx-auto">
+          <article
+            class="bg-[#08080a] border border-white/5 p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] hover:border-blue-500/30 transition-all relative overflow-hidden group"
+          >
+            <div class="relative z-10">
+              <div class="flex justify-between items-start mb-8 sm:mb-10">
+                <div
+                  class="w-14 h-14 flex items-center justify-center bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:border-blue-500/50 transition-colors"
+                >
+                  <span class="text-4xl leading-none select-none transform scale-125" aria-hidden="true">
+                    <img
+                      draggable="false"
+                      class="emoji w-9 h-9"
+                      alt="🇳🇱"
+                      src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f1f3-1f1f1.svg"
+                      width="36"
+                      height="36"
+                    />
+                  </span>
+                </div>
+              </div>
+              <h2 class="text-2xl sm:text-3xl font-black italic uppercase mb-6 sm:mb-8 tracking-tighter">Нидерланды</h2>
+              <div class="space-y-3 mb-8 sm:mb-10">
+                <div class="flex justify-between items-center py-2 border-b border-white/5 gap-4">
+                  <span class="text-[10px] font-bold text-gray-600 uppercase tracking-widest shrink-0">Server</span>
+                  <span class="text-xs font-black italic text-right break-all">2.27.41.7</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-white/5">
+                  <span class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Port</span>
+                  <span class="text-xs font-black italic">443</span>
+                </div>
+              </div>
+              <a
+                href="tg://proxy?server=2.27.41.7&amp;port=443&amp;secret=eeec84fef5e54dda6b30b44bbeacea823e6d61782e7275"
+                class="flex items-center justify-center gap-3 w-full py-4 sm:py-5 bg-blue-600 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-blue-500 shadow-xl transition-all"
+              >
+                Подключить
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-4 h-4 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M15 3h6v6"></path>
+                  <path d="M10 14 21 3"></path>
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                </svg>
+              </a>
             </div>
-            <h3 class="text-2xl sm:text-3xl md:text-4xl font-black italic uppercase tracking-tighter mb-4 break-words">
-              Раздел в разработке
-            </h3>
-            <p class="text-gray-400 text-[15px] sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8">
-              Сейчас мы обновляем список Telegram MTProto прокси. Совсем скоро здесь появятся актуальные и стабильные локации для быстрого подключения.
-            </p>
-            <a
-              href="/"
-              class="inline-flex items-center justify-center w-full sm:w-auto min-h-[48px] px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-blue-600 font-black uppercase tracking-widest text-[10px] sm:text-[11px] hover:bg-blue-500 transition-all"
-            >
-              Вернуться на главную
-            </a>
           </article>
         </div>
       </section>
