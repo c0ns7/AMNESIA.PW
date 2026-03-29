@@ -7,6 +7,7 @@ module.exports = {
   plugins: [],
   // Classes used only inside JS template strings (infra load meter)
   safelist: [
+    'supports-[backdrop-filter]:bg-[#08080c]/85',
     'from-emerald-400/95',
     'to-emerald-500',
     'from-cyan-300/90',

@@ -122,6 +122,23 @@
       #lk-platform-select-icon .flex.items-center {
         gap: 0.2rem;
       }
+      /* Плавающий лейбл */
+      .lk-float-label {
+        top: 1rem;
+      }
+      .lk-float-wrap:focus-within .lk-float-label,
+      .lk-float-input:not(:placeholder-shown) + .lk-float-label {
+        top: 0.375rem;
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .lk-float-input:not(:placeholder-shown) + .lk-float-label {
+        color: rgb(148 163 184);
+      }
+      .lk-float-wrap:focus-within .lk-float-label {
+        color: rgb(96 165 250 / 0.95);
+      }
     </style>
   </head>
   <body>
@@ -185,51 +202,58 @@
       </div>
 
       <!-- Panel -->
-      <div id="view-panel" class="hidden relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-20 pt-6 sm:pt-10">
-        <header class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#0c0c12] via-[#08080c] to-[#060608] p-6 sm:p-8 mb-8 shadow-2xl shadow-blue-950/40">
-          <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[80px] rounded-full pointer-events-none"></div>
-          <div class="relative flex flex-wrap items-start justify-between gap-6">
-            <div class="flex items-center gap-4 min-w-0">
-              <div class="relative shrink-0">
-                <img alt="" class="w-14 h-14 sm:w-16 sm:h-16" src="/logo.svg" width="64" height="64" />
-                <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-[#08080c]"></span>
-              </div>
-              <div class="min-w-0">
-                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-blue-500 mb-1">Личный кабинет</p>
-                <p id="panel-username" class="text-xl sm:text-2xl font-black italic uppercase tracking-tighter text-white truncate">—</p>
-              </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <a href="/" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white hover:border-white/25 transition-all">
-                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                На сайт
-              </a>
-              <button id="btn-logout" type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-[10px] font-black uppercase tracking-widest text-gray-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-300 transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                Выйти
-              </button>
-            </div>
-          </div>
-        </header>
+      <div id="view-panel" class="hidden relative z-10 w-full max-w-[1600px] mx-auto px-3 sm:px-4 pb-28 lg:pb-10 pt-4 sm:pt-6 lg:pt-8">
+        <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-start">
+          <!-- Навигация: боковая панель (desktop) -->
+          <aside
+            class="hidden lg:flex flex-col w-56 xl:w-60 shrink-0 rounded-3xl border border-white/10 bg-[#0a0a12]/90 backdrop-blur-xl p-3 gap-1 shadow-xl shadow-black/30 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto"
+            aria-label="Разделы личного кабинета"
+          >
+            <p class="px-3 pt-2 pb-1 text-[9px] font-black uppercase tracking-[0.2em] text-gray-600">Меню</p>
+            <button type="button" data-lk-nav="side" data-tab="overview" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest bg-blue-600 text-black shadow-lg text-left">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              <span class="truncate">Обзор</span>
+            </button>
+            <button type="button" data-lk-nav="side" data-tab="setup" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span class="truncate">Подключение</span>
+            </button>
+            <button type="button" data-lk-nav="side" data-tab="integration" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left">
+              <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+              <span class="truncate">Интеграции</span>
+            </button>
+            <button type="button" data-lk-nav="side" data-tab="settings" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span class="truncate">Настройки</span>
+            </button>
+          </aside>
 
-        <div class="flex flex-wrap gap-2 mb-8 p-1 rounded-2xl bg-white/[0.02] border border-white/5" id="panel-tabs">
-          <button type="button" data-tab="overview" class="tab-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-blue-600 text-black shadow-lg">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-            Обзор
-          </button>
-          <button type="button" data-tab="setup" class="tab-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 text-gray-400 hover:border-white/25">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            Подключение
-          </button>
-          <button type="button" data-tab="integration" class="tab-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 text-gray-400 hover:border-white/25">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-            Интеграции
-          </button>
-          <button type="button" data-tab="settings" class="tab-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 text-gray-400 hover:border-white/25">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            Настройки
-          </button>
-        </div>
+          <div class="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6">
+            <header class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#0c0c12] via-[#08080c] to-[#060608] p-5 sm:p-8 shadow-2xl shadow-blue-950/40">
+              <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[80px] rounded-full pointer-events-none"></div>
+              <div class="relative flex flex-col sm:flex-row flex-wrap items-stretch sm:items-start justify-between gap-4 sm:gap-6">
+                <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                  <div class="relative shrink-0">
+                    <img alt="" class="w-12 h-12 sm:w-16 sm:h-16" src="/logo.svg" width="64" height="64" />
+                    <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-emerald-500 ring-4 ring-[#08080c]"></span>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-[10px] font-black uppercase tracking-[0.25em] text-blue-500 mb-1">Личный кабинет</p>
+                    <p id="panel-username" class="text-lg sm:text-2xl font-black italic uppercase tracking-tighter text-white truncate">—</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  <a href="/" class="inline-flex flex-1 sm:flex-initial justify-center items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white hover:border-white/25 transition-all min-h-[44px] sm:min-h-0">
+                    <svg class="w-4 h-4 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    На сайт
+                  </a>
+                  <button id="btn-logout" type="button" class="inline-flex flex-1 sm:flex-initial justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-[10px] font-black uppercase tracking-widest text-gray-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-300 transition-all min-h-[44px] sm:min-h-0">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Выйти
+                  </button>
+                </div>
+              </div>
+            </header>
 
         <section id="tab-overview" class="tab-panel space-y-6">
           <p id="overview-hint" class="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs text-gray-400 leading-relaxed hidden"></p>
@@ -645,17 +669,88 @@
         </section>
 
         <section id="tab-settings" class="tab-panel hidden">
-          <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-6 max-w-md">
-            <h2 class="text-sm font-black uppercase tracking-widest text-white mb-6">Смена пароля</h2>
-            <form id="form-password" class="space-y-4">
-              <input id="pw-current" type="password" autocomplete="current-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-3.5 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Текущий пароль" />
-              <input id="pw-new" type="password" autocomplete="new-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-3.5 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Новый пароль" />
-              <input id="pw-confirm" type="password" autocomplete="new-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-3.5 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Повторите новый пароль" />
-              <p id="pw-message" class="hidden text-xs font-bold uppercase tracking-wider"></p>
-              <button type="submit" class="w-full h-12 rounded-xl bg-blue-600 text-white font-black uppercase text-[10px] tracking-widest hover:bg-blue-500 transition-all">Сохранить пароль</button>
+          <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#0c0c12] via-[#08080c] to-[#060608] p-6 sm:p-8 shadow-2xl max-w-lg mx-auto lg:mx-0">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative flex items-center gap-4 mb-8">
+              <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400 ring-1 ring-blue-500/20">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+              </span>
+              <div>
+                <h2 class="text-lg font-black uppercase tracking-widest text-white">Смена пароля</h2>
+                <p class="text-xs text-gray-500 mt-1">Обновите пароль для входа в аккаунт</p>
+              </div>
+            </div>
+            <form id="form-password" class="space-y-5">
+              <div class="lk-float-wrap relative rounded-2xl border border-white/10 bg-white/[0.03] transition-colors focus-within:border-blue-500/40 focus-within:ring-1 focus-within:ring-blue-500/20">
+                <div class="flex gap-3 pl-3 pr-1">
+                  <span class="mt-[1.35rem] shrink-0 text-gray-500" aria-hidden="true">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                  </span>
+                  <div class="relative flex-1 min-w-0 py-1 pr-2">
+                    <input id="pw-current" type="password" autocomplete="current-password" class="lk-float-input peer w-full bg-transparent pt-5 pb-2.5 text-sm text-white outline-none placeholder-transparent" placeholder=" " />
+                    <label for="pw-current" class="lk-float-label pointer-events-none absolute left-0 text-[13px] text-gray-500 transition-all duration-200">Текущий пароль</label>
+                  </div>
+                </div>
+              </div>
+              <div class="lk-float-wrap relative rounded-2xl border border-white/10 bg-white/[0.03] transition-colors focus-within:border-blue-500/40 focus-within:ring-1 focus-within:ring-blue-500/20">
+                <div class="flex gap-3 pl-3 pr-1">
+                  <span class="mt-[1.35rem] shrink-0 text-gray-500" aria-hidden="true">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  </span>
+                  <div class="relative flex-1 min-w-0 py-1 pr-2">
+                    <input id="pw-new" type="password" autocomplete="new-password" class="lk-float-input peer w-full bg-transparent pt-5 pb-2.5 text-sm text-white outline-none placeholder-transparent" placeholder=" " />
+                    <label for="pw-new" class="lk-float-label pointer-events-none absolute left-0 text-[13px] text-gray-500 transition-all duration-200">Новый пароль</label>
+                  </div>
+                </div>
+              </div>
+              <div class="lk-float-wrap relative rounded-2xl border border-white/10 bg-white/[0.03] transition-colors focus-within:border-blue-500/40 focus-within:ring-1 focus-within:ring-blue-500/20">
+                <div class="flex gap-3 pl-3 pr-1">
+                  <span class="mt-[1.35rem] shrink-0 text-gray-500" aria-hidden="true">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  </span>
+                  <div class="relative flex-1 min-w-0 py-1 pr-2">
+                    <input id="pw-confirm" type="password" autocomplete="new-password" class="lk-float-input peer w-full bg-transparent pt-5 pb-2.5 text-sm text-white outline-none placeholder-transparent" placeholder=" " />
+                    <label for="pw-confirm" class="lk-float-label pointer-events-none absolute left-0 text-[13px] text-gray-500 transition-all duration-200">Повтор нового пароля</label>
+                  </div>
+                </div>
+              </div>
+              <p id="pw-match-hint" class="hidden text-xs font-semibold flex items-center gap-2 min-h-[1.25rem]" role="status"></p>
+              <p id="pw-message" class="hidden text-xs font-bold uppercase tracking-wider rounded-xl px-3 py-2"></p>
+              <button type="submit" class="w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-black uppercase text-[11px] tracking-widest hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-900/30 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Сохранить пароль
+              </button>
             </form>
           </div>
         </section>
+          </div>
+        </div>
+
+        <!-- Нижняя навигация (mobile / tablet) -->
+        <nav
+          class="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#08080c]/95 backdrop-blur-xl supports-[backdrop-filter]:bg-[#08080c]/85"
+          style="padding-bottom: env(safe-area-inset-bottom, 0px)"
+          aria-label="Разделы"
+        >
+          <div class="grid grid-cols-4 max-w-lg mx-auto">
+            <button type="button" data-lk-nav="bottom" data-tab="overview" class="tab-btn flex flex-col items-center justify-center gap-0.5 py-2.5 px-1 min-h-[56px] text-blue-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              <span class="text-[9px] font-black uppercase tracking-wide">Обзор</span>
+            </button>
+            <button type="button" data-lk-nav="bottom" data-tab="setup" class="tab-btn flex flex-col items-center justify-center gap-0.5 py-2.5 px-1 min-h-[56px] text-gray-500">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span class="text-[9px] font-black uppercase tracking-wide">Подключ.</span>
+            </button>
+            <button type="button" data-lk-nav="bottom" data-tab="integration" class="tab-btn flex flex-col items-center justify-center gap-0.5 py-2.5 px-1 min-h-[56px] text-gray-500">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+              <span class="text-[9px] font-black uppercase tracking-wide">TG</span>
+            </button>
+            <button type="button" data-lk-nav="bottom" data-tab="settings" class="tab-btn flex flex-col items-center justify-center gap-0.5 py-2.5 px-1 min-h-[56px] text-gray-500">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span class="text-[9px] font-black uppercase tracking-wide">Настр.</span>
+            </button>
+          </div>
+        </nav>
       </div>
 
       <p id="boot-loading" class="relative z-10 text-center text-gray-500 text-sm pt-24">Загрузка…</p>
@@ -767,15 +862,23 @@
           if (viewPanel) viewPanel.classList.toggle('hidden', which !== 'panel');
         }
 
-        var tabActiveClass =
-          'tab-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-blue-600 text-black shadow-lg';
-        var tabIdleClass =
-          'tab-btn inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 text-gray-400 hover:border-white/25';
+        var tabActiveSide =
+          'tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest bg-blue-600 text-black shadow-lg text-left';
+        var tabIdleSide =
+          'tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left';
+        var tabActiveBottom =
+          'tab-btn flex flex-col items-center justify-center gap-0.5 py-2.5 px-1 min-h-[56px] text-blue-400';
+        var tabIdleBottom =
+          'tab-btn flex flex-col items-center justify-center gap-0.5 py-2.5 px-1 min-h-[56px] text-gray-500';
 
         function setTab(name) {
-          document.querySelectorAll('.tab-btn').forEach(function (b) {
+          document.querySelectorAll('.tab-btn[data-lk-nav="side"]').forEach(function (b) {
             var on = b.getAttribute('data-tab') === name;
-            b.className = on ? tabActiveClass : tabIdleClass;
+            b.className = on ? tabActiveSide : tabIdleSide;
+          });
+          document.querySelectorAll('.tab-btn[data-lk-nav="bottom"]').forEach(function (b) {
+            var on = b.getAttribute('data-tab') === name;
+            b.className = on ? tabActiveBottom : tabIdleBottom;
           });
           ['overview', 'setup', 'integration', 'settings'].forEach(function (id) {
             var el = document.getElementById('tab-' + id);
@@ -788,6 +891,33 @@
             setTab(btn.getAttribute('data-tab') || 'overview');
           });
         });
+
+        function updatePwMatchHint() {
+          var nw = document.getElementById('pw-new');
+          var cf = document.getElementById('pw-confirm');
+          var hint = document.getElementById('pw-match-hint');
+          if (!nw || !cf || !hint) return;
+          var a = nw.value;
+          var b = cf.value;
+          if (!b) {
+            hint.className = 'hidden text-xs font-semibold flex items-center gap-2 min-h-[1.25rem]';
+            hint.innerHTML = '';
+            return;
+          }
+          hint.classList.remove('hidden');
+          if (a === b) {
+            hint.className =
+              'text-xs font-semibold flex items-center gap-2 min-h-[1.25rem] text-emerald-400';
+            hint.innerHTML =
+              '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Пароли совпадают</span>';
+          } else {
+            hint.className = 'text-xs font-semibold flex items-center gap-2 min-h-[1.25rem] text-red-400';
+            hint.innerHTML =
+              '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span>Пароли не совпадают</span>';
+          }
+        }
+        document.getElementById('pw-new')?.addEventListener('input', updatePwMatchHint);
+        document.getElementById('pw-confirm')?.addEventListener('input', updatePwMatchHint);
 
         function renderIntegration(user) {
           var linked = user && user.telegram;
@@ -1142,6 +1272,18 @@
           }
         });
 
+        function setPwFormMessage(text, isError) {
+          var pm = document.getElementById('pw-message');
+          if (!pm) return;
+          pm.textContent = text;
+          pm.classList.remove('hidden');
+          pm.className =
+            'text-xs font-bold uppercase tracking-wider rounded-xl px-3 py-2 border ' +
+            (isError
+              ? 'text-red-300 border-red-500/30 bg-red-500/10'
+              : 'text-emerald-200 border-emerald-500/30 bg-emerald-500/10');
+        }
+
         document.getElementById('form-password')?.addEventListener('submit', async function (e) {
           e.preventDefault();
           var cur = document.getElementById('pw-current');
@@ -1149,6 +1291,12 @@
           var cf = document.getElementById('pw-confirm');
           var pm = document.getElementById('pw-message');
           if (!cur || !nw || !cf) return;
+          if (nw.value !== cf.value) {
+            setPwFormMessage('Новый пароль и повтор не совпадают', true);
+            updatePwMatchHint();
+            return;
+          }
+          if (pm) pm.classList.add('hidden');
           try {
             var res = await fetch('/api/auth/password', {
               method: 'POST',
@@ -1162,27 +1310,16 @@
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok) {
-              if (pm) {
-                pm.textContent = parseErrorPayload(data);
-                pm.classList.remove('hidden');
-                pm.classList.add('text-red-400');
-              }
+              setPwFormMessage(parseErrorPayload(data), true);
               return;
             }
             cur.value = '';
             nw.value = '';
             cf.value = '';
-            if (pm) {
-              pm.textContent = data.message || 'Сохранено';
-              pm.classList.remove('hidden');
-              pm.classList.remove('text-red-400');
-              pm.classList.add('text-emerald-400');
-            }
+            updatePwMatchHint();
+            setPwFormMessage(data.message || 'Пароль сохранён', false);
           } catch (_) {
-            if (pm) {
-              pm.textContent = 'Ошибка сети';
-              pm.classList.remove('hidden');
-            }
+            setPwFormMessage('Ошибка сети', true);
           }
         });
 
