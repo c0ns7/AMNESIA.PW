@@ -338,6 +338,25 @@
       .lk-sidebar.lk-sidebar--expanded .lk-nav-tip {
         display: none;
       }
+      /* Прокрутка только в развёрнутом сайдбаре; скроллбар скрыт */
+      #lk-sidebar-nav {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      #lk-sidebar-nav::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+      .lk-sidebar:not(.lk-sidebar--expanded) #lk-sidebar-nav {
+        overflow: visible;
+        max-height: none;
+      }
+      .lk-sidebar.lk-sidebar--expanded #lk-sidebar-nav {
+        overflow-x: hidden;
+        overflow-y: auto;
+        max-height: calc(100vh - 9rem);
+      }
     </style>
   </head>
   <body>
@@ -447,11 +466,7 @@
               </button>
               <p class="lk-sidebar-title text-[9px] font-black uppercase tracking-[0.2em] text-gray-500">Меню</p>
             </div>
-            <nav
-              id="lk-sidebar-nav"
-              class="flex flex-col gap-1 min-w-0 overflow-y-auto overflow-x-visible max-h-[calc(100vh-9rem)] pr-0.5 -mr-0.5"
-              aria-label="Разделы"
-            >
+            <nav id="lk-sidebar-nav" class="flex flex-col gap-1 min-w-0" aria-label="Разделы">
               <button
                 type="button"
                 data-lk-nav="side"
