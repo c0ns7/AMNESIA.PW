@@ -11,6 +11,8 @@ import {
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthSessionGuard, RequestWithSession } from './auth-session.guard';
+import { ActivatePromoDto } from './dto/activate-promo.dto';
+import { RemoveDeviceDto } from './dto/remove-device.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginTelegramOtpDto } from './dto/login-telegram-otp.dto';
 import { LoginDto } from './dto/login.dto';
@@ -154,5 +156,27 @@ export class AuthController {
     const u = req.sessionUser;
     if (!u) throw new UnauthorizedException();
     return this.auth.setTelegramLoginOtpEnabled(u.id, body.enabled);
+  }
+
+  @Post('promo/activate')
+  @UseGuards(AuthSessionGuard)
+  async activatePromo(
+    @Req() req: RequestWithSession,
+    @Body() body: ActivatePromoDto,
+  ) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.activatePromo(u.id, body);
+  }
+
+  @Post('subscription/device/remove')
+  @UseGuards(AuthSessionGuard)
+  async removeSubscriptionDevice(
+    @Req() req: RequestWithSession,
+    @Body() body: RemoveDeviceDto,
+  ) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.removeSubscriptionDevice(u.id, body.hwid);
   }
 }

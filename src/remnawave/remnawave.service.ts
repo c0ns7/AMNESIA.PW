@@ -344,6 +344,85 @@ export class RemnawaveService {
     return this.inFlightRefresh;
   }
 
+  /** POST /api/hwid/devices/delete — как в bot.amnesiavps.ru */
+  async deleteHwidDevice(
+    remnawaveUserUuid: string,
+    hwid: string,
+  ): Promise<boolean> {
+    const uuid = remnawaveUserUuid?.trim();
+    const h = hwid?.trim();
+    if (!this.baseUrl || !this.token || !uuid || !h) {
+      return false;
+    }
+    try {
+      const res = await fetch(this.makeUrl('/api/hwid/devices/delete'), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userUuid: uuid, hwid: h }),
+        signal: AbortSignal.timeout(15000),
+      });
+      return res.ok;
+    } catch (e) {
+      console.warn(
+        'Remnawave deleteHwidDevice:',
+        e instanceof Error ? e.message : e,
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Как в боте после пополнения: включить подписку в Remnawave, если UUID уже есть и баланс ≥ 7 ₽.
+   */
+  async tryEnableSubscriptionIfEligible(
+    remnawaveUserUuid: string | null | undefined,
+    balanceRub: number,
+  ): Promise<void> {
+    const uuid = remnawaveUserUuid?.trim();
+    if (!uuid || balanceRub < 7) {
+      return;
+    }
+    if (!this.baseUrl || !this.token) {
+      return;
+    }
+    try {
+      const url = this.makeUrl(
+        `/api/users/${encodeURIComponent(uuid)}/actions/enable`,
+      );
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        if (
+          res.status === 400 &&
+          (txt.includes('A030') ||
+            txt.includes('A029') ||
+            /already (enabled|disabled)/i.test(txt))
+        ) {
+          return;
+        }
+        console.warn(
+          'Remnawave enable (balance) failed:',
+          res.status,
+          txt.slice(0, 200),
+        );
+      }
+    } catch (e) {
+      console.warn(
+        'Remnawave enable (balance) error:',
+        e instanceof Error ? e.message : e,
+      );
+    }
+  }
+
   /** Запрос к API без исключений — для ЛК */
   private async remnawaveFetchOptional(path: string): Promise<unknown | null> {
     if (!this.baseUrl || !this.token) {

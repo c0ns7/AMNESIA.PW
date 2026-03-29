@@ -17,6 +17,7 @@ import { Pool, RowDataPacket } from 'mysql2/promise';
 import { MYSQL_POOL, VPN_DB_POOL } from '../database/database.module';
 import { RemnawaveService } from '../remnawave/remnawave.service';
 import { SubscriptionLinkService } from '../subscription/subscription-link.service';
+import { ActivatePromoDto } from './dto/activate-promo.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TelegramWidgetDto } from './dto/telegram-widget.dto';
@@ -550,6 +551,189 @@ export class AuthService implements OnModuleInit {
         serviceProfile,
       },
     };
+  }
+
+  /**
+   * Та же логика, что у бота (promo_codes / promo_activations / users.user_id = Telegram).
+   */
+  async activatePromo(siteUserId: number, dto: ActivatePromoDto) {
+    if (!this.vpnPool) {
+      throw new ServiceUnavailableException(
+        'Промокоды недоступны: не настроена база VPN (VPN_DATABASE / DB_NAME).',
+      );
+    }
+    const rawCode = String(dto.code || '').trim();
+    if (!rawCode) {
+      throw new BadRequestException('Введите промокод');
+    }
+    const normalized = rawCode.toLowerCase();
+
+    const [userRows] = await this.pool.execute<UserRow[]>(
+      'SELECT id, telegram_id, telegram_username FROM users WHERE id = ? LIMIT 1',
+      [siteUserId],
+    );
+    const siteUser = userRows[0];
+    if (!siteUser) {
+      throw new UnauthorizedException();
+    }
+    if (siteUser.telegram_id == null) {
+      throw new BadRequestException(
+        'Привяжите Telegram в разделе «Интеграции». Промокод зачисляет баланс на аккаунт VPN, привязанный к Telegram.',
+      );
+    }
+    const tgNumeric = Number(siteUser.telegram_id);
+    const vpnUsername = siteUser.telegram_username?.trim() || 'Unknown';
+
+    interface PromoCodeRow extends RowDataPacket {
+      id: number;
+      activations_max: number;
+      activations_used: number;
+      balance_amount: string | number;
+    }
+
+    const conn = await this.vpnPool.getConnection();
+    let amountCredited = 0;
+    try {
+      await conn.beginTransaction();
+      const [promoRows] = await conn.execute<PromoCodeRow[]>(
+        'SELECT id, activations_max, activations_used, balance_amount FROM promo_codes WHERE LOWER(code) = ? FOR UPDATE',
+        [normalized],
+      );
+      const promo = promoRows[0];
+      if (!promo) {
+        await conn.rollback();
+        throw new BadRequestException('Промокод не найден.');
+      }
+      if (promo.activations_used >= promo.activations_max) {
+        await conn.rollback();
+        throw new BadRequestException('Лимит активаций промокода исчерпан.');
+      }
+      const [existing] = await conn.execute<RowDataPacket[]>(
+        'SELECT 1 FROM promo_activations WHERE promo_id = ? AND user_id = ? LIMIT 1',
+        [promo.id, tgNumeric],
+      );
+      if (existing.length) {
+        await conn.rollback();
+        throw new BadRequestException('Вы уже активировали этот промокод.');
+      }
+      const amount = Number(promo.balance_amount);
+      if (!(amount > 0)) {
+        await conn.rollback();
+        throw new BadRequestException('Промокод недействителен.');
+      }
+
+      await conn.execute(
+        'INSERT INTO users (user_id, username) VALUES (?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username)',
+        [tgNumeric, vpnUsername],
+      );
+      await conn.execute(
+        'INSERT INTO promo_activations (promo_id, user_id) VALUES (?, ?)',
+        [promo.id, tgNumeric],
+      );
+      await conn.execute(
+        'UPDATE promo_codes SET activations_used = activations_used + 1 WHERE id = ?',
+        [promo.id],
+      );
+      await conn.execute(
+        'UPDATE users SET balance = IFNULL(balance, 0) + ? WHERE user_id = ?',
+        [amount, tgNumeric],
+      );
+      await conn.commit();
+      amountCredited = amount;
+    } catch (e) {
+      try {
+        await conn.rollback();
+      } catch {
+        /* already rolled back or no tx */
+      }
+      if (
+        e instanceof BadRequestException ||
+        e instanceof UnauthorizedException
+      ) {
+        throw e;
+      }
+      const err = e as { code?: string };
+      if (err.code === 'ER_DUP_ENTRY') {
+        throw new BadRequestException('Вы уже активировали этот промокод.');
+      }
+      throw new ServiceUnavailableException(
+        'Не удалось применить промокод. Попробуйте позже.',
+      );
+    } finally {
+      conn.release();
+    }
+
+    let newBalance = 0;
+    let rwUuid: string | null = null;
+    try {
+      const [balRows] = await this.vpnPool.execute<RowDataPacket[]>(
+        'SELECT balance, remnawave_user_id FROM users WHERE user_id = ? LIMIT 1',
+        [tgNumeric],
+      );
+      const br = balRows[0];
+      if (br) {
+        newBalance = Number(br.balance ?? 0);
+        rwUuid =
+          br.remnawave_user_id != null
+            ? String(br.remnawave_user_id)
+            : null;
+      }
+    } catch {
+      /* ignore */
+    }
+    await this.remnawaveService.tryEnableSubscriptionIfEligible(
+      rwUuid,
+      newBalance,
+    );
+
+    const creditedRub = Math.round(amountCredited * 100) / 100;
+    return {
+      ok: true as const,
+      creditedRub,
+      message: `Промокод активирован. Зачислено ${creditedRub.toFixed(2)} ₽.`,
+    };
+  }
+
+  /** Удаление HWID-устройства в Remnawave (как miniapp device-delete в боте). */
+  async removeSubscriptionDevice(siteUserId: number, hwid: string) {
+    const clean = String(hwid || '').trim();
+    if (!clean) {
+      throw new BadRequestException('Не указано устройство');
+    }
+    const [userRows] = await this.pool.execute<UserRow[]>(
+      'SELECT id, telegram_id FROM users WHERE id = ? LIMIT 1',
+      [siteUserId],
+    );
+    const siteUser = userRows[0];
+    if (!siteUser) {
+      throw new UnauthorizedException();
+    }
+    if (siteUser.telegram_id == null) {
+      throw new BadRequestException('Привяжите Telegram');
+    }
+    if (!this.vpnPool) {
+      throw new ServiceUnavailableException(
+        'Сервис временно недоступен (нет VPN_DATABASE).',
+      );
+    }
+    const [vpnRows] = await this.vpnPool.execute<RowDataPacket[]>(
+      'SELECT remnawave_user_id FROM users WHERE user_id = ? LIMIT 1',
+      [Number(siteUser.telegram_id)],
+    );
+    const rwUuid = vpnRows[0]?.remnawave_user_id;
+    if (rwUuid == null || String(rwUuid).trim() === '') {
+      throw new BadRequestException('Подписка ещё не создана в Remnawave');
+    }
+    const ok = await this.remnawaveService.deleteHwidDevice(
+      String(rwUuid),
+      clean,
+    );
+    if (!ok) {
+      throw new ServiceUnavailableException(
+        'Не удалось удалить устройство. Попробуйте позже.',
+      );
+    }
+    return { ok: true as const };
   }
 
   async changePassword(
