@@ -269,6 +269,12 @@ export class RemnawaveService {
     return `${size.toFixed(size >= 100 || unit === 0 ? 0 : 1)} ${units[unit]}`;
   }
 
+  /** Не показывать на главной (LTE / обход глушилок и т.п.) */
+  private isHiddenInfrastructureHost(name: string): boolean {
+    const t = (name || '').toLowerCase();
+    return t.includes('обход глушилок');
+  }
+
   private async buildInfrastructurePayload(): Promise<unknown> {
     const [hostsRaw, nodesRaw, paginatedActiveUsers] = await Promise.all([
       this.getRawHosts(),
@@ -285,9 +291,13 @@ export class RemnawaveService {
     }
 
     const nodes = hostsRows.map((host, i) => this.normalizeHost(host, i, nodeMap));
+    const visibleNodes = nodes.filter((n) => !this.isHiddenInfrastructureHost(n.name));
 
-    const onlineUsers = nodes.reduce((sum, n) => sum + n.usersOnline, 0);
-    let activeUsers = nodes.reduce((sum, n) => sum + (n.activeUsers || n.usersOnline), 0);
+    const onlineUsers = visibleNodes.reduce((sum, n) => sum + n.usersOnline, 0);
+    let activeUsers = visibleNodes.reduce(
+      (sum, n) => sum + (n.activeUsers || n.usersOnline),
+      0,
+    );
     if (typeof paginatedActiveUsers === 'number') {
       activeUsers = paginatedActiveUsers;
     }
@@ -301,11 +311,11 @@ export class RemnawaveService {
       activeUsers,
       totalTrafficBytes,
       totalTrafficLabel: this.formatTraffic(totalTrafficBytes),
-      // По запросу UI: количество именно серверов (nodes), а не hosts.
-      locations: nodesRows.length,
+      // Локации на главной — только видимые хосты (без «обход глушилок»).
+      locations: visibleNodes.length,
     };
 
-    const safeNodes = nodes.map((node) => ({
+    const safeNodes = visibleNodes.map((node) => ({
       id: node.id,
       name: node.name,
       countryCode: node.countryCode,
