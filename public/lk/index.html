@@ -192,6 +192,152 @@
         border-color: rgba(96, 165, 250, 0.3);
         color: rgb(147 197 253);
       }
+
+      /* Сайдбар ЛК: свёрнут по умолчанию, бургер → крестик при раскрытии */
+      .lk-sidebar {
+        width: 4.5rem;
+        min-width: 4.5rem;
+        transition:
+          width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+          min-width 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .lk-sidebar.lk-sidebar--expanded {
+        width: 15rem;
+        min-width: 15rem;
+      }
+      .lk-sidebar-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 2.75rem;
+      }
+      .lk-sidebar-title {
+        transition: opacity 0.22s ease, max-width 0.32s ease;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .lk-sidebar:not(.lk-sidebar--expanded) .lk-sidebar-title {
+        opacity: 0;
+        max-width: 0;
+        pointer-events: none;
+      }
+      .lk-sidebar.lk-sidebar--expanded .lk-sidebar-title {
+        opacity: 1;
+        max-width: 10rem;
+      }
+      .lk-burger {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        width: 2.75rem;
+        height: 2.75rem;
+        flex-shrink: 0;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgb(226 232 240);
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      }
+      .lk-burger:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(59, 130, 246, 0.35);
+        color: white;
+      }
+      .lk-burger-line {
+        display: block;
+        width: 1.125rem;
+        height: 2px;
+        border-radius: 2px;
+        background: currentColor;
+        transition:
+          transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 0.22s ease;
+        transform-origin: center;
+      }
+      .lk-sidebar.lk-sidebar--expanded .lk-burger-line:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .lk-sidebar.lk-sidebar--expanded .lk-burger-line:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      .lk-sidebar.lk-sidebar--expanded .lk-burger-line:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+      .lk-nav-label {
+        transition: opacity 0.2s ease, max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .lk-sidebar:not(.lk-sidebar--expanded) .lk-nav-label {
+        opacity: 0;
+        max-width: 0;
+        pointer-events: none;
+      }
+      .lk-sidebar.lk-sidebar--expanded .lk-nav-label {
+        opacity: 1;
+        max-width: 12rem;
+      }
+      .lk-sidebar:not(.lk-sidebar--expanded) .lk-side-btn {
+        justify-content: center;
+        gap: 0;
+        padding-left: 0.65rem;
+        padding-right: 0.65rem;
+      }
+      .lk-sidebar.lk-sidebar--expanded .lk-side-btn {
+        justify-content: flex-start;
+        gap: 0.75rem;
+      }
+      .lk-nav-tip {
+        position: absolute;
+        left: calc(100% + 12px);
+        top: 50%;
+        transform: translateY(-50%) translateX(-6px);
+        z-index: 60;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.65rem;
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.96) 100%);
+        box-shadow:
+          0 12px 40px -8px rgba(0, 0, 0, 0.65),
+          0 0 0 1px rgba(255, 255, 255, 0.06);
+        font-size: 0.65rem;
+        font-weight: 700;
+        line-height: 1.35;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        color: rgb(226 232 240);
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.2s ease,
+          visibility 0.2s ease,
+          transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .lk-nav-tip::before {
+        content: '';
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        margin-top: -5px;
+        border: 5px solid transparent;
+        border-right-color: rgba(30, 41, 59, 0.96);
+      }
+      .lk-sidebar:not(.lk-sidebar--expanded) .lk-side-btn:hover .lk-nav-tip,
+      .lk-sidebar:not(.lk-sidebar--expanded) .lk-side-btn:focus-visible .lk-nav-tip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+      }
+      .lk-sidebar.lk-sidebar--expanded .lk-nav-tip {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -280,32 +426,88 @@
       <!-- Panel -->
       <div id="view-panel" class="hidden relative z-10 w-full max-w-[1600px] mx-auto px-3 sm:px-4 pb-28 lg:pb-10 pt-4 sm:pt-6 lg:pt-8">
         <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-start">
-          <!-- Навигация: боковая панель (desktop) -->
+          <!-- Навигация: боковая панель (desktop), по умолчанию свёрнута — только иконки -->
           <aside
-            class="hidden lg:flex flex-col w-56 xl:w-60 shrink-0 rounded-3xl border border-white/10 bg-[#0a0a12]/90 backdrop-blur-xl p-3 gap-1 shadow-xl shadow-black/30 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto"
+            id="lk-sidebar"
+            class="hidden lg:flex flex-col shrink-0 rounded-3xl border border-white/10 bg-[#0a0a12]/90 backdrop-blur-xl p-2.5 gap-2 shadow-xl shadow-black/30 sticky top-6 z-30 max-h-[calc(100vh-3rem)] overflow-visible lk-sidebar"
             aria-label="Разделы личного кабинета"
           >
-            <p class="px-3 pt-2 pb-1 text-[9px] font-black uppercase tracking-[0.2em] text-gray-600">Меню</p>
-            <button type="button" data-lk-nav="side" data-tab="overview" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest bg-blue-600 text-black shadow-lg text-left">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-              <span class="truncate">Обзор</span>
-            </button>
-            <button type="button" data-lk-nav="side" data-tab="balance" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-              <span class="truncate">Пополнение</span>
-            </button>
-            <button type="button" data-lk-nav="side" data-tab="setup" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              <span class="truncate">Подключение</span>
-            </button>
-            <button type="button" data-lk-nav="side" data-tab="integration" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left">
-              <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-              <span class="truncate">Интеграции</span>
-            </button>
-            <button type="button" data-lk-nav="side" data-tab="settings" class="tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              <span class="truncate">Настройки</span>
-            </button>
+            <div class="lk-sidebar-head px-0.5">
+              <button
+                id="lk-sidebar-toggle"
+                type="button"
+                class="lk-burger"
+                aria-label="Открыть или закрыть меню разделов"
+                aria-expanded="false"
+                aria-controls="lk-sidebar-nav"
+              >
+                <span class="lk-burger-line" aria-hidden="true"></span>
+                <span class="lk-burger-line" aria-hidden="true"></span>
+                <span class="lk-burger-line" aria-hidden="true"></span>
+              </button>
+              <p class="lk-sidebar-title text-[9px] font-black uppercase tracking-[0.2em] text-gray-500">Меню</p>
+            </div>
+            <nav
+              id="lk-sidebar-nav"
+              class="flex flex-col gap-1 min-w-0 overflow-y-auto overflow-x-visible max-h-[calc(100vh-9rem)] pr-0.5 -mr-0.5"
+              aria-label="Разделы"
+            >
+              <button
+                type="button"
+                data-lk-nav="side"
+                data-tab="overview"
+                class="tab-btn lk-side-btn relative w-full flex items-center px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest bg-blue-600 text-black shadow-lg text-left"
+                aria-label="Обзор"
+              >
+                <span class="lk-nav-tip" role="tooltip">Сводка: подписка, баланс, трафик</span>
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                <span class="lk-nav-label truncate">Обзор</span>
+              </button>
+              <button
+                type="button"
+                data-lk-nav="side"
+                data-tab="balance"
+                class="tab-btn lk-side-btn relative w-full flex items-center px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left"
+                aria-label="Пополнение"
+              >
+                <span class="lk-nav-tip" role="tooltip">Пополнение баланса и промокоды</span>
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                <span class="lk-nav-label truncate">Пополнение</span>
+              </button>
+              <button
+                type="button"
+                data-lk-nav="side"
+                data-tab="setup"
+                class="tab-btn lk-side-btn relative w-full flex items-center px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left"
+                aria-label="Подключение"
+              >
+                <span class="lk-nav-tip" role="tooltip">Настройка VPN и приложений</span>
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <span class="lk-nav-label truncate">Подключение</span>
+              </button>
+              <button
+                type="button"
+                data-lk-nav="side"
+                data-tab="integration"
+                class="tab-btn lk-side-btn relative w-full flex items-center px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left"
+                aria-label="Интеграции"
+              >
+                <span class="lk-nav-tip" role="tooltip">Telegram: привязка аккаунта и вход по коду</span>
+                <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+                <span class="lk-nav-label truncate">Интеграции</span>
+              </button>
+              <button
+                type="button"
+                data-lk-nav="side"
+                data-tab="settings"
+                class="tab-btn lk-side-btn relative w-full flex items-center px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left"
+                aria-label="Настройки"
+              >
+                <span class="lk-nav-tip" role="tooltip">Смена пароля и параметры аккаунта</span>
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span class="lk-nav-label truncate">Настройки</span>
+              </button>
+            </nav>
           </aside>
 
           <div class="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6">
@@ -931,9 +1133,9 @@
         }
 
         var tabActiveSide =
-          'tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest bg-blue-600 text-black shadow-lg text-left';
+          'tab-btn lk-side-btn relative w-full flex items-center px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest bg-blue-600 text-black shadow-lg text-left';
         var tabIdleSide =
-          'tab-btn w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left';
+          'tab-btn lk-side-btn relative w-full flex items-center px-3 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border border-transparent text-gray-400 hover:bg-white/[0.06] hover:text-white text-left';
         var tabActiveBottom =
           'tab-btn flex flex-col items-center justify-center gap-0.5 py-2.5 px-1 min-h-[56px] text-blue-400';
         var tabIdleBottom =
@@ -959,6 +1161,22 @@
             setTab(btn.getAttribute('data-tab') || 'overview');
           });
         });
+
+        (function initLkSidebar() {
+          var lkSidebar = document.getElementById('lk-sidebar');
+          var lkSidebarToggle = document.getElementById('lk-sidebar-toggle');
+          if (!lkSidebar || !lkSidebarToggle) return;
+          function syncLkSidebarAria() {
+            var expanded = lkSidebar.classList.contains('lk-sidebar--expanded');
+            lkSidebarToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+          }
+          lkSidebarToggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            lkSidebar.classList.toggle('lk-sidebar--expanded');
+            syncLkSidebarAria();
+          });
+          syncLkSidebarAria();
+        })();
 
         function updatePwMatchHint() {
           var nw = document.getElementById('pw-new');
