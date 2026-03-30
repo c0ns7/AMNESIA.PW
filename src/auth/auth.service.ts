@@ -72,6 +72,7 @@ export class AuthService implements OnModuleInit {
 
   async onModuleInit() {
     await this.ensureSchema();
+    await this.ensureVpnUsersBillingColumn();
   }
 
   private normalizeUsername(raw: string): string {
@@ -256,6 +257,18 @@ export class AuthService implements OnModuleInit {
         INDEX idx_tlc_exp (expires_at)
       )
     `);
+  }
+
+  /** Колонка для ежедневного списания тарифа (общая с bot.amnesiavps.ru). */
+  private async ensureVpnUsersBillingColumn() {
+    if (!this.vpnPool) return;
+    try {
+      await this.vpnPool.execute(
+        'ALTER TABLE users ADD COLUMN last_daily_tariff_date DATE NULL',
+      );
+    } catch {
+      /* already exists */
+    }
   }
 
   private async sendTelegramLoginCode(chatId: string, code: string): Promise<void> {
@@ -635,7 +648,10 @@ export class AuthService implements OnModuleInit {
         [promo.id],
       );
       await conn.execute(
-        'UPDATE users SET balance = IFNULL(balance, 0) + ? WHERE user_id = ?',
+        `UPDATE users SET
+           balance = IFNULL(balance, 0) + ?,
+           last_daily_tariff_date = IF(IFNULL(balance, 0) <= 0, CURDATE(), last_daily_tariff_date)
+         WHERE user_id = ?`,
         [amount, tgNumeric],
       );
       await conn.commit();
