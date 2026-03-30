@@ -622,11 +622,31 @@
               </span>
               <div class="min-w-0 flex-1">
                 <h2 class="text-base font-black uppercase tracking-widest text-white leading-tight">Пополнение баланса</h2>
-                <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Оплата картой и другими способами скоро появится здесь.</p>
+                <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Выберите сумму и удобный способ оплаты. Зачисление приходит автоматически.</p>
               </div>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-black/35 px-5 py-4 text-sm text-gray-400 leading-relaxed">
-              Следите за обновлениями — раздел в разработке.
+            <div class="space-y-4">
+              <div class="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-[11px] text-gray-300 leading-relaxed">
+                Бонус к пополнению: <b class="text-emerald-300">+3%</b> от 500 ₽, <b class="text-emerald-300">+5%</b> от 1000 ₽, <b class="text-emerald-300">+7%</b> от 2000 ₽.
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button type="button" class="lk-topup-amount-btn rounded-xl border border-white/12 bg-white/[0.03] px-3 py-2.5 text-xs font-black uppercase tracking-wide text-gray-200 hover:border-blue-500/35 hover:bg-blue-500/10 transition-all" data-amount="50">50 ₽</button>
+                <button type="button" class="lk-topup-amount-btn rounded-xl border border-white/12 bg-white/[0.03] px-3 py-2.5 text-xs font-black uppercase tracking-wide text-gray-200 hover:border-blue-500/35 hover:bg-blue-500/10 transition-all" data-amount="200">200 ₽</button>
+                <button type="button" class="lk-topup-amount-btn rounded-xl border border-white/12 bg-white/[0.03] px-3 py-2.5 text-xs font-black uppercase tracking-wide text-gray-200 hover:border-blue-500/35 hover:bg-blue-500/10 transition-all" data-amount="500">500 ₽</button>
+                <button type="button" class="lk-topup-amount-btn rounded-xl border border-white/12 bg-white/[0.03] px-3 py-2.5 text-xs font-black uppercase tracking-wide text-gray-200 hover:border-blue-500/35 hover:bg-blue-500/10 transition-all" data-amount="1000">1000 ₽</button>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-black/35 p-3.5">
+                <label for="lk-topup-custom-amount" class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Своя сумма, ₽</label>
+                <input id="lk-topup-custom-amount" type="number" min="10" max="50000" step="1" class="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-sm font-semibold text-white outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20" placeholder="Например, 750" />
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button id="btn-topup-sbp" type="button" class="w-full min-h-[50px] rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-black uppercase text-[11px] tracking-widest hover:from-blue-500 hover:to-blue-400 transition-all border border-blue-400/30">СБП</button>
+                <button id="btn-topup-card" type="button" class="w-full min-h-[50px] rounded-xl bg-white/[0.05] border border-white/15 text-white font-black uppercase text-[11px] tracking-widest hover:bg-white/[0.1] hover:border-blue-500/35 transition-all">Банковская карта</button>
+              </div>
+              <p id="lk-topup-msg" class="hidden min-h-[2.75rem] text-xs font-bold uppercase tracking-wider rounded-2xl px-4 py-3 border flex items-center gap-2" role="status"></p>
+              <p class="text-[11px] text-gray-500 leading-relaxed">
+                После оплаты можно закрыть окно банка и вернуться в личный кабинет.
+              </p>
             </div>
           </div>
 
@@ -1270,6 +1290,29 @@
               : 'text-emerald-100 border-emerald-500/35 bg-emerald-500/[0.12]');
         }
 
+        function setTopupMessage(text, isError) {
+          var el = document.getElementById('lk-topup-msg');
+          if (!el) return;
+          el.classList.remove('hidden');
+          var iconOk =
+            '<svg class="w-5 h-5 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+          var iconErr =
+            '<svg class="w-5 h-5 shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+          el.innerHTML =
+            (isError ? iconErr : iconOk) +
+            '<span class="leading-snug">' +
+            String(text || '')
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;') +
+            '</span>';
+          el.className =
+            'min-h-[2.75rem] text-xs font-bold uppercase tracking-wider rounded-2xl px-4 py-3 border flex items-start gap-2.5 ' +
+            (isError
+              ? 'text-red-200 border-red-500/35 bg-red-500/[0.12]'
+              : 'text-emerald-100 border-emerald-500/35 bg-emerald-500/[0.12]');
+        }
+
         function renderBalanceTab(user) {
           var sp = user && user.serviceProfile;
           var valEl = document.getElementById('balance-page-value');
@@ -1310,6 +1353,10 @@
           }
           if (btn) btn.disabled = !hasTg;
           if (inp) inp.disabled = !hasTg;
+          var btnSbp = document.getElementById('btn-topup-sbp');
+          var btnCard = document.getElementById('btn-topup-card');
+          if (btnSbp) btnSbp.disabled = !hasTg;
+          if (btnCard) btnCard.disabled = !hasTg;
         }
 
         function formatBytes(n) {
@@ -1660,6 +1707,90 @@
         document.getElementById('balance-promo-code')?.addEventListener('input', function () {
           var msg = document.getElementById('balance-promo-msg');
           if (msg) msg.classList.add('hidden');
+        });
+
+        document.querySelectorAll('.lk-topup-amount-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var amt = btn.getAttribute('data-amount');
+            var inp = document.getElementById('lk-topup-custom-amount');
+            if (inp && amt) inp.value = String(amt);
+            document.querySelectorAll('.lk-topup-amount-btn').forEach(function (b) {
+              b.classList.remove('border-blue-500/45', 'bg-blue-500/15', 'text-white');
+            });
+            btn.classList.add('border-blue-500/45', 'bg-blue-500/15', 'text-white');
+            var msg = document.getElementById('lk-topup-msg');
+            if (msg) msg.classList.add('hidden');
+          });
+        });
+
+        async function startTopup(method) {
+          var inp = document.getElementById('lk-topup-custom-amount');
+          if (!inp || !currentUser || !currentUser.telegram) {
+            setTopupMessage('Сначала привяжите Telegram.', true);
+            return;
+          }
+          var amount = Math.round(Number(inp.value || 0));
+          if (!Number.isFinite(amount) || amount < 10) {
+            setTopupMessage('Минимальная сумма пополнения — 10 ₽.', true);
+            return;
+          }
+          if (amount > 50000) {
+            setTopupMessage('Слишком большая сумма. Максимум 50 000 ₽.', true);
+            return;
+          }
+          var btnSbp = document.getElementById('btn-topup-sbp');
+          var btnCard = document.getElementById('btn-topup-card');
+          if (btnSbp) btnSbp.disabled = true;
+          if (btnCard) btnCard.disabled = true;
+          try {
+            var res = await fetch('/api/auth/topup/create', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ amount: amount, method: method }),
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok || !data.paymentUrl) {
+              setTopupMessage(parseErrorPayload(data), true);
+              return;
+            }
+            var paymentId = Number(data.paymentId || 0);
+            setTopupMessage('Ссылка на оплату открыта. Завершите платёж в окне банка.', false);
+            window.open(String(data.paymentUrl), '_blank', 'noopener,noreferrer');
+
+            var attempts = 0;
+            var maxAttempts = 18;
+            while (attempts < maxAttempts) {
+              attempts += 1;
+              await new Promise(function (r) { setTimeout(r, 5000); });
+              var chk = await fetch('/api/auth/topup/check', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ paymentId: paymentId }),
+              });
+              var chkData = await chk.json().catch(function () { return {}; });
+              if (!chk.ok) continue;
+              if (chkData && chkData.status === 'success') {
+                var me = await refreshMe();
+                if (me) await applyPanel(me);
+                setTopupMessage('Оплата подтверждена. Баланс обновлён.', false);
+                return;
+              }
+            }
+            setTopupMessage('Ожидаем подтверждение оплаты. Баланс обновится автоматически.', false);
+          } catch (_) {
+            setTopupMessage('Ошибка сети при создании платежа.', true);
+          } finally {
+            renderBalanceTab(currentUser);
+          }
+        }
+
+        document.getElementById('btn-topup-sbp')?.addEventListener('click', function () {
+          startTopup('sbp');
+        });
+        document.getElementById('btn-topup-card')?.addEventListener('click', function () {
+          startTopup('card');
         });
 
         initSetupDeviceRemove();

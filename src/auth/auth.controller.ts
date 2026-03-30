@@ -12,8 +12,10 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthSessionGuard, RequestWithSession } from './auth-session.guard';
 import { ActivatePromoDto } from './dto/activate-promo.dto';
+import { CheckTopupDto } from './dto/check-topup.dto';
 import { RemoveDeviceDto } from './dto/remove-device.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateTopupDto } from './dto/create-topup.dto';
 import { LoginTelegramOtpDto } from './dto/login-telegram-otp.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -167,6 +169,33 @@ export class AuthController {
     const u = req.sessionUser;
     if (!u) throw new UnauthorizedException();
     return this.auth.activatePromo(u.id, body);
+  }
+
+  @Post('topup/create')
+  @UseGuards(AuthSessionGuard)
+  async createTopup(
+    @Req() req: RequestWithSession,
+    @Body() body: CreateTopupDto,
+  ) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.createTopup(u.id, body);
+  }
+
+  @Post('topup/check')
+  @UseGuards(AuthSessionGuard)
+  async checkTopup(
+    @Req() req: RequestWithSession,
+    @Body() body: CheckTopupDto,
+  ) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.checkTopup(u.id, body.paymentId);
+  }
+
+  @Post('topup/platega/webhook')
+  async plategaWebhook(@Req() req: Request) {
+    return this.auth.processPlategaWebhook(req.body);
   }
 
   @Post('subscription/device/remove')

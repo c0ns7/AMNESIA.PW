@@ -18,6 +18,7 @@ import { MYSQL_POOL, VPN_DB_POOL } from '../database/database.module';
 import { RemnawaveService } from '../remnawave/remnawave.service';
 import { SubscriptionLinkService } from '../subscription/subscription-link.service';
 import { ActivatePromoDto } from './dto/activate-promo.dto';
+import { CreateTopupDto } from './dto/create-topup.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TelegramWidgetDto } from './dto/telegram-widget.dto';
@@ -69,6 +70,14 @@ export class AuthService implements OnModuleInit {
 
   private readonly webTelegramBotToken =
     process.env.WEB_TELEGRAM_BOT_TOKEN?.trim() || '';
+  private readonly plategaApiBase = (
+    process.env.PLATEGA_API_BASE || 'https://app.platega.io'
+  ).replace(/\/$/, '');
+  private readonly plategaMerchantId =
+    process.env.PLATEGA_MERCHANT_ID?.trim() || '';
+  private readonly plategaSecret = process.env.PLATEGA_SECRET?.trim() || '';
+  private readonly TOPUP_CARD_METHODS = [11, 10];
+  private readonly TOPUP_SBP_METHOD = 2;
 
   async onModuleInit() {
     await this.ensureSchema();
@@ -269,6 +278,100 @@ export class AuthService implements OnModuleInit {
     } catch {
       /* already exists */
     }
+    await this.vpnPool.execute(`
+      CREATE TABLE IF NOT EXISTS payments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        bonus_percent DECIMAL(5,2) NOT NULL DEFAULT 0,
+        bonus_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+        final_amount DECIMAL(10,2) NOT NULL,
+        invoice_id VARCHAR(64) NOT NULL,
+        platega_transaction_id VARCHAR(64) NULL,
+        status VARCHAR(32) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX (user_id),
+        INDEX (invoice_id),
+        INDEX (platega_transaction_id)
+      )
+    `);
+  }
+
+  private calcTopupBonus(amount: number): number {
+    if (amount >= 2000) return 7;
+    if (amount >= 1000) return 5;
+    if (amount >= 500) return 3;
+    return 0;
+  }
+
+  private isPaymentStatusPaid(statusRaw: unknown): boolean {
+    const status = String(statusRaw || '').trim().toUpperCase();
+    return ['CONFIRMED', 'PAID', 'COMPLETED', 'SUCCESS'].includes(status);
+  }
+
+  private async plategaGetStatus(transactionId: string): Promise<'paid' | 'pending' | null> {
+    if (!this.plategaMerchantId || !this.plategaSecret || !transactionId) {
+      return null;
+    }
+    try {
+      const resp = await fetch(
+        `${this.plategaApiBase}/transaction/${encodeURIComponent(transactionId)}`,
+        {
+          method: 'GET',
+          headers: {
+            'X-MerchantId': this.plategaMerchantId,
+            'X-Secret': this.plategaSecret,
+          },
+        },
+      );
+      const data = (await resp.json().catch(() => ({}))) as Record<
+        string,
+        unknown
+      >;
+      if (!resp.ok) return null;
+      return this.isPaymentStatusPaid(data.status || data.state)
+        ? 'paid'
+        : 'pending';
+    } catch {
+      return null;
+    }
+  }
+
+  private async markPaymentSuccess(
+    conn: Pool,
+    payment: RowDataPacket,
+  ): Promise<boolean> {
+    const [upd] = await conn.execute<ResultSetHeader>(
+      'UPDATE payments SET status = ?, updated_at = NOW() WHERE id = ? AND status IN (?, ?)',
+      ['success', payment.id, 'pending', 'created'],
+    );
+    if (!upd.affectedRows) return false;
+
+    const userId = Number(payment.user_id);
+    const credited = Number(payment.final_amount || 0);
+    await conn.execute(
+      `UPDATE users SET
+         balance = IFNULL(balance, 0) + ?,
+         last_daily_tariff_date = IF(IFNULL(balance, 0) <= 0, CURDATE(), last_daily_tariff_date)
+       WHERE user_id = ?`,
+      [credited, userId],
+    );
+
+    const [rows] = await conn.execute<RowDataPacket[]>(
+      'SELECT balance, remnawave_user_id FROM users WHERE user_id = ? LIMIT 1',
+      [userId],
+    );
+    const br = rows[0];
+    const newBalance = Number(br?.balance ?? 0);
+    const rwUuid = br?.remnawave_user_id
+      ? String(br.remnawave_user_id)
+      : null;
+    await this.remnawaveService.tryEnableSubscriptionIfEligible(
+      rwUuid,
+      newBalance,
+    );
+    return true;
   }
 
   private async sendTelegramLoginCode(chatId: string, code: string): Promise<void> {
@@ -708,6 +811,232 @@ export class AuthService implements OnModuleInit {
       creditedRub,
       message: `Промокод активирован. Зачислено ${creditedRub.toFixed(2)} ₽.`,
     };
+  }
+
+  async createTopup(siteUserId: number, dto: CreateTopupDto) {
+    if (!this.vpnPool) {
+      throw new ServiceUnavailableException(
+        'Платежи недоступны: не настроена база VPN.',
+      );
+    }
+    if (!this.plategaMerchantId || !this.plategaSecret) {
+      throw new ServiceUnavailableException(
+        'Платежи временно недоступны: Platega не настроена.',
+      );
+    }
+
+    const [userRows] = await this.pool.execute<UserRow[]>(
+      'SELECT id, telegram_id, telegram_username FROM users WHERE id = ? LIMIT 1',
+      [siteUserId],
+    );
+    const siteUser = userRows[0];
+    if (!siteUser) throw new UnauthorizedException();
+    if (siteUser.telegram_id == null) {
+      throw new BadRequestException(
+        'Привяжите Telegram в разделе «Интеграции», чтобы пополнять баланс VPN.',
+      );
+    }
+
+    const tgNumeric = Number(siteUser.telegram_id);
+    const vpnUsername = siteUser.telegram_username?.trim() || 'Unknown';
+    const amount = Math.round(Number(dto.amount || 0) * 100) / 100;
+    if (!Number.isFinite(amount) || amount < 10) {
+      throw new BadRequestException('Минимальная сумма пополнения — 10 ₽.');
+    }
+
+    const bonusPercent = this.calcTopupBonus(amount);
+    const bonusAmount = Math.round((amount * bonusPercent) / 100 * 100) / 100;
+    const finalAmount = Math.round((amount + bonusAmount) * 100) / 100;
+    const invoiceId = crypto.randomUUID();
+
+    await this.vpnPool.execute(
+      'INSERT INTO users (user_id, username) VALUES (?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username)',
+      [tgNumeric, vpnUsername],
+    );
+    const [ins] = await this.vpnPool.execute<ResultSetHeader>(
+      `INSERT INTO payments
+        (user_id, amount, bonus_percent, bonus_amount, final_amount, invoice_id, status)
+       VALUES (?, ?, ?, ?, ?, ?, 'pending')`,
+      [tgNumeric, amount, bonusPercent, bonusAmount, finalAmount, invoiceId],
+    );
+    const paymentId = ins.insertId;
+
+    const methods =
+      dto.method === 'sbp'
+        ? [this.TOPUP_SBP_METHOD]
+        : this.TOPUP_CARD_METHODS.slice();
+
+    let lastStatus: number | string | null = null;
+    let redirectUrl: string | null = null;
+    let transactionId: string | null = null;
+
+    for (const methodId of methods) {
+      let resp: Response;
+      try {
+        resp = await fetch(`${this.plategaApiBase}/transaction/process`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-MerchantId': this.plategaMerchantId,
+            'X-Secret': this.plategaSecret,
+          },
+          body: JSON.stringify({
+            paymentMethod: methodId,
+            paymentDetails: { amount, currency: 'RUB' },
+            description: 'Пополнение баланса AMNESIA VPN (LK)',
+            payload: invoiceId,
+          }),
+        });
+      } catch {
+        lastStatus = 'network_error';
+        continue;
+      }
+      const data = (await resp.json().catch(() => ({}))) as Record<
+        string,
+        unknown
+      >;
+      lastStatus = resp.status;
+      if (![200, 201].includes(resp.status)) continue;
+
+      const txRaw = data.transactionId || data.transaction_id || data.id;
+      if (txRaw != null) {
+        transactionId = String(txRaw);
+      }
+      const pd = (data.paymentDetails || {}) as Record<string, unknown>;
+      const direct =
+        data.redirect ||
+        data.payment_url ||
+        data.paymentUrl ||
+        data.url ||
+        data.link;
+      const nested = pd.url || pd.redirect;
+      const urlRaw = direct || nested;
+      if (typeof urlRaw === 'string' && urlRaw.trim()) {
+        redirectUrl = urlRaw.trim();
+      }
+      if (transactionId || redirectUrl) {
+        break;
+      }
+    }
+
+    if (transactionId) {
+      await this.vpnPool.execute(
+        'UPDATE payments SET platega_transaction_id = ?, status = ? WHERE id = ?',
+        [transactionId, 'created', paymentId],
+      );
+    }
+    if (!redirectUrl) {
+      await this.vpnPool.execute(
+        'UPDATE payments SET status = ? WHERE id = ?',
+        ['error', paymentId],
+      );
+      throw new ServiceUnavailableException(
+        `Не удалось создать платёж (Platega status: ${String(lastStatus)}).`,
+      );
+    }
+
+    return {
+      ok: true as const,
+      paymentId,
+      invoiceId,
+      amount,
+      bonusPercent,
+      bonusAmount,
+      finalAmount,
+      status: 'created' as const,
+      paymentUrl: redirectUrl,
+    };
+  }
+
+  async checkTopup(siteUserId: number, paymentId: number) {
+    if (!this.vpnPool) {
+      throw new ServiceUnavailableException(
+        'Платежи недоступны: не настроена база VPN.',
+      );
+    }
+    const [userRows] = await this.pool.execute<UserRow[]>(
+      'SELECT id, telegram_id FROM users WHERE id = ? LIMIT 1',
+      [siteUserId],
+    );
+    const siteUser = userRows[0];
+    if (!siteUser) throw new UnauthorizedException();
+    if (siteUser.telegram_id == null) {
+      throw new BadRequestException('Привяжите Telegram.');
+    }
+
+    const tgNumeric = Number(siteUser.telegram_id);
+    const [rows] = await this.vpnPool.execute<RowDataPacket[]>(
+      'SELECT * FROM payments WHERE id = ? AND user_id = ? LIMIT 1',
+      [paymentId, tgNumeric],
+    );
+    const payment = rows[0];
+    if (!payment) {
+      throw new NotFoundException('Платёж не найден.');
+    }
+    if (String(payment.status) === 'success') {
+      return { ok: true as const, status: 'success' as const, credited: true };
+    }
+
+    const txId = payment.platega_transaction_id
+      ? String(payment.platega_transaction_id)
+      : '';
+    if (!txId) {
+      return {
+        ok: true as const,
+        status: String(payment.status || 'pending'),
+        credited: false,
+      };
+    }
+
+    const plategaStatus = await this.plategaGetStatus(txId);
+    if (plategaStatus !== 'paid') {
+      return {
+        ok: true as const,
+        status: String(payment.status || 'pending'),
+        credited: false,
+      };
+    }
+    const credited = await this.markPaymentSuccess(this.vpnPool, payment);
+    return { ok: true as const, status: 'success' as const, credited };
+  }
+
+  async processPlategaWebhook(payload: unknown) {
+    if (!this.vpnPool) return { ok: true as const };
+    const body = (payload || {}) as Record<string, unknown>;
+    const tx = (body.transaction || {}) as Record<string, unknown>;
+    const statusRaw = tx.status || body.status;
+    const status = String(statusRaw || '').toLowerCase();
+    const invoiceId =
+      tx.invoiceId || tx.invoice_id || tx.id || body.invoiceId || body.invoice_id;
+    if (!invoiceId) return { ok: true as const };
+
+    const [rows] = await this.vpnPool.execute<RowDataPacket[]>(
+      'SELECT * FROM payments WHERE invoice_id = ? LIMIT 1',
+      [String(invoiceId)],
+    );
+    const payment = rows[0];
+    if (!payment) return { ok: true as const };
+    if (String(payment.status) === 'success') return { ok: true as const };
+
+    if (!['success', 'paid', 'completed'].includes(status)) {
+      await this.vpnPool.execute(
+        'UPDATE payments SET status = ?, updated_at = NOW() WHERE id = ? AND status IN (?, ?)',
+        [status || 'failed', payment.id, 'pending', 'created'],
+      );
+      return { ok: true as const };
+    }
+
+    const txId = tx.id || body.transactionId || body.transaction_id || null;
+    if (txId != null) {
+      await this.vpnPool.execute(
+        'UPDATE payments SET platega_transaction_id = ? WHERE id = ?',
+        [String(txId), payment.id],
+      );
+      payment.platega_transaction_id = String(txId);
+    }
+
+    await this.markPaymentSuccess(this.vpnPool, payment);
+    return { ok: true as const };
   }
 
   /** Удаление HWID-устройства в Remnawave (как miniapp device-delete в боте). */
