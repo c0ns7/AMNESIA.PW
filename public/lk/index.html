@@ -2672,8 +2672,22 @@
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok) {
+              var errText = parseErrorPayload(data);
+              if (/уже привязан/i.test(errText)) {
+                try {
+                  var meLinked = await syncMeFresh();
+                  if (meLinked) {
+                    if (msg) msg.classList.add('hidden');
+                    sessionStorage.removeItem('lk_tg_link_pending');
+                    await applyPanel(meLinked);
+                    return;
+                  }
+                } catch (_) {
+                  /* ignore and show original error below */
+                }
+              }
               if (msg) {
-                msg.textContent = parseErrorPayload(data);
+                msg.textContent = errText;
                 msg.classList.remove('hidden');
                 msg.classList.add('text-red-400');
               }
