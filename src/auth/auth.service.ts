@@ -306,8 +306,31 @@ export class AuthService implements OnModuleInit {
   }
 
   private isPaymentStatusPaid(statusRaw: unknown): boolean {
-    const status = String(statusRaw || '').trim().toUpperCase();
-    return ['CONFIRMED', 'PAID', 'COMPLETED', 'SUCCESS'].includes(status);
+    const status = String(statusRaw || '')
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, '_');
+    return [
+      'CONFIRMED',
+      'PAID',
+      'COMPLETED',
+      'SUCCESS',
+      'SUCCEEDED',
+      'DONE',
+      'SETTLED',
+    ].includes(status);
+  }
+
+  private extractPlategaStatusPayload(data: Record<string, unknown>): unknown {
+    const tx = data.transaction as Record<string, unknown> | undefined;
+    if (tx && typeof tx === 'object') {
+      return (
+        tx.status ??
+        tx.state ??
+        (tx as { paymentStatus?: unknown }).paymentStatus
+      );
+    }
+    return data.status ?? data.state ?? (data as { paymentStatus?: unknown }).paymentStatus;
   }
 
   private async plategaGetStatus(transactionId: string): Promise<'paid' | 'pending' | null> {
@@ -330,9 +353,8 @@ export class AuthService implements OnModuleInit {
         unknown
       >;
       if (!resp.ok) return null;
-      return this.isPaymentStatusPaid(data.status || data.state)
-        ? 'paid'
-        : 'pending';
+      const raw = this.extractPlategaStatusPayload(data);
+      return this.isPaymentStatusPaid(raw) ? 'paid' : 'pending';
     } catch {
       return null;
     }
@@ -998,6 +1020,77 @@ export class AuthService implements OnModuleInit {
     }
     const credited = await this.markPaymentSuccess(this.vpnPool, payment);
     return { ok: true as const, status: 'success' as const, credited };
+  }
+
+  /** Список платежей VPN для текущего пользователя ЛК (по Telegram ID). */
+  async listPayments(siteUserId: number, limitRaw = 50) {
+    if (!this.vpnPool) {
+      throw new ServiceUnavailableException(
+        'Платежи недоступны: не настроена база VPN.',
+      );
+    }
+    const [userRows] = await this.pool.execute<UserRow[]>(
+      'SELECT id, telegram_id FROM users WHERE id = ? LIMIT 1',
+      [siteUserId],
+    );
+    const siteUser = userRows[0];
+    if (!siteUser) throw new UnauthorizedException();
+    if (siteUser.telegram_id == null) {
+      throw new BadRequestException('Привяжите Telegram.');
+    }
+    const tgNumeric = Number(siteUser.telegram_id);
+    const limit = Math.min(100, Math.max(1, Math.floor(Number(limitRaw) || 50)));
+
+    interface PayRow extends RowDataPacket {
+      id: number;
+      amount: string | number;
+      bonus_percent: string | number | null;
+      bonus_amount: string | number | null;
+      final_amount: string | number | null;
+      invoice_id: string | null;
+      status: string | null;
+      created_at: Date | string | null;
+      updated_at: Date | string | null;
+    }
+
+    const [rows] = await this.vpnPool.execute<PayRow[]>(
+      `SELECT id, amount, bonus_percent, bonus_amount, final_amount, invoice_id, status,
+              created_at, updated_at
+       FROM payments
+       WHERE user_id = ?
+       ORDER BY id DESC
+       LIMIT ?`,
+      [tgNumeric, limit],
+    );
+
+    const tabFor = (s: string): 'success' | 'processing' | 'failed' => {
+      const u = s.toLowerCase();
+      if (u === 'success') return 'success';
+      if (u === 'pending' || u === 'created') return 'processing';
+      return 'failed';
+    };
+
+    const payments = rows.map((r) => {
+      const st = String(r.status || 'pending');
+      return {
+        id: r.id,
+        amount: Number(r.amount ?? 0),
+        bonusPercent: r.bonus_percent != null ? Number(r.bonus_percent) : null,
+        bonusAmount: r.bonus_amount != null ? Number(r.bonus_amount) : null,
+        finalAmount: r.final_amount != null ? Number(r.final_amount) : null,
+        invoiceId: r.invoice_id ? String(r.invoice_id) : null,
+        status: st,
+        tab: tabFor(st),
+        createdAt: r.created_at
+          ? new Date(r.created_at as Date).toISOString()
+          : null,
+        updatedAt: r.updated_at
+          ? new Date(r.updated_at as Date).toISOString()
+          : null,
+      };
+    });
+
+    return { ok: true as const, payments };
   }
 
   async processPlategaWebhook(payload: unknown) {

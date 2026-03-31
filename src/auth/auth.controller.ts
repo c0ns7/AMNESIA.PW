@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Req,
   Res,
   UnauthorizedException,
@@ -193,6 +194,18 @@ export class AuthController {
     return this.auth.checkTopup(u.id, body.paymentId);
   }
 
+  @Get('payments')
+  @UseGuards(AuthSessionGuard)
+  async listPayments(
+    @Req() req: RequestWithSession,
+    @Query('limit') limit?: string,
+  ) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.listPayments(u.id, limit ? Number(limit) : 50);
+  }
+
+  /** Резервный endpoint; в продакшене в Platega укажите webhook на бота: https://bot.amnesiavps.ru/platega/webhook */
   @Post('topup/platega/webhook')
   async plategaWebhook(@Req() req: Request) {
     return this.auth.processPlategaWebhook(req.body);

@@ -192,6 +192,36 @@
         border-color: rgba(96, 165, 250, 0.3);
         color: rgb(147 197 253);
       }
+      @keyframes lk-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .lk-spin {
+        animation: lk-spin 0.75s linear infinite;
+      }
+      .lk-topup-method--on {
+        border-color: rgba(59, 130, 246, 0.55) !important;
+        background: rgba(59, 130, 246, 0.14) !important;
+        box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+      }
+      .lk-pay-tab--active {
+        border-color: rgba(59, 130, 246, 0.45) !important;
+        background: rgba(59, 130, 246, 0.12) !important;
+        color: rgb(191 219 254) !important;
+      }
+      @keyframes lk-topup-glow {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.25);
+        }
+        50% {
+          box-shadow: 0 0 28px -4px rgba(59, 130, 246, 0.35);
+        }
+      }
+      .lk-topup-card-pulse {
+        animation: lk-topup-glow 4s ease-in-out infinite;
+      }
 
       /* Сайдбар ЛК: свёрнут по умолчанию, бургер → крестик при раскрытии */
       .lk-sidebar {
@@ -600,34 +630,74 @@
         </section>
 
         <section id="tab-balance" class="tab-panel hidden space-y-6">
-          <div class="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/[0.08] via-[#0a0a12] to-[#060608] p-6 sm:p-8 shadow-lg shadow-blue-950/20">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
+            <div class="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/[0.08] via-[#0a0a12] to-[#060608] p-6 sm:p-8 shadow-lg shadow-blue-950/20 lg:col-span-1 flex flex-col justify-center min-h-[11rem]">
               <div class="flex items-center gap-4 min-w-0">
                 <span class="lk-balance-ico lk-balance-ico--blue" aria-hidden="true">
                   <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </span>
-                <div class="min-w-0">
+                <div class="min-w-0 flex-1">
                   <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400/90 mb-1">Текущий баланс</p>
                   <p id="balance-page-value" class="text-2xl sm:text-3xl font-black tabular-nums text-blue-300 tracking-tight">—</p>
                   <p id="balance-page-hint" class="text-[11px] text-gray-500 mt-1.5 leading-snug">Привяжите Telegram, чтобы видеть баланс VPN.</p>
                 </div>
               </div>
             </div>
+
+            <div class="rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/[0.1] via-[#080c0a] to-transparent p-6 sm:p-8 ring-1 ring-emerald-500/10 lg:col-span-2 flex flex-col">
+              <div class="flex flex-nowrap items-start gap-4 sm:gap-5 mb-5 min-w-0">
+                <span class="lk-balance-ico lk-balance-ico--emerald mt-0.5" aria-hidden="true">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                </span>
+                <div class="min-w-0 flex-1">
+                  <h2 class="text-base font-black uppercase tracking-widest text-white leading-tight">Промокод</h2>
+                  <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Тот же код, что и в Telegram-боте. Нужен привязанный Telegram.</p>
+                </div>
+              </div>
+              <p id="balance-promo-hint" class="hidden mb-5 rounded-2xl border border-amber-500/30 bg-amber-500/[0.12] px-4 py-3.5 text-xs text-amber-100/95 leading-relaxed"></p>
+              <form id="form-balance-promo" class="space-y-4 flex-1 flex flex-col">
+                <div>
+                  <label for="balance-promo-code" class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2.5 pl-0.5">Введите промокод</label>
+                  <div class="relative rounded-2xl border border-white/10 bg-black/40 shadow-inner transition-colors focus-within:border-emerald-500/45 focus-within:ring-2 focus-within:ring-emerald-500/15">
+                    <span class="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-emerald-500/70" aria-hidden="true">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                    </span>
+                    <input
+                      id="balance-promo-code"
+                      type="text"
+                      autocomplete="off"
+                      maxlength="64"
+                      spellcheck="false"
+                      class="w-full rounded-2xl bg-transparent pl-12 pr-4 py-3.5 text-[15px] font-semibold tracking-wide text-white placeholder:text-gray-600 outline-none font-mono"
+                      placeholder="код из бота"
+                    />
+                  </div>
+                </div>
+                <p id="balance-promo-msg" class="hidden min-h-[2.75rem] text-xs font-bold uppercase tracking-wider rounded-2xl px-4 py-3 border flex items-center gap-2" role="status"></p>
+                <button id="btn-balance-promo" type="submit" class="w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black uppercase text-[11px] tracking-widest hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 border border-emerald-400/20 mt-auto">
+                  <svg class="w-5 h-5 shrink-0 opacity-95" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Активировать
+                </button>
+              </form>
+            </div>
           </div>
 
-          <div class="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/[0.12] via-[#0c0a08] to-transparent p-6 sm:p-8 ring-1 ring-amber-500/10">
-            <div class="flex flex-nowrap items-start gap-4 sm:gap-5 mb-5 min-w-0">
-              <span class="lk-balance-ico lk-balance-ico--amber mt-0.5" aria-hidden="true">
+          <div class="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/[0.12] via-[#0c0a08] to-transparent p-6 sm:p-8 ring-1 ring-amber-500/10 lk-topup-card-pulse">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 mb-6 min-w-0">
+              <span class="lk-balance-ico lk-balance-ico--amber shrink-0 mt-0.5" aria-hidden="true">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
               </span>
               <div class="min-w-0 flex-1">
                 <h2 class="text-base font-black uppercase tracking-widest text-white leading-tight">Пополнение баланса</h2>
-                <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Выберите сумму и удобный способ оплаты. Зачисление приходит автоматически.</p>
+                <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Выберите сумму, способ оплаты и нажмите «Пополнить». Откроется страница банка — после оплаты баланс обновится автоматически.</p>
               </div>
             </div>
             <div class="space-y-4">
-              <div class="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-[11px] text-gray-300 leading-relaxed">
-                Бонус к пополнению: <b class="text-emerald-300">+3%</b> от 500 ₽, <b class="text-emerald-300">+5%</b> от 1000 ₽, <b class="text-emerald-300">+7%</b> от 2000 ₽.
+              <div class="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-[11px] text-gray-300 leading-relaxed flex items-start gap-3">
+                <span class="text-emerald-400 shrink-0 mt-0.5" aria-hidden="true">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </span>
+                <span>Бонус к пополнению: <b class="text-emerald-300">+3%</b> от 500 ₽, <b class="text-emerald-300">+5%</b> от 1000 ₽, <b class="text-emerald-300">+7%</b> от 2000 ₽.</span>
               </div>
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <button type="button" class="lk-topup-amount-btn rounded-xl border border-white/12 bg-white/[0.03] px-3 py-2.5 text-xs font-black uppercase tracking-wide text-gray-200 hover:border-blue-500/35 hover:bg-blue-500/10 transition-all" data-amount="50">50 ₽</button>
@@ -636,55 +706,73 @@
                 <button type="button" class="lk-topup-amount-btn rounded-xl border border-white/12 bg-white/[0.03] px-3 py-2.5 text-xs font-black uppercase tracking-wide text-gray-200 hover:border-blue-500/35 hover:bg-blue-500/10 transition-all" data-amount="1000">1000 ₽</button>
               </div>
               <div class="rounded-2xl border border-white/10 bg-black/35 p-3.5">
-                <label for="lk-topup-custom-amount" class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Своя сумма, ₽</label>
-                <input id="lk-topup-custom-amount" type="number" min="10" max="50000" step="1" class="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-sm font-semibold text-white outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20" placeholder="Например, 750" />
+                <label for="lk-topup-custom-amount" class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-6h-8"/></svg>
+                  Своя сумма, ₽
+                </label>
+                <input id="lk-topup-custom-amount" type="number" min="10" max="50000" step="1" class="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-sm font-semibold text-white outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 transition-shadow" placeholder="Например, 750" />
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button id="btn-topup-sbp" type="button" class="w-full min-h-[50px] rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-black uppercase text-[11px] tracking-widest hover:from-blue-500 hover:to-blue-400 transition-all border border-blue-400/30">СБП</button>
-                <button id="btn-topup-card" type="button" class="w-full min-h-[50px] rounded-xl bg-white/[0.05] border border-white/15 text-white font-black uppercase text-[11px] tracking-widest hover:bg-white/[0.1] hover:border-blue-500/35 transition-all">Банковская карта</button>
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Способ оплаты</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button type="button" data-method="sbp" class="lk-topup-method lk-topup-method--on group flex items-center gap-3 rounded-2xl border border-white/12 bg-white/[0.03] px-4 py-4 text-left transition-all hover:border-blue-500/35">
+                  <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                  </span>
+                  <span>
+                    <span class="block text-sm font-black text-white tracking-wide">СБП</span>
+                    <span class="block text-[10px] text-gray-500 mt-0.5">Быстрый перевод</span>
+                  </span>
+                </button>
+                <button type="button" data-method="card" class="lk-topup-method group flex items-center gap-3 rounded-2xl border border-white/12 bg-white/[0.03] px-4 py-4 text-left transition-all hover:border-blue-500/35">
+                  <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-gray-300 ring-1 ring-white/10">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                  </span>
+                  <span>
+                    <span class="block text-sm font-black text-white tracking-wide">Банковская карта</span>
+                    <span class="block text-[10px] text-gray-500 mt-0.5">Visa, МИР, Mastercard</span>
+                  </span>
+                </button>
               </div>
+              <button id="btn-topup-submit" type="button" class="w-full min-h-[54px] rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 text-white font-black uppercase text-[12px] tracking-widest hover:from-blue-500 hover:to-indigo-400 transition-all border border-blue-400/30 shadow-lg shadow-blue-900/30 flex items-center justify-center gap-3">
+                <svg id="btn-topup-submit-ico" class="w-5 h-5 shrink-0 opacity-95" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                <span id="btn-topup-submit-label">Пополнить</span>
+                <svg id="btn-topup-submit-spinner" class="hidden w-5 h-5 shrink-0 lk-spin text-white/90" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+              </button>
               <p id="lk-topup-msg" class="hidden min-h-[2.75rem] text-xs font-bold uppercase tracking-wider rounded-2xl px-4 py-3 border flex items-center gap-2" role="status"></p>
-              <p class="text-[11px] text-gray-500 leading-relaxed">
-                После оплаты можно закрыть окно банка и вернуться в личный кабинет.
+              <p class="text-[11px] text-gray-500 leading-relaxed flex items-start gap-2">
+                <svg class="w-4 h-4 shrink-0 text-gray-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                После оплаты можно закрыть окно банка и вернуться сюда — статус проверяется автоматически. Если баланс не обновился, откройте «Мои платежи» и нажмите «Проверить».
               </p>
             </div>
           </div>
 
-          <div class="rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/[0.1] via-[#080c0a] to-transparent p-6 sm:p-8 ring-1 ring-emerald-500/10">
-            <div class="flex flex-nowrap items-start gap-4 sm:gap-5 mb-5 min-w-0">
-              <span class="lk-balance-ico lk-balance-ico--emerald mt-0.5" aria-hidden="true">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
-              </span>
-              <div class="min-w-0 flex-1">
-                <h2 class="text-base font-black uppercase tracking-widest text-white leading-tight">Промокод</h2>
-                <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Тот же код, что и в Telegram-боте. Нужен привязанный Telegram.</p>
-              </div>
-            </div>
-            <p id="balance-promo-hint" class="hidden mb-5 rounded-2xl border border-amber-500/30 bg-amber-500/[0.12] px-4 py-3.5 text-xs text-amber-100/95 leading-relaxed"></p>
-            <form id="form-balance-promo" class="space-y-4">
-              <div>
-                <label for="balance-promo-code" class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2.5 pl-0.5">Введите промокод</label>
-                <div class="relative rounded-2xl border border-white/10 bg-black/40 shadow-inner transition-colors focus-within:border-emerald-500/45 focus-within:ring-2 focus-within:ring-emerald-500/15">
-                  <span class="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-emerald-500/70" aria-hidden="true">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
-                  </span>
-                  <input
-                    id="balance-promo-code"
-                    type="text"
-                    autocomplete="off"
-                    maxlength="64"
-                    spellcheck="false"
-                    class="w-full rounded-2xl bg-transparent pl-12 pr-4 py-3.5 text-[15px] font-semibold tracking-wide text-white placeholder:text-gray-600 outline-none font-mono"
-                    placeholder="код из бота"
-                  />
+          <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-[#0c0c14] to-[#060608] p-6 sm:p-8 ring-1 ring-white/5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/25" aria-hidden="true">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                </span>
+                <div>
+                  <h3 class="text-sm font-black uppercase tracking-widest text-white">История платежей</h3>
+                  <p class="text-[11px] text-gray-500 mt-0.5">Статусы и ручная проверка при задержке</p>
                 </div>
               </div>
-              <p id="balance-promo-msg" class="hidden min-h-[2.75rem] text-xs font-bold uppercase tracking-wider rounded-2xl px-4 py-3 border flex items-center gap-2" role="status"></p>
-              <button id="btn-balance-promo" type="submit" class="w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black uppercase text-[11px] tracking-widest hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 border border-emerald-400/20">
-                <svg class="w-5 h-5 shrink-0 opacity-95" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Активировать
+              <button id="btn-balance-payments-toggle" type="button" class="shrink-0 rounded-xl border border-violet-500/35 bg-violet-500/10 px-5 py-2.5 text-[11px] font-black uppercase tracking-widest text-violet-200 hover:bg-violet-500/20 transition-all flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                <span id="btn-balance-payments-toggle-label">Мои платежи</span>
               </button>
-            </form>
+            </div>
+            <div id="balance-payments-panel" class="hidden mt-6 pt-6 border-t border-white/10">
+              <div id="lk-payments-tabs" class="flex flex-wrap gap-2 mb-5" role="tablist">
+                <button type="button" data-pay-tab="all" class="lk-pay-tab lk-pay-tab--active rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-400 hover:text-white transition-colors">Все</button>
+                <button type="button" data-pay-tab="success" class="lk-pay-tab rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-400 hover:text-white transition-colors">Успешные</button>
+                <button type="button" data-pay-tab="processing" class="lk-pay-tab rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-400 hover:text-white transition-colors">В обработке</button>
+                <button type="button" data-pay-tab="failed" class="lk-pay-tab rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-400 hover:text-white transition-colors">Отклонённые</button>
+              </div>
+              <p id="lk-payments-loading" class="hidden text-center text-xs text-gray-500 py-8">Загрузка…</p>
+              <p id="lk-payments-empty" class="hidden text-center text-xs text-gray-500 py-8">Платежей пока нет.</p>
+              <div id="lk-payments-list" class="space-y-3"></div>
+            </div>
           </div>
         </section>
 
@@ -1313,6 +1401,31 @@
               : 'text-emerald-100 border-emerald-500/35 bg-emerald-500/[0.12]');
         }
 
+        var selectedTopupMethod = 'sbp';
+        var topupPollGen = 0;
+        var lkPaymentsCache = [];
+        var lkPaymentsTab = 'all';
+        var lkPaymentsPanelOpen = false;
+
+        function setTopupSubmitProcessing(on) {
+          var btn = document.getElementById('btn-topup-submit');
+          var label = document.getElementById('btn-topup-submit-label');
+          var ico = document.getElementById('btn-topup-submit-ico');
+          var spin = document.getElementById('btn-topup-submit-spinner');
+          if (!btn) return;
+          btn.disabled = !!on;
+          if (label) label.textContent = on ? 'Обработка' : 'Пополнить';
+          if (ico) ico.classList.toggle('hidden', !!on);
+          if (spin) spin.classList.toggle('hidden', !on);
+        }
+
+        function syncTopupMethodButtons() {
+          document.querySelectorAll('.lk-topup-method').forEach(function (el) {
+            var m = el.getAttribute('data-method');
+            el.classList.toggle('lk-topup-method--on', m === selectedTopupMethod);
+          });
+        }
+
         function renderBalanceTab(user) {
           var sp = user && user.serviceProfile;
           var valEl = document.getElementById('balance-page-value');
@@ -1353,10 +1466,12 @@
           }
           if (btn) btn.disabled = !hasTg;
           if (inp) inp.disabled = !hasTg;
-          var btnSbp = document.getElementById('btn-topup-sbp');
-          var btnCard = document.getElementById('btn-topup-card');
-          if (btnSbp) btnSbp.disabled = !hasTg;
-          if (btnCard) btnCard.disabled = !hasTg;
+          var btnTop = document.getElementById('btn-topup-submit');
+          var busy = btnTop && btnTop.disabled;
+          document.querySelectorAll('.lk-topup-method').forEach(function (b) {
+            b.disabled = !hasTg || busy;
+          });
+          if (btnTop && !busy) btnTop.disabled = !hasTg;
         }
 
         function formatBytes(n) {
@@ -1723,7 +1838,207 @@
           });
         });
 
-        async function startTopup(method) {
+        document.querySelectorAll('.lk-topup-method').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var m = btn.getAttribute('data-method');
+            if (m === 'sbp' || m === 'card') {
+              selectedTopupMethod = m;
+              syncTopupMethodButtons();
+            }
+          });
+        });
+        syncTopupMethodButtons();
+
+        function lkPaymentStatusLabel(st) {
+          var u = String(st || '').toLowerCase();
+          if (u === 'success') return 'Успешно';
+          if (u === 'pending') return 'В обработке';
+          if (u === 'created') return 'Создан';
+          if (u === 'error' || u === 'failed') return 'Отклонён';
+          return st || '—';
+        }
+
+        function lkFilterPayments(list, tab) {
+          if (!tab || tab === 'all') return list.slice();
+          return list.filter(function (p) {
+            return p.tab === tab;
+          });
+        }
+
+        function renderPaymentsList() {
+          var wrap = document.getElementById('lk-payments-list');
+          var empty = document.getElementById('lk-payments-empty');
+          if (!wrap || !empty) return;
+          var filtered = lkFilterPayments(lkPaymentsCache, lkPaymentsTab);
+          wrap.innerHTML = '';
+          if (!filtered.length) {
+            empty.classList.remove('hidden');
+            empty.textContent =
+              lkPaymentsCache.length === 0
+                ? 'Платежей пока нет.'
+                : 'В этой категории ничего нет.';
+            return;
+          }
+          empty.classList.add('hidden');
+          filtered.forEach(function (p) {
+            var row = document.createElement('div');
+            row.className =
+              'rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors hover:border-white/15';
+            var left = document.createElement('div');
+            left.className = 'min-w-0';
+            var amtLine = document.createElement('div');
+            amtLine.className = 'text-sm font-bold text-white tabular-nums';
+            var fa = p.finalAmount != null ? p.finalAmount : p.amount;
+            amtLine.textContent =
+              (p.amount != null ? Number(p.amount).toFixed(0) : '—') +
+              ' ₽' +
+              (fa != null && Number(fa) !== Number(p.amount)
+                ? ' → зачисление ' + Number(fa).toFixed(2) + ' ₽'
+                : '');
+            var meta = document.createElement('div');
+            meta.className = 'text-[10px] text-gray-500 mt-1 font-mono truncate';
+            var inv = p.invoiceId ? String(p.invoiceId).slice(0, 8) + '…' : '—';
+            var dt = p.createdAt ? new Date(p.createdAt).toLocaleString('ru-RU') : '';
+            meta.textContent = '#' + p.id + ' · ' + inv + (dt ? ' · ' + dt : '');
+            left.appendChild(amtLine);
+            left.appendChild(meta);
+            var right = document.createElement('div');
+            right.className = 'flex flex-wrap items-center gap-2 shrink-0';
+            var badge = document.createElement('span');
+            var st = String(p.status || '');
+            var ok = st === 'success';
+            var pend = st === 'pending' || st === 'created';
+            badge.className =
+              'inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ' +
+              (ok
+                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25'
+                : pend
+                  ? 'bg-amber-500/15 text-amber-200 border border-amber-500/25'
+                  : 'bg-red-500/10 text-red-300 border border-red-500/25');
+            badge.textContent = lkPaymentStatusLabel(st);
+            right.appendChild(badge);
+            if (pend) {
+              var chkBtn = document.createElement('button');
+              chkBtn.type = 'button';
+              chkBtn.className =
+                'lk-pay-check rounded-lg border border-blue-500/40 bg-blue-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-blue-200 hover:bg-blue-500/20 transition-colors';
+              chkBtn.setAttribute('data-payment-id', String(p.id));
+              chkBtn.textContent = 'Проверить';
+              right.appendChild(chkBtn);
+            }
+            row.appendChild(left);
+            row.appendChild(right);
+            wrap.appendChild(row);
+          });
+          wrap.querySelectorAll('.lk-pay-check').forEach(function (b) {
+            b.addEventListener('click', function () {
+              var pid = Number(b.getAttribute('data-payment-id') || 0);
+              if (pid) void checkSinglePayment(pid, b);
+            });
+          });
+        }
+
+        async function fetchPaymentsList() {
+          var load = document.getElementById('lk-payments-loading');
+          if (load) load.classList.remove('hidden');
+          try {
+            var res = await fetch('/api/auth/payments?limit=80', {
+              credentials: 'include',
+              headers: { Accept: 'application/json' },
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok || !data.payments) {
+              lkPaymentsCache = [];
+            } else {
+              lkPaymentsCache = data.payments;
+            }
+            renderPaymentsList();
+          } catch (_) {
+            lkPaymentsCache = [];
+            renderPaymentsList();
+          } finally {
+            if (load) load.classList.add('hidden');
+          }
+        }
+
+        var checkingPaymentIds = {};
+
+        async function checkSinglePayment(paymentId, btnEl) {
+          if (checkingPaymentIds[paymentId]) return;
+          checkingPaymentIds[paymentId] = true;
+          if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.textContent = '…';
+          }
+          try {
+            var res = await fetch('/api/auth/topup/check', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ paymentId: paymentId }),
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (res.ok && data && data.status === 'success') {
+              sessionStorage.removeItem('lk_topup_pending');
+              var me = await refreshMe();
+              if (me) await applyPanel(me);
+              setTopupMessage('Статус обновлён. Баланс зачислен.', false);
+            } else if (!res.ok) {
+              setTopupMessage(parseErrorPayload(data) || 'Не удалось проверить', true);
+            }
+            await fetchPaymentsList();
+          } catch (_) {
+            setTopupMessage('Ошибка сети при проверке платежа.', true);
+          } finally {
+            checkingPaymentIds[paymentId] = false;
+            if (btnEl) {
+              btnEl.disabled = false;
+              btnEl.textContent = 'Проверить';
+            }
+          }
+        }
+
+        async function pollTopupUntilDone(paymentId) {
+          var myGen = ++topupPollGen;
+          var fastTries = 40;
+          var slowTries = 24;
+          var i = 0;
+          while (myGen === topupPollGen && i < fastTries + slowTries) {
+            i += 1;
+            var delay = i <= fastTries ? 3000 : 12000;
+            await new Promise(function (r) { setTimeout(r, delay); });
+            if (myGen !== topupPollGen) return;
+            try {
+              var chk = await fetch('/api/auth/topup/check', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ paymentId: paymentId }),
+              });
+              var chkData = await chk.json().catch(function () { return {}; });
+              if (!chk.ok) continue;
+              if (chkData && chkData.status === 'success') {
+                sessionStorage.removeItem('lk_topup_pending');
+                var me = await refreshMe();
+                if (me) await applyPanel(me);
+                setTopupMessage('Оплата подтверждена. Баланс обновлён.', false);
+                if (lkPaymentsPanelOpen) await fetchPaymentsList();
+                return;
+              }
+            } catch (_) {
+              /* retry */
+            }
+          }
+          if (myGen === topupPollGen) {
+            setTopupMessage(
+              'Платёж ещё в обработке. Откройте «Мои платежи» и нажмите «Проверить», либо обновите страницу позже.',
+              false,
+            );
+          }
+          if (lkPaymentsPanelOpen && myGen === topupPollGen) await fetchPaymentsList();
+        }
+
+        async function startTopup() {
           var inp = document.getElementById('lk-topup-custom-amount');
           if (!inp || !currentUser || !currentUser.telegram) {
             setTopupMessage('Сначала привяжите Telegram.', true);
@@ -1738,16 +2053,16 @@
             setTopupMessage('Слишком большая сумма. Максимум 50 000 ₽.', true);
             return;
           }
-          var btnSbp = document.getElementById('btn-topup-sbp');
-          var btnCard = document.getElementById('btn-topup-card');
-          if (btnSbp) btnSbp.disabled = true;
-          if (btnCard) btnCard.disabled = true;
+          setTopupSubmitProcessing(true);
+          document.querySelectorAll('.lk-topup-method').forEach(function (b) {
+            b.disabled = true;
+          });
           try {
             var res = await fetch('/api/auth/topup/create', {
               method: 'POST',
               credentials: 'include',
               headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-              body: JSON.stringify({ amount: amount, method: method }),
+              body: JSON.stringify({ amount: amount, method: selectedTopupMethod }),
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok || !data.paymentUrl) {
@@ -1755,42 +2070,74 @@
               return;
             }
             var paymentId = Number(data.paymentId || 0);
-            setTopupMessage('Ссылка на оплату открыта. Завершите платёж в окне банка.', false);
+            sessionStorage.setItem('lk_topup_pending', String(paymentId));
+            setTopupMessage('Открываем оплату… Завершите платёж в окне банка.', false);
             window.open(String(data.paymentUrl), '_blank', 'noopener,noreferrer');
-
-            var attempts = 0;
-            var maxAttempts = 18;
-            while (attempts < maxAttempts) {
-              attempts += 1;
-              await new Promise(function (r) { setTimeout(r, 5000); });
-              var chk = await fetch('/api/auth/topup/check', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                body: JSON.stringify({ paymentId: paymentId }),
-              });
-              var chkData = await chk.json().catch(function () { return {}; });
-              if (!chk.ok) continue;
-              if (chkData && chkData.status === 'success') {
-                var me = await refreshMe();
-                if (me) await applyPanel(me);
-                setTopupMessage('Оплата подтверждена. Баланс обновлён.', false);
-                return;
-              }
-            }
-            setTopupMessage('Ожидаем подтверждение оплаты. Баланс обновится автоматически.', false);
+            void pollTopupUntilDone(paymentId);
           } catch (_) {
             setTopupMessage('Ошибка сети при создании платежа.', true);
           } finally {
+            setTopupSubmitProcessing(false);
+            document.querySelectorAll('.lk-topup-method').forEach(function (b) {
+              b.disabled = !currentUser || !currentUser.telegram;
+            });
             renderBalanceTab(currentUser);
           }
         }
 
-        document.getElementById('btn-topup-sbp')?.addEventListener('click', function () {
-          startTopup('sbp');
+        document.getElementById('btn-topup-submit')?.addEventListener('click', function () {
+          void startTopup();
         });
-        document.getElementById('btn-topup-card')?.addEventListener('click', function () {
-          startTopup('card');
+
+        document.getElementById('btn-balance-payments-toggle')?.addEventListener('click', async function () {
+          var panel = document.getElementById('balance-payments-panel');
+          var lab = document.getElementById('btn-balance-payments-toggle-label');
+          if (!panel) return;
+          lkPaymentsPanelOpen = !lkPaymentsPanelOpen;
+          if (lkPaymentsPanelOpen) {
+            panel.classList.remove('hidden');
+            if (lab) lab.textContent = 'Скрыть';
+            await fetchPaymentsList();
+          } else {
+            panel.classList.add('hidden');
+            if (lab) lab.textContent = 'Мои платежи';
+          }
+        });
+
+        document.getElementById('lk-payments-tabs')?.addEventListener('click', function (e) {
+          var t = e.target;
+          if (!t || !t.getAttribute || t.getAttribute('data-pay-tab') == null) return;
+          lkPaymentsTab = t.getAttribute('data-pay-tab') || 'all';
+          document.querySelectorAll('.lk-pay-tab').forEach(function (b) {
+            b.classList.toggle('lk-pay-tab--active', b.getAttribute('data-pay-tab') === lkPaymentsTab);
+          });
+          renderPaymentsList();
+        });
+
+        window.addEventListener('focus', function () {
+          var raw = sessionStorage.getItem('lk_topup_pending');
+          if (!raw) return;
+          var pid = Number(raw);
+          if (!pid) return;
+          void (async function () {
+            try {
+              var chk = await fetch('/api/auth/topup/check', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ paymentId: pid }),
+              });
+              var chkData = await chk.json().catch(function () { return {}; });
+              if (chk.ok && chkData && chkData.status === 'success') {
+                sessionStorage.removeItem('lk_topup_pending');
+                var me = await refreshMe();
+                if (me) await applyPanel(me);
+                if (lkPaymentsPanelOpen) await fetchPaymentsList();
+              }
+            } catch (_) {
+              /* ignore */
+            }
+          })();
         });
 
         initSetupDeviceRemove();
