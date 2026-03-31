@@ -1407,6 +1407,17 @@
             : '<svg class="lk-password-toggle-eye w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
         }
 
+        function setBusyButton(btn, busy, idleText) {
+          if (!btn) return;
+          if (!btn.dataset.idleText) {
+            btn.dataset.idleText = idleText || btn.textContent || '';
+          }
+          btn.disabled = !!busy;
+          btn.textContent = busy
+            ? 'Подождите...'
+            : (idleText || btn.dataset.idleText || btn.textContent || '');
+        }
+
         function initPasswordToggles() {
           document.querySelectorAll('.lk-password-toggle').forEach(function (btn) {
             if (btn.dataset.bound === '1') return;
@@ -2919,10 +2930,13 @@
         formLogin?.addEventListener('submit', async function (e) {
           e.preventDefault();
           hideAuthMessage();
+          var submitBtn = document.getElementById('btn-login');
           var username = document.getElementById('login-username')?.value.trim() || '';
           var password = document.getElementById('login-password')?.value || '';
+          setBusyButton(submitBtn, true, 'Войти');
           var token = await executeCaptcha('login');
           if (!token) {
+            setBusyButton(submitBtn, false, 'Войти');
             showAuthMessage('Подтвердите, что вы не робот', true);
             return;
           }
@@ -2935,10 +2949,12 @@
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok) {
+              setBusyButton(submitBtn, false, 'Войти');
               showAuthMessage(parseErrorPayload(data), true);
               return;
             }
             if (data.needsTelegramOtp && data.challengeId) {
+              setBusyButton(submitBtn, false, 'Войти');
               loginChallengeId = data.challengeId;
               var cred = document.getElementById('login-step-credentials');
               var otp = document.getElementById('login-step-otp');
@@ -2957,15 +2973,19 @@
             }
             reloadPageFresh();
           } catch (_) {
+            setBusyButton(submitBtn, false, 'Войти');
             showAuthMessage('Сеть недоступна', true);
           }
         });
 
         document.getElementById('btn-reset-request')?.addEventListener('click', async function () {
           hideAuthMessage();
+          var btn = this;
           var username = document.getElementById('reset-username')?.value.trim() || '';
+          setBusyButton(btn, true, 'Запросить код');
           var token = await executeCaptcha('login');
           if (!token) {
+            setBusyButton(btn, false, 'Запросить код');
             showAuthMessage('Подтвердите, что вы не робот', true);
             return;
           }
@@ -2978,6 +2998,7 @@
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok) {
+              setBusyButton(btn, false, 'Запросить код');
               showAuthMessage(parseErrorPayload(data), true);
               return;
             }
@@ -2995,6 +3016,7 @@
             showAuthMessage(data.message || 'Код отправлен в Telegram', false);
             refreshAuthButtons();
           } catch (_) {
+            setBusyButton(btn, false, 'Запросить код');
             showAuthMessage('Сеть недоступна', true);
           }
         });
@@ -3057,10 +3079,12 @@
 
         document.getElementById('btn-reset-complete')?.addEventListener('click', async function () {
           hideAuthMessage();
+          var btn = this;
           var code = document.getElementById('reset-otp-code')?.value.trim() || '';
           var newPassword = document.getElementById('reset-new-password')?.value || '';
           var confirmPassword = document.getElementById('reset-confirm-password')?.value || '';
           if (!passwordResetChallengeId) return;
+          setBusyButton(btn, true, 'Сохранить новый пароль');
           try {
             var res = await fetch('/api/auth/password-reset/complete', {
               method: 'POST',
@@ -3075,12 +3099,14 @@
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok) {
+              setBusyButton(btn, false, 'Сохранить новый пароль');
               showAuthMessage(parseErrorPayload(data), true);
               return;
             }
             showAuthMessage(data.message || 'Пароль обновлён', false);
             setMode('login');
           } catch (_) {
+            setBusyButton(btn, false, 'Сохранить новый пароль');
             showAuthMessage('Сеть недоступна', true);
           }
         });
@@ -3096,8 +3122,10 @@
 
         document.getElementById('btn-login-otp-submit')?.addEventListener('click', async function () {
           hideAuthMessage();
+          var btn = this;
           var code = document.getElementById('login-otp-code')?.value.trim() || '';
           if (!loginChallengeId || !/^[0-9]{6}$/.test(code)) return;
+          setBusyButton(btn, true, 'Подтвердить вход');
           try {
             var res = await fetch('/api/auth/login/telegram-otp', {
               method: 'POST',
@@ -3107,11 +3135,13 @@
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok) {
+              setBusyButton(btn, false, 'Подтвердить вход');
               showAuthMessage(parseErrorPayload(data), true);
               return;
             }
             reloadPageFresh();
           } catch (_) {
+            setBusyButton(btn, false, 'Подтвердить вход');
             showAuthMessage('Сеть недоступна', true);
           }
         });
@@ -3119,11 +3149,14 @@
         formRegister?.addEventListener('submit', async function (e) {
           e.preventDefault();
           hideAuthMessage();
+          var submitBtn = document.getElementById('btn-register');
           var u = document.getElementById('register-username')?.value.trim() || '';
           var p = document.getElementById('register-password')?.value || '';
           var c = document.getElementById('register-confirm-password')?.value || '';
+          setBusyButton(submitBtn, true, 'Создать аккаунт');
           var token = await executeCaptcha('register');
           if (!token) {
+            setBusyButton(submitBtn, false, 'Создать аккаунт');
             showAuthMessage('Подтвердите, что вы не робот', true);
             return;
           }
@@ -3141,17 +3174,20 @@
             });
             var data = await res.json().catch(function () { return {}; });
             if (!res.ok) {
+              setBusyButton(submitBtn, false, 'Создать аккаунт');
               showAuthMessage(parseErrorPayload(data), true);
               return;
             }
             reloadPageFresh();
           } catch (_) {
+            setBusyButton(submitBtn, false, 'Создать аккаунт');
             showAuthMessage('Сеть недоступна', true);
           }
         });
 
         formLogin?.addEventListener('input', refreshAuthButtons);
         formRegister?.addEventListener('input', refreshAuthButtons);
+        document.getElementById('reset-username')?.addEventListener('input', refreshAuthButtons);
 
         async function boot() {
           startBootLoaderDots();
