@@ -421,10 +421,19 @@
           <div id="login-step-credentials">
             <form id="form-login" class="space-y-4">
               <div class="relative group/input">
-                <input id="login-username" autocomplete="username" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Логин" type="text" maxlength="32" />
+                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors" aria-hidden="true">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/></svg>
+                </span>
+                <input id="login-username" autocomplete="username" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-12 pr-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Логин" type="text" maxlength="32" />
               </div>
               <div class="relative group/input">
-                <input id="login-password" autocomplete="current-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Пароль" type="password" />
+                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors" aria-hidden="true">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 10.5V8a4.5 4.5 0 1 0-9 0v2.5M7 10.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/></svg>
+                </span>
+                <input id="login-password" autocomplete="current-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-12 pr-14 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Пароль" type="password" />
+                <button type="button" class="lk-password-toggle absolute right-3 top-1/2 -translate-y-1/2 rounded-xl p-2 text-gray-500 hover:text-white transition-colors" data-target="login-password" aria-label="Показать пароль">
+                  <svg class="lk-password-toggle-eye w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
               </div>
               <button id="btn-login" type="submit" disabled class="w-full h-14 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-blue-500 transition-all disabled:opacity-50">Войти</button>
             </form>
@@ -434,14 +443,23 @@
             <p class="text-sm text-gray-400 text-center leading-relaxed">
               Код отправлен в Telegram. Введите <span class="text-white font-bold">6 цифр</span> из сообщения бота.
             </p>
+            <div id="login-otp-visual" class="grid grid-cols-6 gap-2 sm:gap-3" role="group" aria-label="Код подтверждения">
+              <button type="button" class="lk-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-emerald-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-emerald-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-emerald-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-emerald-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-emerald-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-emerald-500/30 focus:outline-none"></button>
+            </div>
             <input
               id="login-otp-code"
               type="text"
               inputmode="numeric"
               autocomplete="one-time-code"
               maxlength="6"
-              class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-center text-2xl font-black tracking-[0.5em] text-white outline-none focus:border-emerald-500/40 font-mono"
-              placeholder="······"
+              class="sr-only"
+              placeholder="123456"
+              aria-label="Код из Telegram"
             />
             <button id="btn-login-otp-submit" type="button" class="w-full h-14 rounded-2xl bg-emerald-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-emerald-500 transition-all disabled:opacity-50" disabled>
               Подтвердить вход
@@ -452,9 +470,30 @@
           </div>
 
           <form id="form-register" class="space-y-4 hidden">
-            <input id="register-username" autocomplete="username" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Логин" type="text" maxlength="32" />
-            <input id="register-password" autocomplete="new-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Пароль" type="password" />
-            <input id="register-confirm-password" autocomplete="new-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Повторите пароль" type="password" />
+            <div class="relative group/input">
+              <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/></svg>
+              </span>
+              <input id="register-username" autocomplete="username" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-12 pr-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Логин" type="text" maxlength="32" />
+            </div>
+            <div class="relative group/input">
+              <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 10.5V8a4.5 4.5 0 1 0-9 0v2.5M7 10.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/></svg>
+              </span>
+              <input id="register-password" autocomplete="new-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-12 pr-14 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Пароль" type="password" />
+              <button type="button" class="lk-password-toggle absolute right-3 top-1/2 -translate-y-1/2 rounded-xl p-2 text-gray-500 hover:text-white transition-colors" data-target="register-password" aria-label="Показать пароль">
+                <svg class="lk-password-toggle-eye w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="relative group/input">
+              <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 10.5V8a4.5 4.5 0 1 0-9 0v2.5M7 10.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/></svg>
+              </span>
+              <input id="register-confirm-password" autocomplete="new-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-12 pr-14 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Повторите пароль" type="password" />
+              <button type="button" class="lk-password-toggle absolute right-3 top-1/2 -translate-y-1/2 rounded-xl p-2 text-gray-500 hover:text-white transition-colors" data-target="register-confirm-password" aria-label="Показать пароль">
+                <svg class="lk-password-toggle-eye w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
             <button id="btn-register" type="submit" disabled class="w-full h-14 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-blue-500 transition-all disabled:opacity-50">Создать аккаунт</button>
           </form>
 
@@ -630,8 +669,8 @@
         </section>
 
         <section id="tab-balance" class="tab-panel hidden space-y-6">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
-            <div class="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/[0.08] via-[#0a0a12] to-[#060608] p-6 sm:p-8 shadow-lg shadow-blue-950/20 lg:col-span-1 flex flex-col justify-center min-h-[11rem]">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-start">
+            <div class="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/[0.08] via-[#0a0a12] to-[#060608] p-6 sm:p-8 shadow-lg shadow-blue-950/20 lg:col-span-1 flex flex-col justify-start min-h-[11rem]">
               <div class="flex items-center gap-4 min-w-0">
                 <span class="lk-balance-ico lk-balance-ico--blue" aria-hidden="true">
                   <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -793,7 +832,7 @@
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <h4 class="text-lg font-semibold text-white tracking-tight">Установка</h4>
                   <div class="relative w-full sm:w-[12rem] shrink-0">
-                    <span class="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-gray-400" aria-hidden="true">
+                    <span id="lk-setup-platform-icon" class="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-gray-400" aria-hidden="true">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7m0 2a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M16 3l-4 4-4-4"/></svg>
                     </span>
                     <select id="lk-setup-platform-select" class="w-full appearance-none rounded-xl border border-white/10 bg-black/50 py-2.5 pl-10 pr-9 text-sm font-medium text-white outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/25">
@@ -1149,6 +1188,7 @@
           if (cred) cred.classList.remove('hidden');
           if (otp) otp.classList.add('hidden');
           if (otpIn) otpIn.value = '';
+          renderLoginOtpSlots();
           refreshLoginOtpSubmitBtn();
           if (tgWrap && !tgWrap.classList.contains('hidden')) {
             /* keep widget */
@@ -1161,6 +1201,65 @@
           if (!otpIn || !b) return;
           var ok = /^[0-9]{6}$/.test((otpIn.value || '').trim());
           b.disabled = !ok;
+        }
+
+        function renderLoginOtpSlots() {
+          var otpIn = document.getElementById('login-otp-code');
+          if (!otpIn) return;
+          var value = (otpIn.value || '').replace(/\D/g, '').slice(0, 6);
+          var slots = document.querySelectorAll('.lk-otp-slot');
+          var activeIndex = Math.min(value.length, 5);
+          slots.forEach(function (slot, index) {
+            var digit = value[index] || '';
+            slot.textContent = digit;
+            slot.classList.toggle('border-emerald-500/50', index === activeIndex);
+            slot.classList.toggle('bg-emerald-500/[0.08]', index === activeIndex);
+            slot.classList.toggle('shadow-[0_0_0_1px_rgba(16,185,129,0.15)]', index === activeIndex);
+            slot.classList.toggle('text-emerald-100', !!digit);
+            slot.classList.toggle('border-white/10', index !== activeIndex);
+            slot.classList.toggle('bg-white/[0.03]', index !== activeIndex);
+          });
+        }
+
+        function focusLoginOtpInput() {
+          var otpIn = document.getElementById('login-otp-code');
+          if (!otpIn) return;
+          otpIn.focus();
+          try {
+            var pos = otpIn.value.length;
+            otpIn.setSelectionRange(pos, pos);
+          } catch (_) {}
+        }
+
+        function setPasswordToggleState(btn, shown) {
+          if (!btn) return;
+          btn.setAttribute('aria-label', shown ? 'Скрыть пароль' : 'Показать пароль');
+          btn.classList.toggle('text-white', shown);
+          btn.classList.toggle('text-gray-500', !shown);
+          btn.innerHTML = shown
+            ? '<svg class="lk-password-toggle-eye w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l18 18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.58 10.58a2 2 0 1 0 2.83 2.83"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.88 5.09A10.94 10.94 0 0 1 12 4.9c4.48 0 8.27 2.94 9.54 7a10.96 10.96 0 0 1-4.09 5.27"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6.61 6.61A11 11 0 0 0 2.46 12c1.27 4.06 5.06 7 9.54 7 1.47 0 2.87-.32 4.13-.89"/></svg>'
+            : '<svg class="lk-password-toggle-eye w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+        }
+
+        function initPasswordToggles() {
+          document.querySelectorAll('.lk-password-toggle').forEach(function (btn) {
+            if (btn.dataset.bound === '1') return;
+            btn.dataset.bound = '1';
+            setPasswordToggleState(btn, false);
+            btn.addEventListener('click', function () {
+              var targetId = btn.getAttribute('data-target');
+              var input = targetId ? document.getElementById(targetId) : null;
+              if (!input) return;
+              var shown = input.type === 'password';
+              input.type = shown ? 'text' : 'password';
+              setPasswordToggleState(btn, shown);
+              input.focus();
+              try {
+                var pos = input.value.length;
+                input.setSelectionRange(pos, pos);
+              } catch (_) {}
+            });
+          });
         }
 
         function showAuthMessage(text, isError) {
@@ -1450,8 +1549,8 @@
             } else {
               valEl.textContent = formatBalanceRub(sp.balance);
               if (hintBal) {
-                hintBal.textContent = 'Баланс в боте и в личном кабинете совпадает.';
-                hintBal.classList.remove('hidden');
+                hintBal.textContent = '';
+                hintBal.classList.add('hidden');
               }
             }
           }
@@ -1486,6 +1585,36 @@
             i++;
           } while (v >= 1024 && i < u.length - 1);
           return (v >= 10 || i === 0 ? v.toFixed(0) : v.toFixed(1)) + ' ' + u[i];
+        }
+
+        function detectDevicePlatform(name) {
+          var s = String(name || '').toLowerCase();
+          if (!s) return 'generic';
+          if (s.indexOf('iphone') >= 0 || s.indexOf('ipad') >= 0 || s.indexOf('ios') >= 0) return 'ios';
+          if (s.indexOf('apple tv') >= 0 || s.indexOf('tvos') >= 0) return 'appleTV';
+          if (s.indexOf('android tv') >= 0 || s.indexOf('google tv') >= 0 || s.indexOf('tv') >= 0) return 'androidTV';
+          if (s.indexOf('android') >= 0) return 'android';
+          if (s.indexOf('windows') >= 0 || s.indexOf('win') >= 0 || s.indexOf('pc') >= 0) return 'windows';
+          if (s.indexOf('macbook') >= 0 || s.indexOf('macos') >= 0 || s.indexOf('mac os') >= 0 || s.indexOf('imac') >= 0) return 'macos';
+          if (s.indexOf('linux') >= 0 || s.indexOf('ubuntu') >= 0 || s.indexOf('debian') >= 0) return 'linux';
+          return 'generic';
+        }
+
+        function getPlatformIconSvg(platform) {
+          var p = String(platform || 'generic');
+          if (p === 'ios' || p === 'macos' || p === 'appleTV') {
+            return '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.61c.03 3.2 2.81 4.26 2.84 4.28-.02.08-.44 1.52-1.46 3.01-.88 1.29-1.8 2.58-3.24 2.61-1.41.03-1.86-.83-3.47-.83-1.61 0-2.11.8-3.45.86-1.39.05-2.45-1.39-3.34-2.67-1.82-2.63-3.2-7.43-1.34-10.67.92-1.61 2.58-2.63 4.38-2.66 1.37-.03 2.66.92 3.47.92.81 0 2.33-1.14 3.93-.97.67.03 2.55.27 3.76 2.04-.1.06-2.24 1.31-2.22 4.08z"/><path d="M14.3 4.62c.74-.89 1.24-2.12 1.1-3.35-1.07.04-2.37.71-3.13 1.6-.69.79-1.29 2.06-1.12 3.27 1.19.09 2.41-.6 3.15-1.52z"/></svg>';
+          }
+          if (p === 'windows') {
+            return '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.5 4.4v7.1H3V5.5zm8.5-1.22L21 3v8.5h-9.5V4.28zM3 12.5h7.5v7.1L3 18.5v-6zm8.5 0H21V21l-9.5-1.28V12.5z"/></svg>';
+          }
+          if (p === 'android' || p === 'androidTV') {
+            return '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7.52 7.12 5.96 4.41a.75.75 0 1 1 1.3-.75l1.6 2.78A8.9 8.9 0 0 1 12 5.9c1.15 0 2.24.2 3.24.55l1.5-2.79a.75.75 0 1 1 1.32.71l-1.47 2.74A7.1 7.1 0 0 1 19.5 13H4.5a7.07 7.07 0 0 1 3.02-5.88ZM9 10.25a.85.85 0 1 0 0-1.7.85.85 0 0 0 0 1.7Zm6 0a.85.85 0 1 0 0-1.7.85.85 0 0 0 0 1.7ZM6 14h1v4.25a1.25 1.25 0 1 0 2.5 0V14h1v4.75a1.5 1.5 0 0 0 3 0V14h1v4.25a1.25 1.25 0 1 0 2.5 0V14h1a1 1 0 0 0 1-1v-.5h-14V13a1 1 0 0 0 1 1Z"/></svg>';
+          }
+          if (p === 'linux') {
+            return '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.92 0 3.5 1.83 3.5 4.08 0 1.19-.44 2.25-1.14 3 .93.7 1.89 2 2.3 4.17.18.96.6 1.73 1.02 2.48.53.96 1.08 1.95 1.08 3.17 0 1.87-1.35 3.1-3.38 3.1-.94 0-1.86-.3-2.63-.86-.47-.34-.7-.42-.75-.42s-.28.08-.75.42c-.77.56-1.69.86-2.63.86-2.03 0-3.38-1.23-3.38-3.1 0-1.22.55-2.21 1.08-3.17.42-.75.84-1.52 1.02-2.48.41-2.17 1.37-3.47 2.3-4.17-.7-.75-1.14-1.81-1.14-3C8.5 3.83 10.08 2 12 2Zm-1.75 4.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm3.5 0a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z"/></svg>';
+          }
+          return '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 18h.01M8 21h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z"/></svg>';
         }
 
         function setOverviewDash() {
@@ -1547,14 +1676,8 @@
           if (te) te.textContent = formatBytes(sp.used_traffic_bytes);
           var td = document.getElementById('overview-traffic-detail');
           if (td) {
-            var lt = sp.lifetime_used_traffic_bytes;
-            if (lt != null) {
-              td.textContent = 'Всего: ' + formatBytes(lt);
-              td.classList.remove('hidden');
-            } else {
-              td.textContent = '';
-              td.classList.add('hidden');
-            }
+            td.textContent = '';
+            td.classList.add('hidden');
           }
           var devs = Array.isArray(sp.devices) ? sp.devices : [];
           var lim = sp.devices_limit;
@@ -1624,19 +1747,24 @@
             var hid = d && d.id != null ? String(d.id) : '';
             var name = d && d.name != null ? String(d.name) : 'Устройство';
             if (!hid) continue;
+            var platform = detectDevicePlatform(name);
             var li = document.createElement('li');
             li.className =
               'flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3';
             var wrap = document.createElement('div');
-            wrap.className = 'min-w-0 flex-1';
+            wrap.className = 'min-w-0 flex items-center gap-3 flex-1';
+            var icon = document.createElement('span');
+            icon.className =
+              'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 text-cyan-300 ring-1 ring-white/10';
+            icon.innerHTML = getPlatformIconSvg(platform);
+            var textWrap = document.createElement('div');
+            textWrap.className = 'min-w-0 flex-1';
             var pName = document.createElement('p');
             pName.className = 'text-sm font-semibold text-white truncate';
             pName.textContent = name;
-            var pId = document.createElement('p');
-            pId.className = 'text-[10px] font-mono text-gray-500 truncate mt-0.5';
-            pId.textContent = hid;
-            wrap.appendChild(pName);
-            wrap.appendChild(pId);
+            textWrap.appendChild(pName);
+            wrap.appendChild(icon);
+            wrap.appendChild(textWrap);
             var btn = document.createElement('button');
             btn.type = 'button';
             btn.className =
@@ -1715,6 +1843,8 @@
           var sel = document.getElementById('lk-setup-platform-select');
           if (!sel) return;
           var v = sel.value;
+          var icon = document.getElementById('lk-setup-platform-icon');
+          if (icon) icon.innerHTML = getPlatformIconSvg(v);
           document.querySelectorAll('.lk-setup-plat').forEach(function (el) {
             el.classList.toggle('hidden', el.getAttribute('data-lk-setup') !== v);
           });
@@ -2414,7 +2544,8 @@
               var otpIn = document.getElementById('login-otp-code');
               if (otpIn) {
                 otpIn.value = '';
-                otpIn.focus();
+                renderLoginOtpSlots();
+                focusLoginOtpInput();
               }
               refreshLoginOtpSubmitBtn();
               return;
@@ -2425,8 +2556,17 @@
           }
         });
 
+        document.getElementById('login-otp-visual')?.addEventListener('click', function () {
+          focusLoginOtpInput();
+        });
+        document.querySelectorAll('.lk-otp-slot').forEach(function (slot) {
+          slot.addEventListener('click', function () {
+            focusLoginOtpInput();
+          });
+        });
         document.getElementById('login-otp-code')?.addEventListener('input', function () {
           this.value = (this.value || '').replace(/\D/g, '').slice(0, 6);
+          renderLoginOtpSlots();
           refreshLoginOtpSubmitBtn();
         });
         document.getElementById('login-otp-code')?.addEventListener('keydown', function (e) {
@@ -2435,6 +2575,12 @@
             var btn = document.getElementById('btn-login-otp-submit');
             if (btn && !btn.disabled) btn.click();
           }
+        });
+        document.getElementById('login-otp-code')?.addEventListener('focus', function () {
+          renderLoginOtpSlots();
+        });
+        document.getElementById('login-otp-code')?.addEventListener('blur', function () {
+          renderLoginOtpSlots();
         });
 
         document.getElementById('btn-login-otp-back')?.addEventListener('click', function () {
@@ -2508,6 +2654,8 @@
         async function boot() {
           await loadTelegramWidgetConfig();
           await initCaptcha();
+          initPasswordToggles();
+          renderLoginOtpSlots();
           refreshAuthButtons();
 
           var me = await refreshMe();
