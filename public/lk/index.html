@@ -1587,16 +1587,16 @@
           return (v >= 10 || i === 0 ? v.toFixed(0) : v.toFixed(1)) + ' ' + u[i];
         }
 
-        function detectDevicePlatform(name) {
-          var s = String(name || '').toLowerCase();
-          if (!s) return 'generic';
+        function detectDevicePlatform(name, id) {
+          var s = (String(name || '') + ' ' + String(id || '')).toLowerCase();
+          if (!s.trim()) return 'generic';
           if (s.indexOf('iphone') >= 0 || s.indexOf('ipad') >= 0 || s.indexOf('ios') >= 0) return 'ios';
           if (s.indexOf('apple tv') >= 0 || s.indexOf('tvos') >= 0) return 'appleTV';
-          if (s.indexOf('android tv') >= 0 || s.indexOf('google tv') >= 0 || s.indexOf('tv') >= 0) return 'androidTV';
-          if (s.indexOf('android') >= 0) return 'android';
-          if (s.indexOf('windows') >= 0 || s.indexOf('win') >= 0 || s.indexOf('pc') >= 0) return 'windows';
-          if (s.indexOf('macbook') >= 0 || s.indexOf('macos') >= 0 || s.indexOf('mac os') >= 0 || s.indexOf('imac') >= 0) return 'macos';
+          if (s.indexOf('android tv') >= 0 || s.indexOf('google tv') >= 0 || s.indexOf('smart tv') >= 0 || s.indexOf('tv') >= 0) return 'androidTV';
+          if (s.indexOf('windows') >= 0 || s.indexOf('desktop-') >= 0 || s.indexOf('_x86_64') >= 0 || s.indexOf('x86_64') >= 0 || s.indexOf('amd64') >= 0 || s.indexOf(' win') >= 0 || s.indexOf('win-') >= 0 || s.indexOf('win_') >= 0 || s.indexOf('pc') >= 0) return 'windows';
+          if (s.indexOf('macbook') >= 0 || s.indexOf('macos') >= 0 || s.indexOf('mac os') >= 0 || s.indexOf('imac') >= 0 || s.indexOf('darwin') >= 0) return 'macos';
           if (s.indexOf('linux') >= 0 || s.indexOf('ubuntu') >= 0 || s.indexOf('debian') >= 0) return 'linux';
+          if (s.indexOf('android') >= 0) return 'android';
           return 'generic';
         }
 
@@ -1747,7 +1747,7 @@
             var hid = d && d.id != null ? String(d.id) : '';
             var name = d && d.name != null ? String(d.name) : 'Устройство';
             if (!hid) continue;
-            var platform = detectDevicePlatform(name);
+            var platform = detectDevicePlatform(name, hid);
             var li = document.createElement('li');
             li.className =
               'flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3';
