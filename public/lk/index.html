@@ -2573,6 +2573,20 @@
         });
 
         window.addEventListener('focus', function () {
+          var tgPending = sessionStorage.getItem('lk_tg_link_pending');
+          if (tgPending) {
+            void (async function () {
+              try {
+                var linkedMe = await syncMeFresh();
+                if (linkedMe && linkedMe.telegram) {
+                  sessionStorage.removeItem('lk_tg_link_pending');
+                  await applyPanel(linkedMe);
+                }
+              } catch (_) {
+                /* ignore */
+              }
+            })();
+          }
           var raw = sessionStorage.getItem('lk_topup_pending');
           if (!raw) return;
           var pid = Number(raw);
@@ -2665,6 +2679,7 @@
               }
               return;
             }
+            sessionStorage.setItem('lk_tg_link_pending', '1');
             if (data.url) window.open(data.url, '_blank', 'noopener');
             if (msg) {
               msg.textContent = 'Откройте бота и нажмите «Start». После привязки обновите страницу.';
