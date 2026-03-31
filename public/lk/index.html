@@ -197,8 +197,24 @@
           transform: rotate(360deg);
         }
       }
+      @keyframes lk-loader-pulse {
+        0%, 100% {
+          opacity: 0.72;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+      }
       .lk-spin {
         animation: lk-spin 0.75s linear infinite;
+      }
+      .lk-boot-loader-ring {
+        animation: lk-spin 1s linear infinite;
+      }
+      .lk-boot-loader-mark {
+        animation: lk-loader-pulse 1.6s ease-in-out infinite;
       }
       .lk-topup-method--on {
         border-color: rgba(59, 130, 246, 0.55) !important;
@@ -435,6 +451,9 @@
                   <svg class="lk-password-toggle-eye w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12Z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
+              <button id="btn-forgot-password" type="button" class="w-full text-right text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-blue-300 transition-colors">
+                Забыли пароль?
+              </button>
               <button id="btn-login" type="submit" disabled class="w-full h-14 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-blue-500 transition-all disabled:opacity-50">Войти</button>
             </form>
           </div>
@@ -466,6 +485,59 @@
             </button>
             <button id="btn-login-otp-back" type="button" class="w-full py-3 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
               ← Назад к логину
+            </button>
+          </div>
+
+          <div id="login-step-reset-request" class="hidden space-y-4">
+            <p class="text-sm text-gray-400 text-center leading-relaxed">
+              Сброс пароля доступен для аккаунтов с привязанным <span class="text-white font-bold">Telegram</span>.
+            </p>
+            <div class="relative group/input">
+              <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/></svg>
+              </span>
+              <input id="reset-username" autocomplete="username" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-12 pr-5 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Логин" type="text" maxlength="32" />
+            </div>
+            <button id="btn-reset-request" type="button" class="w-full h-14 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-blue-500 transition-all disabled:opacity-50">
+              Запросить код
+            </button>
+            <button id="btn-reset-request-back" type="button" class="w-full py-3 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
+              ← Назад ко входу
+            </button>
+          </div>
+
+          <div id="login-step-reset-complete" class="hidden space-y-4">
+            <p class="text-sm text-gray-400 text-center leading-relaxed">
+              Код отправлен в Telegram. Введите <span class="text-white font-bold">6 цифр</span> и задайте новый пароль.
+            </p>
+            <div id="reset-otp-visual" class="grid grid-cols-6 gap-2 sm:gap-3" role="group" aria-label="Код сброса пароля">
+              <button type="button" class="lk-reset-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-blue-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-reset-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-blue-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-reset-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-blue-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-reset-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-blue-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-reset-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-blue-500/30 focus:outline-none"></button>
+              <button type="button" class="lk-reset-otp-slot h-14 sm:h-16 rounded-2xl border border-white/10 bg-white/[0.03] text-lg sm:text-xl font-black text-white font-mono transition-all hover:border-blue-500/30 focus:outline-none"></button>
+            </div>
+            <input id="reset-otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="sr-only" placeholder="123456" aria-label="Код сброса" />
+            <div class="relative group/input">
+              <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 10.5V8a4.5 4.5 0 1 0-9 0v2.5M7 10.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/></svg>
+              </span>
+              <input id="reset-new-password" autocomplete="new-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-12 pr-14 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Новый пароль" type="password" />
+              <button type="button" class="lk-password-toggle absolute right-3 top-1/2 -translate-y-1/2 rounded-xl p-2 text-gray-500 hover:text-white transition-colors" data-target="reset-new-password" aria-label="Показать пароль"></button>
+            </div>
+            <div class="relative group/input">
+              <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 10.5V8a4.5 4.5 0 1 0-9 0v2.5M7 10.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/></svg>
+              </span>
+              <input id="reset-confirm-password" autocomplete="new-password" class="w-full bg-white/[0.02] border border-white/5 rounded-2xl pl-12 pr-14 py-4 text-sm text-white outline-none focus:border-blue-500/30" placeholder="Повторите пароль" type="password" />
+              <button type="button" class="lk-password-toggle absolute right-3 top-1/2 -translate-y-1/2 rounded-xl p-2 text-gray-500 hover:text-white transition-colors" data-target="reset-confirm-password" aria-label="Показать пароль"></button>
+            </div>
+            <button id="btn-reset-complete" type="button" class="w-full h-14 rounded-2xl bg-emerald-600 text-white font-black uppercase tracking-widest text-[11px] hover:bg-emerald-500 transition-all disabled:opacity-50" disabled>
+              Сохранить новый пароль
+            </button>
+            <button id="btn-reset-complete-back" type="button" class="w-full py-3 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
+              ← Назад
             </button>
           </div>
 
@@ -719,6 +791,37 @@
                 </button>
               </form>
             </div>
+          </div>
+
+          <div class="rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] via-[#08110d] to-transparent p-6 sm:p-8 ring-1 ring-emerald-500/10">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 mb-6 min-w-0">
+              <span class="lk-balance-ico lk-balance-ico--emerald shrink-0 mt-0.5" aria-hidden="true">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </span>
+              <div class="min-w-0 flex-1">
+                <h2 class="text-base font-black uppercase tracking-widest text-white leading-tight">Бонусы</h2>
+                <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Разовые начисления для новых пользователей сайта. Бонусы приходят на баланс VPN и доступны только один раз.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div class="rounded-2xl border border-white/10 bg-black/25 p-4 sm:p-5">
+                <p class="text-[10px] font-black uppercase tracking-widest text-emerald-300/90">Тестовый период</p>
+                <p class="text-2xl font-black text-white mt-2">+20 ₽</p>
+                <p class="text-[11px] text-gray-500 mt-2 leading-relaxed">Для тех, кто ещё не получал стартовый тестовый бонус.</p>
+                <button id="btn-bonus-trial" type="button" class="mt-4 w-full min-h-[50px] rounded-2xl bg-gradient-to-r from-emerald-600 to-green-600 text-white font-black uppercase text-[11px] tracking-widest hover:from-emerald-500 hover:to-green-500 transition-all border border-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Получить 20 ₽
+                </button>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-black/25 p-4 sm:p-5">
+                <p class="text-[10px] font-black uppercase tracking-widest text-blue-300/90">За привязку Telegram</p>
+                <p class="text-2xl font-black text-white mt-2">+50 ₽</p>
+                <p class="text-[11px] text-gray-500 mt-2 leading-relaxed">Одноразовый бонус после входа на сайт и привязки Telegram-аккаунта в личном кабинете.</p>
+                <button id="btn-bonus-telegram" type="button" class="mt-4 w-full min-h-[50px] rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black uppercase text-[11px] tracking-widest hover:from-blue-500 hover:to-indigo-500 transition-all border border-blue-400/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Получить 50 ₽
+                </button>
+              </div>
+            </div>
+            <p id="balance-bonus-msg" class="hidden mt-4 min-h-[2.75rem] text-xs font-bold uppercase tracking-wider rounded-2xl px-4 py-3 border flex items-center gap-2" role="status"></p>
           </div>
 
           <div class="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/[0.12] via-[#0c0a08] to-transparent p-6 sm:p-8 ring-1 ring-amber-500/10 lk-topup-card-pulse">
@@ -1151,7 +1254,19 @@
         </nav>
       </div>
 
-      <p id="boot-loading" class="relative z-10 text-center text-gray-500 text-sm pt-24">Загрузка…</p>
+      <div id="boot-loading" class="relative z-10 flex min-h-[60vh] items-center justify-center px-6">
+        <div class="w-full max-w-xs rounded-[2rem] border border-white/10 bg-[#08080a]/75 backdrop-blur-2xl px-8 py-10 text-center shadow-2xl shadow-black/40">
+          <div class="relative mx-auto flex h-24 w-24 items-center justify-center">
+            <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 border-r-cyan-400 lk-boot-loader-ring"></div>
+            <div class="absolute inset-2 rounded-full border border-white/10"></div>
+            <img src="/logo.svg" alt="Amnesia" class="lk-boot-loader-mark relative z-10 h-12 w-12" width="48" height="48" />
+          </div>
+          <p class="mt-6 text-xl font-black uppercase italic tracking-tight text-white">Amnesia WPN</p>
+          <p class="mt-3 text-sm font-semibold text-gray-400">
+            Загрузка<span id="boot-loading-dots">.</span>
+          </p>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -1159,15 +1274,20 @@
         var viewAuth = document.getElementById('view-auth');
         var viewPanel = document.getElementById('view-panel');
         var bootLoading = document.getElementById('boot-loading');
+        var bootLoadingDots = document.getElementById('boot-loading-dots');
         var panelUsername = document.getElementById('panel-username');
         var authMsg = document.getElementById('auth-message');
         var captchaReady = false;
         var siteKey = '';
         var currentUser = null;
+        var meCacheKey = 'amnesia.lk.me.v1';
+        var meCacheTtlMs = 5 * 60 * 1000;
+        var bootDotsTimer = null;
         var telegramWidgetEnabled = false;
         var telegramBotUsername = 'AmnesiaWebBot';
         var tgWidgetInjected = false;
         var loginChallengeId = null;
+        var passwordResetChallengeId = null;
 
         function syncOtpToggleUi(on) {
           var btn = document.getElementById('tg-login-otp-toggle');
@@ -1193,6 +1313,24 @@
           if (tgWrap && !tgWrap.classList.contains('hidden')) {
             /* keep widget */
           }
+        }
+
+        function resetPasswordResetUi() {
+          passwordResetChallengeId = null;
+          var req = document.getElementById('login-step-reset-request');
+          var done = document.getElementById('login-step-reset-complete');
+          var user = document.getElementById('reset-username');
+          var otp = document.getElementById('reset-otp-code');
+          var np = document.getElementById('reset-new-password');
+          var cp = document.getElementById('reset-confirm-password');
+          if (req) req.classList.add('hidden');
+          if (done) done.classList.add('hidden');
+          if (user) user.value = '';
+          if (otp) otp.value = '';
+          if (np) np.value = '';
+          if (cp) cp.value = '';
+          renderResetOtpSlots();
+          refreshAuthButtons();
         }
 
         function refreshLoginOtpSubmitBtn() {
@@ -1223,6 +1361,34 @@
 
         function focusLoginOtpInput() {
           var otpIn = document.getElementById('login-otp-code');
+          if (!otpIn) return;
+          otpIn.focus();
+          try {
+            var pos = otpIn.value.length;
+            otpIn.setSelectionRange(pos, pos);
+          } catch (_) {}
+        }
+
+        function renderResetOtpSlots() {
+          var otpIn = document.getElementById('reset-otp-code');
+          if (!otpIn) return;
+          var value = (otpIn.value || '').replace(/\D/g, '').slice(0, 6);
+          var slots = document.querySelectorAll('.lk-reset-otp-slot');
+          var activeIndex = Math.min(value.length, 5);
+          slots.forEach(function (slot, index) {
+            var digit = value[index] || '';
+            slot.textContent = digit;
+            slot.classList.toggle('border-blue-500/50', index === activeIndex);
+            slot.classList.toggle('bg-blue-500/[0.08]', index === activeIndex);
+            slot.classList.toggle('shadow-[0_0_0_1px_rgba(59,130,246,0.15)]', index === activeIndex);
+            slot.classList.toggle('text-blue-100', !!digit);
+            slot.classList.toggle('border-white/10', index !== activeIndex);
+            slot.classList.toggle('bg-white/[0.03]', index !== activeIndex);
+          });
+        }
+
+        function focusResetOtpInput() {
+          var otpIn = document.getElementById('reset-otp-code');
           if (!otpIn) return;
           otpIn.focus();
           try {
@@ -1349,9 +1515,90 @@
         }
 
         function showView(which) {
+          if (bootDotsTimer) {
+            clearInterval(bootDotsTimer);
+            bootDotsTimer = null;
+          }
           if (bootLoading) bootLoading.classList.add('hidden');
           if (viewAuth) viewAuth.classList.toggle('hidden', which !== 'auth');
           if (viewPanel) viewPanel.classList.toggle('hidden', which !== 'panel');
+        }
+
+        function startBootLoaderDots() {
+          if (!bootLoadingDots) return;
+          var seq = ['.', '..', '...'];
+          var idx = 0;
+          bootLoadingDots.textContent = seq[0];
+          if (bootDotsTimer) clearInterval(bootDotsTimer);
+          bootDotsTimer = setInterval(function () {
+            idx = (idx + 1) % seq.length;
+            bootLoadingDots.textContent = seq[idx];
+          }, 450);
+        }
+
+        function readCachedMe() {
+          try {
+            var raw = localStorage.getItem(meCacheKey);
+            if (!raw) return null;
+            var parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return null;
+            if (!parsed.user || !parsed.cachedAt) return null;
+            if (Date.now() - Number(parsed.cachedAt) > meCacheTtlMs) return null;
+            return parsed.user;
+          } catch (_) {
+            return null;
+          }
+        }
+
+        function writeCachedMe(user) {
+          try {
+            if (!user) {
+              localStorage.removeItem(meCacheKey);
+              return;
+            }
+            localStorage.setItem(
+              meCacheKey,
+              JSON.stringify({ cachedAt: Date.now(), user: user }),
+            );
+          } catch (_) {
+            /* ignore */
+          }
+        }
+
+        function invalidateMeCache() {
+          try {
+            localStorage.removeItem(meCacheKey);
+          } catch (_) {
+            /* ignore */
+          }
+        }
+
+        async function refreshMe(options) {
+          var opts = options || {};
+          var force = !!opts.force;
+          if (!force) {
+            var cached = readCachedMe();
+            if (cached) return cached;
+          }
+          var res = await fetch('/api/auth/me', { credentials: 'include', headers: { Accept: 'application/json' } });
+          if (!res.ok) {
+            invalidateMeCache();
+            return null;
+          }
+          var data = await res.json().catch(function () { return null; });
+          var user = data && data.user ? data.user : null;
+          writeCachedMe(user);
+          return user;
+        }
+
+        async function syncMeFresh() {
+          invalidateMeCache();
+          return await refreshMe({ force: true });
+        }
+
+        function reloadPageFresh() {
+          invalidateMeCache();
+          location.reload();
         }
 
         var tabActiveSide =
@@ -1477,6 +1724,29 @@
               : 'text-emerald-100 border-emerald-500/35 bg-emerald-500/[0.12]');
         }
 
+        function setBalanceBonusMessage(text, isError) {
+          var el = document.getElementById('balance-bonus-msg');
+          if (!el) return;
+          el.classList.remove('hidden');
+          var iconOk =
+            '<svg class="w-5 h-5 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+          var iconErr =
+            '<svg class="w-5 h-5 shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+          el.innerHTML =
+            (isError ? iconErr : iconOk) +
+            '<span class="leading-snug">' +
+            String(text || '')
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;') +
+            '</span>';
+          el.className =
+            'mt-4 min-h-[2.75rem] text-xs font-bold uppercase tracking-wider rounded-2xl px-4 py-3 border flex items-start gap-2.5 ' +
+            (isError
+              ? 'text-red-200 border-red-500/35 bg-red-500/[0.12]'
+              : 'text-emerald-100 border-emerald-500/35 bg-emerald-500/[0.12]');
+        }
+
         function setTopupMessage(text, isError) {
           var el = document.getElementById('lk-topup-msg');
           if (!el) return;
@@ -1527,11 +1797,14 @@
 
         function renderBalanceTab(user) {
           var sp = user && user.serviceProfile;
+          var bonuses = user && user.bonuses;
           var valEl = document.getElementById('balance-page-value');
           var hintBal = document.getElementById('balance-page-hint');
           var hint = document.getElementById('balance-promo-hint');
           var btn = document.getElementById('btn-balance-promo');
           var inp = document.getElementById('balance-promo-code');
+          var trialBtn = document.getElementById('btn-bonus-trial');
+          var tgBonusBtn = document.getElementById('btn-bonus-telegram');
           var hasTg = !!(user && user.telegram);
           if (valEl) {
             if (!hasTg) {
@@ -1571,6 +1844,16 @@
             b.disabled = !hasTg || busy;
           });
           if (btnTop && !busy) btnTop.disabled = !hasTg;
+          if (trialBtn) {
+            var trialClaimed = !!(bonuses && bonuses.trial20Claimed);
+            trialBtn.disabled = !hasTg || trialClaimed;
+            trialBtn.textContent = trialClaimed ? 'Уже получено' : (hasTg ? 'Получить 20 ₽' : 'Привяжите Telegram');
+          }
+          if (tgBonusBtn) {
+            var tgClaimed = !!(bonuses && bonuses.telegram50Claimed);
+            tgBonusBtn.disabled = !hasTg || tgClaimed;
+            tgBonusBtn.textContent = tgClaimed ? 'Уже получено' : (hasTg ? 'Получить 50 ₽' : 'Привяжите Telegram');
+          }
         }
 
         function formatBytes(n) {
@@ -1815,13 +2098,6 @@
           renderSetupDevicesList(sp);
         }
 
-        async function refreshMe() {
-          var res = await fetch('/api/auth/me', { credentials: 'include', headers: { Accept: 'application/json' } });
-          if (!res.ok) return null;
-          var data = await res.json().catch(function () { return null; });
-          return data && data.user ? data.user : null;
-        }
-
         function detectLkSetupPlatform() {
           var ua = navigator.userAgent || '';
           var p = navigator.platform || '';
@@ -1894,7 +2170,7 @@
                 btn.disabled = false;
                 return;
               }
-              var me = await refreshMe();
+              var me = await syncMeFresh();
               if (me) await applyPanel(me);
             } catch (_) {
               alert('Ошибка сети');
@@ -1940,7 +2216,7 @@
               return;
             }
             inp.value = '';
-            var me = await refreshMe();
+            var me = await syncMeFresh();
             if (me) await applyPanel(me);
             setBalancePromoMessage(data.message || 'Промокод активирован', false);
           } catch (_) {
@@ -1952,6 +2228,58 @@
         document.getElementById('balance-promo-code')?.addEventListener('input', function () {
           var msg = document.getElementById('balance-promo-msg');
           if (msg) msg.classList.add('hidden');
+        });
+
+        document.getElementById('btn-bonus-trial')?.addEventListener('click', async function () {
+          var btn = this;
+          var msg = document.getElementById('balance-bonus-msg');
+          if (msg) msg.classList.add('hidden');
+          btn.disabled = true;
+          try {
+            var res = await fetch('/api/auth/bonus/trial', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { Accept: 'application/json' },
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) {
+              setBalanceBonusMessage(parseErrorPayload(data), true);
+              btn.disabled = !(currentUser && currentUser.telegram) || !!(currentUser && currentUser.bonuses && currentUser.bonuses.trial20Claimed);
+              return;
+            }
+            var me = await syncMeFresh();
+            if (me) await applyPanel(me);
+            setBalanceBonusMessage(data.message || 'Зачислено 20 ₽.', false);
+          } catch (_) {
+            setBalanceBonusMessage('Ошибка сети', true);
+            btn.disabled = false;
+          }
+        });
+
+        document.getElementById('btn-bonus-telegram')?.addEventListener('click', async function () {
+          var btn = this;
+          var msg = document.getElementById('balance-bonus-msg');
+          if (msg) msg.classList.add('hidden');
+          btn.disabled = true;
+          try {
+            var res = await fetch('/api/auth/bonus/telegram-link', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { Accept: 'application/json' },
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) {
+              setBalanceBonusMessage(parseErrorPayload(data), true);
+              btn.disabled = !(currentUser && currentUser.telegram) || !!(currentUser && currentUser.bonuses && currentUser.bonuses.telegram50Claimed);
+              return;
+            }
+            var me = await syncMeFresh();
+            if (me) await applyPanel(me);
+            setBalanceBonusMessage(data.message || 'Зачислено 50 ₽.', false);
+          } catch (_) {
+            setBalanceBonusMessage('Ошибка сети', true);
+            btn.disabled = false;
+          }
         });
 
         document.querySelectorAll('.lk-topup-amount-btn').forEach(function (btn) {
@@ -2110,7 +2438,7 @@
             var data = await res.json().catch(function () { return {}; });
             if (res.ok && data && data.status === 'success') {
               sessionStorage.removeItem('lk_topup_pending');
-              var me = await refreshMe();
+              var me = await syncMeFresh();
               if (me) await applyPanel(me);
               setTopupMessage('Статус обновлён. Баланс зачислен.', false);
             } else if (!res.ok) {
@@ -2149,7 +2477,7 @@
               if (!chk.ok) continue;
               if (chkData && chkData.status === 'success') {
                 sessionStorage.removeItem('lk_topup_pending');
-                var me = await refreshMe();
+                var me = await syncMeFresh();
                 if (me) await applyPanel(me);
                 setTopupMessage('Оплата подтверждена. Баланс обновлён.', false);
                 if (lkPaymentsPanelOpen) await fetchPaymentsList();
@@ -2260,7 +2588,7 @@
               var chkData = await chk.json().catch(function () { return {}; });
               if (chk.ok && chkData && chkData.status === 'success') {
                 sessionStorage.removeItem('lk_topup_pending');
-                var me = await refreshMe();
+                var me = await syncMeFresh();
                 if (me) await applyPanel(me);
                 if (lkPaymentsPanelOpen) await fetchPaymentsList();
               }
@@ -2274,7 +2602,7 @@
 
         document.getElementById('btn-logout')?.addEventListener('click', async function () {
           await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-          location.reload();
+          reloadPageFresh();
         });
 
         document.getElementById('tg-login-otp-toggle')?.addEventListener('click', async function () {
@@ -2313,7 +2641,7 @@
               alert(parseErrorPayload(data));
               return;
             }
-            var me = await refreshMe();
+            var me = await syncMeFresh();
             if (me) await applyPanel(me);
           } catch (_) {
             alert('Ошибка сети');
@@ -2422,7 +2750,7 @@
               }
               return;
             }
-            location.reload();
+            reloadPageFresh();
           } catch (_) {
             if (hint) {
               hint.textContent = 'Сеть недоступна';
@@ -2457,6 +2785,7 @@
         function setMode(mode) {
           hideAuthMessage();
           resetLoginOtpUi();
+          resetPasswordResetUi();
           var isLogin = mode === 'login';
           var tgWrap = document.getElementById('tg-login-wrap');
           if (formLogin) formLogin.classList.toggle('hidden', !isLogin);
@@ -2482,11 +2811,47 @@
         }
         tabLogin?.addEventListener('click', function () { setMode('login'); });
         tabRegister?.addEventListener('click', function () { setMode('register'); });
+        document.getElementById('btn-forgot-password')?.addEventListener('click', function () {
+          hideAuthMessage();
+          resetLoginOtpUi();
+          resetPasswordResetUi();
+          if (formLogin) formLogin.classList.add('hidden');
+          if (formRegister) formRegister.classList.add('hidden');
+          var req = document.getElementById('login-step-reset-request');
+          var tgWrap = document.getElementById('tg-login-wrap');
+          if (req) req.classList.remove('hidden');
+          if (tgWrap) {
+            tgWrap.classList.add('hidden');
+            clearTelegramWidget();
+          }
+          if (title) title.textContent = 'Сброс пароля';
+          if (tabLogin) tabLogin.className = 'flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-gray-500 hover:text-gray-300';
+          if (tabRegister) tabRegister.className = 'flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-gray-500 hover:text-gray-300';
+          refreshAuthButtons();
+        });
+        document.getElementById('btn-reset-request-back')?.addEventListener('click', function () {
+          setMode('login');
+        });
+        document.getElementById('btn-reset-complete-back')?.addEventListener('click', function () {
+          hideAuthMessage();
+          var req = document.getElementById('login-step-reset-request');
+          var done = document.getElementById('login-step-reset-complete');
+          if (req) req.classList.remove('hidden');
+          if (done) done.classList.add('hidden');
+          passwordResetChallengeId = null;
+          refreshAuthButtons();
+        });
 
         function refreshAuthButtons() {
           var lu = document.getElementById('login-username');
           var lp = document.getElementById('login-password');
           var bl = document.getElementById('btn-login');
+          var ruq = document.getElementById('reset-username');
+          var brq = document.getElementById('btn-reset-request');
+          var roc = document.getElementById('reset-otp-code');
+          var rnp = document.getElementById('reset-new-password');
+          var rcp = document.getElementById('reset-confirm-password');
+          var brc = document.getElementById('btn-reset-complete');
           var ru = document.getElementById('register-username');
           var rp = document.getElementById('register-password');
           var rc = document.getElementById('register-confirm-password');
@@ -2508,6 +2873,17 @@
               ru.value.trim() &&
               rp.value &&
               rc.value
+            );
+          if (brq) brq.disabled = !(captchaReady && ruq && ruq.value.trim());
+          if (brc)
+            brc.disabled = !(
+              passwordResetChallengeId &&
+              roc &&
+              /^[0-9]{6}$/.test((roc.value || '').trim()) &&
+              rnp &&
+              rcp &&
+              rnp.value.length >= 6 &&
+              rnp.value === rcp.value
             );
         }
 
@@ -2550,7 +2926,45 @@
               refreshLoginOtpSubmitBtn();
               return;
             }
-            location.reload();
+            reloadPageFresh();
+          } catch (_) {
+            showAuthMessage('Сеть недоступна', true);
+          }
+        });
+
+        document.getElementById('btn-reset-request')?.addEventListener('click', async function () {
+          hideAuthMessage();
+          var username = document.getElementById('reset-username')?.value.trim() || '';
+          var token = await executeCaptcha('login');
+          if (!token) {
+            showAuthMessage('Подтвердите, что вы не робот', true);
+            return;
+          }
+          try {
+            var res = await fetch('/api/auth/password-reset/request', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ username: username, captchaToken: token }),
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) {
+              showAuthMessage(parseErrorPayload(data), true);
+              return;
+            }
+            passwordResetChallengeId = data.challengeId || null;
+            var req = document.getElementById('login-step-reset-request');
+            var done = document.getElementById('login-step-reset-complete');
+            if (req) req.classList.add('hidden');
+            if (done) done.classList.remove('hidden');
+            var otpIn = document.getElementById('reset-otp-code');
+            if (otpIn) {
+              otpIn.value = '';
+              renderResetOtpSlots();
+              focusResetOtpInput();
+            }
+            showAuthMessage(data.message || 'Код отправлен в Telegram', false);
+            refreshAuthButtons();
           } catch (_) {
             showAuthMessage('Сеть недоступна', true);
           }
@@ -2583,6 +2997,65 @@
           renderLoginOtpSlots();
         });
 
+        document.getElementById('reset-otp-visual')?.addEventListener('click', function () {
+          focusResetOtpInput();
+        });
+        document.querySelectorAll('.lk-reset-otp-slot').forEach(function (slot) {
+          slot.addEventListener('click', function () {
+            focusResetOtpInput();
+          });
+        });
+        document.getElementById('reset-otp-code')?.addEventListener('input', function () {
+          this.value = (this.value || '').replace(/\D/g, '').slice(0, 6);
+          renderResetOtpSlots();
+          refreshAuthButtons();
+        });
+        document.getElementById('reset-otp-code')?.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            var btn = document.getElementById('btn-reset-complete');
+            if (btn && !btn.disabled) btn.click();
+          }
+        });
+        document.getElementById('reset-otp-code')?.addEventListener('focus', function () {
+          renderResetOtpSlots();
+        });
+        document.getElementById('reset-otp-code')?.addEventListener('blur', function () {
+          renderResetOtpSlots();
+        });
+        document.getElementById('reset-new-password')?.addEventListener('input', refreshAuthButtons);
+        document.getElementById('reset-confirm-password')?.addEventListener('input', refreshAuthButtons);
+
+        document.getElementById('btn-reset-complete')?.addEventListener('click', async function () {
+          hideAuthMessage();
+          var code = document.getElementById('reset-otp-code')?.value.trim() || '';
+          var newPassword = document.getElementById('reset-new-password')?.value || '';
+          var confirmPassword = document.getElementById('reset-confirm-password')?.value || '';
+          if (!passwordResetChallengeId) return;
+          try {
+            var res = await fetch('/api/auth/password-reset/complete', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({
+                challengeId: passwordResetChallengeId,
+                code: code,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword,
+              }),
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) {
+              showAuthMessage(parseErrorPayload(data), true);
+              return;
+            }
+            showAuthMessage(data.message || 'Пароль обновлён', false);
+            setMode('login');
+          } catch (_) {
+            showAuthMessage('Сеть недоступна', true);
+          }
+        });
+
         document.getElementById('btn-login-otp-back')?.addEventListener('click', function () {
           resetLoginOtpUi();
           var tgWrap = document.getElementById('tg-login-wrap');
@@ -2608,7 +3081,7 @@
               showAuthMessage(parseErrorPayload(data), true);
               return;
             }
-            location.reload();
+            reloadPageFresh();
           } catch (_) {
             showAuthMessage('Сеть недоступна', true);
           }
@@ -2642,7 +3115,7 @@
               showAuthMessage(parseErrorPayload(data), true);
               return;
             }
-            location.reload();
+            reloadPageFresh();
           } catch (_) {
             showAuthMessage('Сеть недоступна', true);
           }
@@ -2652,11 +3125,20 @@
         formRegister?.addEventListener('input', refreshAuthButtons);
 
         async function boot() {
+          startBootLoaderDots();
           await loadTelegramWidgetConfig();
           await initCaptcha();
           initPasswordToggles();
           renderLoginOtpSlots();
           refreshAuthButtons();
+
+          var cachedMe = readCachedMe();
+          if (cachedMe) {
+            showView('panel');
+            await applyPanel(cachedMe);
+            setTab('overview');
+            return;
+          }
 
           var me = await refreshMe();
           if (me) {

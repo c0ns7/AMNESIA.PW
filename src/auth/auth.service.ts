@@ -18,6 +18,7 @@ import { MYSQL_POOL, VPN_DB_POOL } from '../database/database.module';
 import { RemnawaveService } from '../remnawave/remnawave.service';
 import { SubscriptionLinkService } from '../subscription/subscription-link.service';
 import { ActivatePromoDto } from './dto/activate-promo.dto';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { CreateTopupDto } from './dto/create-topup.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -31,6 +32,8 @@ interface UserRow extends RowDataPacket {
   telegram_id: number | null;
   telegram_username: string | null;
   telegram_login_otp_enabled?: number | boolean | null;
+  trial_bonus_claimed?: number | boolean | null;
+  telegram_link_bonus_claimed?: number | boolean | null;
 }
 
 interface AmnesiaJwtPayload {
@@ -78,6 +81,8 @@ export class AuthService implements OnModuleInit {
   private readonly plategaSecret = process.env.PLATEGA_SECRET?.trim() || '';
   private readonly TOPUP_CARD_METHODS = [11, 10];
   private readonly TOPUP_SBP_METHOD = 2;
+  private readonly WEB_BONUS_TRIAL_20 = 'trial_20_rub';
+  private readonly WEB_BONUS_TELEGRAM_50 = 'telegram_link_50_rub';
 
   async onModuleInit() {
     await this.ensureSchema();
@@ -255,6 +260,20 @@ export class AuthService implements OnModuleInit {
     } catch (_) {
       /* exists */
     }
+    try {
+      await this.pool.execute(
+        'ALTER TABLE users ADD COLUMN trial_bonus_claimed TINYINT(1) NOT NULL DEFAULT 0',
+      );
+    } catch (_) {
+      /* exists */
+    }
+    try {
+      await this.pool.execute(
+        'ALTER TABLE users ADD COLUMN telegram_link_bonus_claimed TINYINT(1) NOT NULL DEFAULT 0',
+      );
+    } catch (_) {
+      /* exists */
+    }
     await this.pool.execute(`
       CREATE TABLE IF NOT EXISTS telegram_login_challenges (
         id VARCHAR(64) NOT NULL PRIMARY KEY,
@@ -264,6 +283,17 @@ export class AuthService implements OnModuleInit {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         INDEX idx_tlc_user (user_id),
         INDEX idx_tlc_exp (expires_at)
+      )
+    `);
+    await this.pool.execute(`
+      CREATE TABLE IF NOT EXISTS telegram_password_reset_challenges (
+        id VARCHAR(64) NOT NULL PRIMARY KEY,
+        user_id INT NOT NULL,
+        code_hash VARCHAR(255) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_tprc_user (user_id),
+        INDEX idx_tprc_exp (expires_at)
       )
     `);
   }
@@ -296,6 +326,17 @@ export class AuthService implements OnModuleInit {
         INDEX (platega_transaction_id)
       )
     `);
+    await this.vpnPool.execute(`
+      CREATE TABLE IF NOT EXISTS web_bonus_claims (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT NOT NULL,
+        bonus_code VARCHAR(64) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_web_bonus_claim (user_id, bonus_code),
+        INDEX idx_web_bonus_user (user_id)
+      )
+    `);
   }
 
   private calcTopupBonus(amount: number): number {
@@ -303,6 +344,28 @@ export class AuthService implements OnModuleInit {
     if (amount >= 1000) return 5;
     if (amount >= 500) return 3;
     return 0;
+  }
+
+  private async loadWebBonusFlags(telegramId: string | number | null) {
+    const flags = {
+      trial20Claimed: false,
+      telegram50Claimed: false,
+    };
+    if (!this.vpnPool || telegramId == null) return flags;
+    try {
+      const [rows] = await this.vpnPool.execute<RowDataPacket[]>(
+        'SELECT bonus_code FROM web_bonus_claims WHERE user_id = ?',
+        [Number(telegramId)],
+      );
+      for (const row of rows) {
+        const code = String(row.bonus_code || '');
+        if (code === this.WEB_BONUS_TRIAL_20) flags.trial20Claimed = true;
+        if (code === this.WEB_BONUS_TELEGRAM_50) flags.telegram50Claimed = true;
+      }
+    } catch {
+      /* ignore */
+    }
+    return flags;
   }
 
   private isPaymentStatusPaid(statusRaw: unknown): boolean {
@@ -403,6 +466,45 @@ export class AuthService implements OnModuleInit {
     const text =
       `<tg-emoji emoji-id="5422439311196834318">💡</tg-emoji> <b>Код входа в личный кабинет:</b> <code>${code}</code>\n\n` +
       `Действителен 10 минут. Если это не вы — смените пароль.`;
+    const url = `https://api.telegram.org/bot${encodeURIComponent(this.webTelegramBotToken)}/sendMessage`;
+    const body = new URLSearchParams({
+      chat_id: String(chatId),
+      text,
+      parse_mode: 'HTML',
+    });
+    let response;
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      });
+    } catch {
+      throw new ServiceUnavailableException(
+        'Не удалось связаться с Telegram. Попробуйте позже.',
+      );
+    }
+    const data = (await response.json().catch(() => ({}))) as {
+      ok?: boolean;
+      description?: string;
+    };
+    if (!response.ok || !data.ok) {
+      throw new ServiceUnavailableException(
+        data.description || 'Не удалось отправить код в Telegram',
+      );
+    }
+  }
+
+  private async sendTelegramPasswordResetCode(
+    chatId: string,
+    code: string,
+  ): Promise<void> {
+    if (!this.webTelegramBotToken) {
+      throw new ServiceUnavailableException('Telegram-бот для сайта не настроен');
+    }
+    const text =
+      `<tg-emoji emoji-id="5422439311196834318">🔐</tg-emoji> <b>Код сброса пароля:</b> <code>${code}</code>\n\n` +
+      `Действителен 10 минут. Если это не вы — просто проигнорируйте сообщение.`;
     const url = `https://api.telegram.org/bot${encodeURIComponent(this.webTelegramBotToken)}/sendMessage`;
     const body = new URLSearchParams({
       chat_id: String(chatId),
@@ -579,6 +681,102 @@ export class AuthService implements OnModuleInit {
     return { ok: true as const, token, user };
   }
 
+  async requestPasswordReset(
+    dto: RequestPasswordResetDto,
+    remoteIp?: string,
+  ) {
+    await this.verifyCaptcha(dto.captchaToken, remoteIp, 'login');
+    const username = this.normalizeUsername(dto.username);
+    const [rows] = await this.pool.execute<UserRow[]>(
+      'SELECT id, telegram_id FROM users WHERE username = ? LIMIT 1',
+      [username],
+    );
+    const row = rows[0];
+    if (!row || row.telegram_id == null) {
+      throw new BadRequestException(
+        'Сброс пароля доступен только для аккаунтов с привязанным Telegram.',
+      );
+    }
+    await this.pool.execute(
+      'DELETE FROM telegram_password_reset_challenges WHERE user_id = ?',
+      [row.id],
+    );
+    const code = String(crypto.randomInt(100000, 1000000));
+    const codeHash = await bcrypt.hash(code, 10);
+    const challengeId = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 10 * 60 * 1000);
+    await this.pool.execute(
+      'INSERT INTO telegram_password_reset_challenges (id, user_id, code_hash, expires_at) VALUES (?, ?, ?, ?)',
+      [challengeId, row.id, codeHash, expires],
+    );
+    try {
+      await this.sendTelegramPasswordResetCode(String(row.telegram_id), code);
+    } catch (e) {
+      await this.pool.execute(
+        'DELETE FROM telegram_password_reset_challenges WHERE id = ?',
+        [challengeId],
+      );
+      throw e;
+    }
+    return {
+      ok: true as const,
+      challengeId,
+      message: 'Код отправлен в Telegram.',
+    };
+  }
+
+  async completePasswordReset(
+    challengeId: string,
+    code: string,
+    newPassword: string,
+    confirmPassword: string,
+  ) {
+    const cleanId = String(challengeId || '').trim();
+    if (!cleanId) {
+      throw new BadRequestException('Нет сессии сброса пароля');
+    }
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException('Пароли не совпадают');
+    }
+    if (String(newPassword || '').length < 6) {
+      throw new BadRequestException('Новый пароль: минимум 6 символов');
+    }
+    const [rows] = await this.pool.execute<RowDataPacket[]>(
+      'SELECT user_id, code_hash, expires_at FROM telegram_password_reset_challenges WHERE id = ? LIMIT 1',
+      [cleanId],
+    );
+    const r = rows[0];
+    if (!r) {
+      throw new BadRequestException(
+        'Сессия сброса недействительна. Запросите код заново.',
+      );
+    }
+    if (new Date(String(r.expires_at)) < new Date()) {
+      await this.pool.execute(
+        'DELETE FROM telegram_password_reset_challenges WHERE id = ?',
+        [cleanId],
+      );
+      throw new BadRequestException('Код истёк. Запросите новый.');
+    }
+    const okCode = await bcrypt.compare(String(code).trim(), String(r.code_hash));
+    if (!okCode) {
+      throw new UnauthorizedException('Неверный код');
+    }
+    const hash = await bcrypt.hash(newPassword, 10);
+    await this.pool.execute('UPDATE users SET password_hash = ? WHERE id = ?', [
+      hash,
+      Number(r.user_id),
+    ]);
+    await this.pool.execute(
+      'DELETE FROM telegram_password_reset_challenges WHERE id = ?',
+      [cleanId],
+    );
+    return {
+      ok: true as const,
+      message: 'Пароль успешно изменён. Теперь войдите с новым паролем.',
+    };
+  }
+
   async setTelegramLoginOtpEnabled(userId: number, enabled: boolean) {
     const [rows] = await this.pool.execute<UserRow[]>(
       'SELECT id, telegram_id FROM users WHERE id = ? LIMIT 1',
@@ -661,7 +859,9 @@ export class AuthService implements OnModuleInit {
 
   async getMe(userId: number) {
     const [rows] = await this.pool.execute<UserRow[]>(
-      'SELECT id, username, telegram_id, telegram_username, telegram_login_otp_enabled FROM users WHERE id = ? LIMIT 1',
+      `SELECT id, username, telegram_id, telegram_username, telegram_login_otp_enabled,
+              trial_bonus_claimed, telegram_link_bonus_claimed
+       FROM users WHERE id = ? LIMIT 1`,
       [userId],
     );
     const row = rows[0];
@@ -674,6 +874,7 @@ export class AuthService implements OnModuleInit {
         String(row.telegram_id),
       );
     }
+    const webBonusFlags = await this.loadWebBonusFlags(row.telegram_id);
     return {
       ok: true as const,
       user: {
@@ -686,9 +887,156 @@ export class AuthService implements OnModuleInit {
               loginOtpEnabled: Number(row.telegram_login_otp_enabled) === 1,
             }
           : null,
+        bonuses: {
+          trial20Claimed:
+            Number(row.trial_bonus_claimed) === 1 ||
+            webBonusFlags.trial20Claimed,
+          telegram50Claimed:
+            Number(row.telegram_link_bonus_claimed) === 1 ||
+            webBonusFlags.telegram50Claimed,
+        },
         serviceProfile,
       },
     };
+  }
+
+  private async applyWebBonus(
+    siteUserId: number,
+    kind: 'trial20' | 'telegram50',
+  ) {
+    if (!this.vpnPool) {
+      throw new ServiceUnavailableException(
+        'Бонусы временно недоступны: не настроена база VPN.',
+      );
+    }
+
+    const [userRows] = await this.pool.execute<UserRow[]>(
+      `SELECT id, telegram_id, telegram_username, trial_bonus_claimed, telegram_link_bonus_claimed
+       FROM users WHERE id = ? LIMIT 1`,
+      [siteUserId],
+    );
+    const siteUser = userRows[0];
+    if (!siteUser) throw new UnauthorizedException();
+    if (siteUser.telegram_id == null) {
+      throw new BadRequestException(
+        'Привяжите Telegram в разделе «Интеграции», чтобы получить бонус на баланс VPN.',
+      );
+    }
+
+    const isTrial = kind === 'trial20';
+    const amount = isTrial ? 20 : 50;
+    const tgNumeric = Number(siteUser.telegram_id);
+    const vpnUsername = siteUser.telegram_username?.trim() || 'Unknown';
+    const bonusCode = isTrial
+      ? this.WEB_BONUS_TRIAL_20
+      : this.WEB_BONUS_TELEGRAM_50;
+    const alreadyClaimed = isTrial
+      ? Number(siteUser.trial_bonus_claimed) === 1
+      : Number(siteUser.telegram_link_bonus_claimed) === 1;
+
+    if (alreadyClaimed) {
+      throw new BadRequestException(
+        isTrial
+          ? 'Тестовый период уже был активирован.'
+          : 'Бонус +50 ₽ уже был получен.',
+      );
+    }
+
+    const conn = await this.vpnPool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [existing] = await conn.execute<RowDataPacket[]>(
+        'SELECT 1 FROM web_bonus_claims WHERE user_id = ? AND bonus_code = ? LIMIT 1 FOR UPDATE',
+        [tgNumeric, bonusCode],
+      );
+      if (existing.length) {
+        throw new BadRequestException(
+          isTrial
+            ? 'Тестовый период уже был активирован.'
+            : 'Бонус +50 ₽ уже был получен.',
+        );
+      }
+      await conn.execute(
+        'INSERT INTO users (user_id, username) VALUES (?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username)',
+        [tgNumeric, vpnUsername],
+      );
+      await conn.execute(
+        `UPDATE users SET
+           balance = IFNULL(balance, 0) + ?,
+           last_daily_tariff_date = IF(IFNULL(balance, 0) <= 0, CURDATE(), last_daily_tariff_date)
+         WHERE user_id = ?`,
+        [amount, tgNumeric],
+      );
+      await conn.execute(
+        'INSERT INTO web_bonus_claims (user_id, bonus_code, amount) VALUES (?, ?, ?)',
+        [tgNumeric, bonusCode, amount],
+      );
+      await conn.commit();
+    } catch (e) {
+      try {
+        await conn.rollback();
+      } catch {
+        /* ignore */
+      }
+      if (e instanceof BadRequestException) throw e;
+      const err = e as { code?: string };
+      if (err.code === 'ER_DUP_ENTRY') {
+        throw new BadRequestException(
+          isTrial
+            ? 'Тестовый период уже был активирован.'
+            : 'Бонус +50 ₽ уже был получен.',
+        );
+      }
+      throw new ServiceUnavailableException(
+        'Не удалось начислить бонус. Попробуйте позже.',
+      );
+    } finally {
+      conn.release();
+    }
+
+    await this.pool.execute(
+      isTrial
+        ? 'UPDATE users SET trial_bonus_claimed = 1 WHERE id = ?'
+        : 'UPDATE users SET telegram_link_bonus_claimed = 1 WHERE id = ?',
+      [siteUserId],
+    );
+
+    let newBalance = 0;
+    let rwUuid: string | null = null;
+    try {
+      const [balRows] = await this.vpnPool.execute<RowDataPacket[]>(
+        'SELECT balance, remnawave_user_id FROM users WHERE user_id = ? LIMIT 1',
+        [tgNumeric],
+      );
+      const br = balRows[0];
+      if (br) {
+        newBalance = Number(br.balance ?? 0);
+        rwUuid =
+          br.remnawave_user_id != null ? String(br.remnawave_user_id) : null;
+      }
+    } catch {
+      /* ignore */
+    }
+    await this.remnawaveService.tryEnableSubscriptionIfEligible(
+      rwUuid,
+      newBalance,
+    );
+
+    return {
+      ok: true as const,
+      creditedRub: amount,
+      message: isTrial
+        ? 'Тестовый период активирован. Зачислено 20 ₽.'
+        : 'Бонус за привязку Telegram активирован. Зачислено 50 ₽.',
+    };
+  }
+
+  async claimTrialBonus(siteUserId: number) {
+    return this.applyWebBonus(siteUserId, 'trial20');
+  }
+
+  async claimTelegramLinkBonus(siteUserId: number) {
+    return this.applyWebBonus(siteUserId, 'telegram50');
   }
 
   /**

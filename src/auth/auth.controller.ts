@@ -14,12 +14,14 @@ import { AuthService } from './auth.service';
 import { AuthSessionGuard, RequestWithSession } from './auth-session.guard';
 import { ActivatePromoDto } from './dto/activate-promo.dto';
 import { CheckTopupDto } from './dto/check-topup.dto';
+import { CompletePasswordResetDto } from './dto/complete-password-reset.dto';
 import { RemoveDeviceDto } from './dto/remove-device.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateTopupDto } from './dto/create-topup.dto';
 import { LoginTelegramOtpDto } from './dto/login-telegram-otp.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { TelegramLoginOtpPrefDto } from './dto/telegram-login-otp-pref.dto';
 import { TelegramWidgetDto } from './dto/telegram-widget.dto';
 
@@ -91,6 +93,26 @@ export class AuthController {
     );
     this.setCookie(res, result.token);
     return { ok: true, user: result.user };
+  }
+
+  @Post('password-reset/request')
+  async requestPasswordReset(
+    @Req() req: Request,
+    @Body() body: RequestPasswordResetDto,
+  ) {
+    return this.auth.requestPasswordReset(body, req.ip);
+  }
+
+  @Post('password-reset/complete')
+  async completePasswordReset(
+    @Body() body: CompletePasswordResetDto,
+  ) {
+    return this.auth.completePasswordReset(
+      body.challengeId,
+      body.code,
+      body.newPassword,
+      body.confirmPassword,
+    );
   }
 
   @Post('logout')
@@ -170,6 +192,22 @@ export class AuthController {
     const u = req.sessionUser;
     if (!u) throw new UnauthorizedException();
     return this.auth.activatePromo(u.id, body);
+  }
+
+  @Post('bonus/trial')
+  @UseGuards(AuthSessionGuard)
+  async claimTrialBonus(@Req() req: RequestWithSession) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.claimTrialBonus(u.id);
+  }
+
+  @Post('bonus/telegram-link')
+  @UseGuards(AuthSessionGuard)
+  async claimTelegramLinkBonus(@Req() req: RequestWithSession) {
+    const u = req.sessionUser;
+    if (!u) throw new UnauthorizedException();
+    return this.auth.claimTelegramLinkBonus(u.id);
   }
 
   @Post('topup/create')
