@@ -9,7 +9,9 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Request, Response } from 'express';
+import { getClientIp } from '../utils/client-ip';
 import { AuthService } from './auth.service';
 import { AuthSessionGuard, RequestWithSession } from './auth-session.guard';
 import { ActivatePromoDto } from './dto/activate-promo.dto';
@@ -44,6 +46,8 @@ export class AuthController {
   }
 
   @Get('captcha-config')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 120, ttl: 60000 } })
   captchaConfig() {
     return this.auth.getCaptchaConfig();
   }
@@ -54,23 +58,27 @@ export class AuthController {
   }
 
   @Post('register')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
   async register(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Body() body: RegisterDto,
   ) {
-    const result = await this.auth.register(body, req.ip);
+    const result = await this.auth.register(body, getClientIp(req));
     this.setCookie(res, result.token);
     return { ok: true, message: result.message, user: result.user };
   }
 
   @Post('login')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async login(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Body() body: LoginDto,
   ) {
-    const result = await this.auth.login(body, req.ip);
+    const result = await this.auth.login(body, getClientIp(req));
     if ('needsTelegramOtp' in result && result.needsTelegramOtp) {
       return {
         ok: true,
@@ -83,6 +91,8 @@ export class AuthController {
   }
 
   @Post('login/telegram-otp')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 25, ttl: 60000 } })
   async loginTelegramOtp(
     @Res({ passthrough: true }) res: Response,
     @Body() body: LoginTelegramOtpDto,
@@ -96,11 +106,13 @@ export class AuthController {
   }
 
   @Post('password-reset/request')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 8, ttl: 60000 } })
   async requestPasswordReset(
     @Req() req: Request,
     @Body() body: RequestPasswordResetDto,
   ) {
-    return this.auth.requestPasswordReset(body, req.ip);
+    return this.auth.requestPasswordReset(body, getClientIp(req));
   }
 
   @Post('password-reset/complete')
@@ -147,6 +159,8 @@ export class AuthController {
 
   /** Telegram Login Widget (same-origin callback) */
   @Post('telegram/widget')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async telegramWidget(
     @Res({ passthrough: true }) res: Response,
     @Body() body: TelegramWidgetDto,

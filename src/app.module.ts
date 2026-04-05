@@ -4,15 +4,33 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { RemnawaveModule } from './remnawave/remnawave.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { SiteController } from './site.controller';
+import { getClientIp } from './utils/client-ip';
+import { Request } from 'express';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, RemnawaveModule, SubscriptionModule],
+  imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'default',
+          ttl: 60000,
+          limit: 300,
+        },
+      ],
+      getTracker: (req) => getClientIp(req as Request) || 'unknown',
+    }),
+    DatabaseModule,
+    AuthModule,
+    RemnawaveModule,
+    SubscriptionModule,
+  ],
   controllers: [AppController, SiteController],
   providers: [
     {

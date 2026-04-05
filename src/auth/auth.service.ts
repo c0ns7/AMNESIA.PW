@@ -85,8 +85,21 @@ export class AuthService implements OnModuleInit {
   private readonly WEB_BONUS_TELEGRAM_50 = 'telegram_link_50_rub';
 
   async onModuleInit() {
+    this.ensureJwtSecretStrong();
     await this.ensureSchema();
     await this.ensureVpnUsersBillingColumn();
+  }
+
+  private ensureJwtSecretStrong(): void {
+    const weak =
+      !this.jwtSecret ||
+      this.jwtSecret === 'change-me-in-production' ||
+      this.jwtSecret.length < 32;
+    if (process.env.NODE_ENV === 'production' && weak) {
+      throw new Error(
+        'JWT_SECRET (или SESSION_SECRET) должен быть задан и не короче 32 символов в production',
+      );
+    }
   }
 
   private normalizeUsername(raw: string): string {
@@ -113,8 +126,7 @@ export class AuthService implements OnModuleInit {
     this.ensureCaptchaConfigured();
     return {
       siteKey: this.recaptchaSiteKey,
-      version: 'v3',
-      minScore: this.recaptchaMinScore,
+      version: 'v3' as const,
     };
   }
 
@@ -538,14 +550,37 @@ export class AuthService implements OnModuleInit {
     const payload: AmnesiaJwtPayload = { sub: user.id, u: user.username };
     return jwt.sign(payload, this.jwtSecret, {
       expiresIn: Math.floor(this.jwtExpiresMs / 1000),
+      algorithm: 'HS256',
     });
+  }
+
+  private parseJwtPayload(raw: unknown): AmnesiaJwtPayload | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const o = raw as Record<string, unknown>;
+    const subRaw = o.sub;
+    let id: number;
+    if (typeof subRaw === 'number' && Number.isInteger(subRaw)) {
+      id = subRaw;
+    } else if (typeof subRaw === 'string' && /^\d+$/.test(subRaw)) {
+      id = parseInt(subRaw, 10);
+    } else {
+      return null;
+    }
+    if (id < 1) return null;
+    const u = o.u;
+    if (typeof u !== 'string') return null;
+    const username = this.normalizeUsername(u);
+    if (!username) return null;
+    return { sub: id, u: username };
   }
 
   verifyAuthToken(token: string): SessionUser | null {
     try {
-      const raw = jwt.verify(token, this.jwtSecret);
-      const decoded = raw as unknown as AmnesiaJwtPayload;
-      if (!decoded?.sub || !decoded?.u) return null;
+      const raw = jwt.verify(token, this.jwtSecret, {
+        algorithms: ['HS256'],
+      });
+      const decoded = this.parseJwtPayload(raw);
+      if (!decoded) return null;
       return { id: decoded.sub, username: decoded.u };
     } catch {
       return null;
