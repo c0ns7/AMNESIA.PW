@@ -45,6 +45,18 @@ async function bootstrap() {
         }
       });
     }
+    const isAdmin =
+      pathOnly === '/admin' ||
+      pathOnly === '/admin/' ||
+      fromOriginal === '/admin' ||
+      fromOriginal === '/admin/';
+    if (isAdmin) {
+      return res.sendFile(join(publicRoot, 'admin', 'index.html'), (err) => {
+        if (err) {
+          next(err);
+        }
+      });
+    }
     const isLogin =
       pathOnly === '/login' ||
       pathOnly === '/login/' ||

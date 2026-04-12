@@ -61,4 +61,9 @@ export class SiteController {
   pageFranchises(@Res() res: Response) {
     return res.sendFile(join(this.publicDir, 'franchises', 'index.html'));
   }
+
+  @Get(['admin', 'admin/'])
+  pageAdmin(@Res() res: Response) {
+    return res.sendFile(join(this.publicDir, 'admin', 'index.html'));
+  }
 }

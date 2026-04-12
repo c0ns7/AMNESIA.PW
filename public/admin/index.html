@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>AMNESIA — админ · Франшизы</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="min-h-screen bg-[#030308] text-white antialiased">
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+      <div
+        class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:48px_48px]"
+      ></div>
+      <div class="absolute -top-24 -right-24 w-[min(100vw,560px)] h-[480px] bg-violet-600/20 blur-[140px] rounded-full"></div>
+      <div class="absolute bottom-0 left-0 w-[min(90vw,420px)] h-[360px] bg-cyan-500/10 blur-[120px] rounded-full"></div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10 sm:mb-14">
+        <div class="flex items-center gap-4">
+          <img src="/logo.svg" alt="" class="w-12 h-12 sm:w-14 sm:h-14" width="56" height="56" />
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-[0.35em] text-violet-400">Amnesia.pw</p>
+            <h1 class="text-2xl sm:text-3xl font-black italic uppercase tracking-tighter">Админ · Франшизы</h1>
+          </div>
+        </div>
+        <div id="hdr-actions" class="hidden flex flex-wrap gap-3">
+          <button
+            type="button"
+            id="btn-logout"
+            class="px-5 py-2.5 rounded-xl border border-white/15 text-[10px] font-black uppercase tracking-widest text-gray-300 hover:bg-white/[0.06] transition-colors"
+          >
+            Выйти
+          </button>
+        </div>
+      </header>
+
+      <section id="panel-login" class="max-w-md mx-auto">
+        <div
+          class="rounded-[2rem] border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 sm:p-10 shadow-[0_24px_80px_rgba(0,0,0,0.45)]"
+        >
+          <p class="text-xs text-gray-500 mb-6 leading-relaxed">
+            После нажатия «Войти» на Telegram <span class="text-gray-400">755944391</span> придёт код от основного бота.
+          </p>
+          <form id="form-step1" class="space-y-4">
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Логин</label>
+              <input
+                name="login"
+                autocomplete="username"
+                class="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30"
+                value="root"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Пароль</label>
+              <input
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                class="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30"
+                placeholder="••••••••••••"
+              />
+            </div>
+            <p id="err-step1" class="text-sm text-red-400/90 hidden"></p>
+            <button
+              type="submit"
+              class="w-full rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-violet-900/40 hover:opacity-95 transition-opacity"
+            >
+              Войти
+            </button>
+          </form>
+
+          <form id="form-step2" class="mt-8 space-y-4 hidden">
+            <p class="text-sm text-gray-400">Введите <b class="text-white">6 цифр</b> из Telegram.</p>
+            <input type="hidden" id="otp-session" name="sessionId" />
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Код</label>
+              <input
+                id="otp-code"
+                name="code"
+                inputmode="numeric"
+                maxlength="6"
+                pattern="[0-9]*"
+                class="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-lg tracking-[0.4em] text-center font-mono outline-none focus:border-emerald-500/50"
+                placeholder="000000"
+              />
+            </div>
+            <p id="err-step2" class="text-sm text-red-400/90 hidden"></p>
+            <button
+              type="submit"
+              class="w-full rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-200 hover:bg-emerald-500/15 transition-colors"
+            >
+              Подтвердить
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section id="panel-dash" class="hidden space-y-10">
+        <div id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
+
+        <div
+          class="rounded-[2rem] border border-white/10 bg-white/[0.02] backdrop-blur-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
+        >
+          <div class="px-6 py-5 border-b border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-black italic uppercase tracking-tight">Все франшизы</h2>
+              <p class="text-[11px] text-gray-500 mt-1">Последняя запись на владельца · оборот и доля по успешным платежам</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm min-w-[920px]">
+              <thead class="text-[10px] font-black uppercase tracking-widest text-gray-500 bg-black/20">
+                <tr>
+                  <th class="px-5 py-4">Бот</th>
+                  <th class="px-5 py-4">Создатель</th>
+                  <th class="px-5 py-4 text-center">Статус</th>
+                  <th class="px-5 py-4 text-right">%</th>
+                  <th class="px-5 py-4 text-right">Оборот</th>
+                  <th class="px-5 py-4 text-right">Прибыль фр.</th>
+                  <th class="px-5 py-4 text-right">К выводу</th>
+                  <th class="px-5 py-4 text-right">Выведено</th>
+                  <th class="px-5 py-4 text-right">В ожид.</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-fr" class="divide-y divide-white/[0.06]"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <p id="dash-err" class="mt-8 text-center text-red-400/90 text-sm hidden max-w-lg mx-auto"></p>
+    </div>
+
+    <script>
+      (function () {
+        var money = new Intl.NumberFormat('ru-RU', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+
+        function esc(s) {
+          return String(s || '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;');
+        }
+
+        function $(id) {
+          return document.getElementById(id);
+        }
+
+        async function api(path, opts) {
+          var o = opts || {};
+          var headers = Object.assign({ Accept: 'application/json' }, o.headers || {});
+          if (o.body && typeof o.body === 'object' && !(o.body instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+            o.body = JSON.stringify(o.body);
+          }
+          return fetch(path, Object.assign({ credentials: 'same-origin' }, o, { headers: headers }));
+        }
+
+        function statCard(label, value, sub, tone) {
+          var border =
+            tone === 'violet'
+              ? 'border-violet-500/25 from-violet-500/10'
+              : tone === 'cyan'
+                ? 'border-cyan-500/25 from-cyan-500/10'
+                : tone === 'emerald'
+                  ? 'border-emerald-500/25 from-emerald-500/10'
+                  : 'border-amber-500/25 from-amber-500/10';
+          return (
+            '<div class="relative overflow-hidden rounded-2xl border ' +
+            border +
+            ' bg-gradient-to-br to-transparent p-6">' +
+            '<p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-2">' +
+            esc(label) +
+            '</p>' +
+            '<p class="text-2xl sm:text-3xl font-black tracking-tight text-white">' +
+            esc(value) +
+            '</p>' +
+            (sub ? '<p class="text-[11px] text-gray-500 mt-2">' + esc(sub) + '</p>' : '') +
+            '</div>'
+          );
+        }
+
+        function renderStats(t) {
+          $('stats-grid').innerHTML =
+            [
+              statCard('Оборот (успешные)', money.format(t.revenue) + ' ₽', 'Сумма платежей через франшиз', 'violet'),
+              statCard('Прибыль франшизам', money.format(t.franchise_profit) + ' ₽', 'Начисленная доля', 'cyan'),
+              statCard('Доступно к выводу', money.format(t.available_to_withdraw) + ' ₽', 'По всем владельцам', 'emerald'),
+              statCard('Выведено (одобрено)', money.format(t.withdrawn_approved) + ' ₽', 'Заявки approved', 'amber'),
+            ].join('') +
+            '<div class="col-span-full grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">' +
+            '<div class="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4 text-[11px] text-gray-500 font-bold uppercase tracking-wider">Всего записей: <span class="text-white">' +
+            t.count +
+            '</span> · активных: <span class="text-emerald-400">' +
+            t.active_count +
+            '</span></div>' +
+            '<div class="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4 text-[11px] text-gray-500 font-bold uppercase tracking-wider">В ожидании вывода: <span class="text-amber-300">' +
+            money.format(t.withdrawn_pending) +
+            ' ₽</span></div></div>';
+        }
+
+        function ownerCell(f) {
+          var id = f.owner_user_id;
+          var un = f.owner_username ? String(f.owner_username).replace(/^@/, '') : '';
+          var line1 = '<span class="text-white font-mono text-xs">id ' + esc(id) + '</span>';
+          var line2 = un
+            ? '<a class="text-violet-400 hover:text-white text-xs font-bold" href="https://t.me/' +
+              esc(un) +
+              '" target="_blank" rel="noopener">@' +
+              esc(un) +
+              '</a>'
+            : '<a class="text-gray-500 hover:text-gray-300 text-xs" href="https://t.me/user?id=' +
+              esc(id) +
+              '" target="_blank" rel="noopener">Telegram</a>';
+          return '<div class="space-y-1">' + line1 + '<div>' + line2 + '</div></div>';
+        }
+
+        function renderTable(rows) {
+          $('tbody-fr').innerHTML = rows
+            .map(function (f) {
+              var bot = f.bot_username ? '@' + esc(String(f.bot_username).replace(/^@/, '')) : '—';
+              var botCell = f.bot_link
+                ? '<a class="font-bold text-white hover:text-violet-400" href="' +
+                  esc(f.bot_link) +
+                  '" target="_blank" rel="noopener">' +
+                  bot +
+                  '</a>'
+                : '<span class="text-gray-400">' + bot + '</span>';
+              var active = f.is_active;
+              var badge = active
+                ? '<span class="inline-flex rounded-full px-2.5 py-1 text-[9px] font-black uppercase bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Активна</span>'
+                : '<span class="inline-flex rounded-full px-2.5 py-1 text-[9px] font-black uppercase bg-white/10 text-gray-400 border border-white/15">Выкл</span>';
+              return (
+                '<tr class="hover:bg-white/[0.02]">' +
+                '<td class="px-5 py-4 font-medium">' +
+                botCell +
+                '</td>' +
+                '<td class="px-5 py-4">' +
+                ownerCell(f) +
+                '</td>' +
+                '<td class="px-5 py-4 text-center">' +
+                badge +
+                '</td>' +
+                '<td class="px-5 py-4 text-right text-gray-300">' +
+                esc(f.share_percent) +
+                '</td>' +
+                '<td class="px-5 py-4 text-right font-mono text-xs">' +
+                money.format(f.revenue) +
+                '</td>' +
+                '<td class="px-5 py-4 text-right font-mono text-xs text-cyan-200/90">' +
+                money.format(f.franchise_profit) +
+                '</td>' +
+                '<td class="px-5 py-4 text-right font-mono text-xs text-emerald-200/90">' +
+                money.format(f.available_to_withdraw) +
+                '</td>' +
+                '<td class="px-5 py-4 text-right font-mono text-xs">' +
+                money.format(f.withdrawn_approved) +
+                '</td>' +
+                '<td class="px-5 py-4 text-right font-mono text-xs text-amber-200/80">' +
+                money.format(f.withdrawn_pending) +
+                '</td>' +
+                '</tr>'
+              );
+            })
+            .join('');
+        }
+
+        async function showDashboard() {
+          $('panel-login').classList.add('hidden');
+          $('panel-dash').classList.remove('hidden');
+          $('hdr-actions').classList.remove('hidden');
+          $('dash-err').classList.add('hidden');
+          var res = await api('/api/site-admin/franchises');
+          if (!res.ok) {
+            $('dash-err').textContent = 'Не удалось загрузить данные (' + res.status + ').';
+            $('dash-err').classList.remove('hidden');
+            return;
+          }
+          var data = await res.json();
+          $('stats-grid').innerHTML = '';
+          renderStats(data.totals || {});
+          renderTable(data.franchises || []);
+        }
+
+        async function checkSession() {
+          var res = await api('/api/site-admin/session');
+          var j = await res.json().catch(function () {
+            return {};
+          });
+          if (j.ok) showDashboard();
+        }
+
+        $('form-step1').addEventListener('submit', async function (e) {
+          e.preventDefault();
+          $('err-step1').classList.add('hidden');
+          var fd = new FormData(e.target);
+          var login = fd.get('login');
+          var password = fd.get('password');
+          var res = await api('/api/site-admin/login', {
+            method: 'POST',
+            body: { login: login, password: password },
+          });
+          var j = await res.json().catch(function () {
+            return {};
+          });
+          if (!res.ok) {
+            $('err-step1').textContent = j.message || 'Ошибка входа';
+            $('err-step1').classList.remove('hidden');
+            return;
+          }
+          $('otp-session').value = j.sessionId || '';
+          $('form-step1').classList.add('hidden');
+          $('form-step2').classList.remove('hidden');
+          $('otp-code').focus();
+        });
+
+        $('form-step2').addEventListener('submit', async function (e) {
+          e.preventDefault();
+          $('err-step2').classList.add('hidden');
+          var fd = new FormData(e.target);
+          var res = await api('/api/site-admin/verify', {
+            method: 'POST',
+            body: { sessionId: fd.get('sessionId'), code: fd.get('code') },
+          });
+          var j = await res.json().catch(function () {
+            return {};
+          });
+          if (!res.ok) {
+            $('err-step2').textContent = j.message || 'Неверный код';
+            $('err-step2').classList.remove('hidden');
+            return;
+          }
+          showDashboard();
+        });
+
+        $('btn-logout').addEventListener('click', async function () {
+          await api('/api/site-admin/logout', { method: 'POST' });
+          location.reload();
+        });
+
+        checkSession();
+      })();
+    </script>
+  </body>
+</html>

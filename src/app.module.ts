@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { RemnawaveModule } from './remnawave/remnawave.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { SiteAdminModule } from './site-admin/site-admin.module';
 import { SiteController } from './site.controller';
 import { getClientIp } from './utils/client-ip';
 import { Request } from 'express';
@@ -30,6 +31,7 @@ import { Request } from 'express';
     AuthModule,
     RemnawaveModule,
     SubscriptionModule,
+    SiteAdminModule,
   ],
   controllers: [AppController, SiteController],
   providers: [
