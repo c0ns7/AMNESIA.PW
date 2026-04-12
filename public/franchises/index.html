@@ -255,33 +255,9 @@
               <span class="text-[12px] font-black uppercase tracking-[0.35em] text-blue-500">Каталог</span>
               <h2 class="mt-2 text-3xl sm:text-4xl font-black italic uppercase tracking-tighter">Партнёрские боты</h2>
               <p class="mt-2 text-gray-500 text-sm max-w-xl">
-                Активные публичные франшизы. Нажмите на карточку — откроется бот в Telegram. Данные обновляются с сервера партнёрской программы.
+                Активные франшизы с проверенным токеном бота. Выключенные и с недействительным токеном не показываются. Нажмите на карточку — откроется бот в Telegram.
               </p>
             </div>
-          </div>
-
-          <div class="max-w-4xl mx-auto mb-8 flex flex-wrap items-center justify-center gap-2">
-            <button
-              type="button"
-              class="fr-filter-btn active px-5 py-2.5 rounded-full border text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all"
-              data-filter="all"
-            >
-              Все
-            </button>
-            <button
-              type="button"
-              class="fr-filter-btn px-5 py-2.5 rounded-full border text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all"
-              data-filter="active"
-            >
-              Активные
-            </button>
-            <button
-              type="button"
-              class="fr-filter-btn px-5 py-2.5 rounded-full border text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all"
-              data-filter="inactive"
-            >
-              Неактивные
-            </button>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" id="fr-grid">
@@ -353,7 +329,6 @@
       (function () {
         var API_BASE = 'https://bot.amnesiavps.ru';
         var grid = document.getElementById('fr-grid');
-        var filter = 'all';
         var items = [];
 
         function esc(v) {
@@ -366,23 +341,15 @@
         }
 
         function render() {
-          var filtered = items.filter(function (f) {
-            if (filter === 'all') return true;
-            if (filter === 'active') return Number(f.is_active) === 1;
-            if (filter === 'inactive') return Number(f.is_active) === 0;
-            return true;
-          });
-
-          if (filtered.length === 0) {
+          if (items.length === 0) {
             grid.innerHTML =
-              '<div class="p-10 rounded-[2rem] border border-dashed border-white/15 bg-white/[0.02] text-center text-gray-500 text-sm font-bold uppercase tracking-wider col-span-full">Нет ботов по выбранному фильтру</div>';
+              '<div class="p-10 rounded-[2rem] border border-dashed border-white/15 bg-white/[0.02] text-center text-gray-500 text-sm font-bold uppercase tracking-wider col-span-full">Сейчас нет партнёрских ботов в каталоге</div>';
             return;
           }
 
-          grid.innerHTML = filtered
+          grid.innerHTML = items
             .map(function (f) {
               var username = String(f.bot_username || '').replace(/^@/, '') || 'bot';
-              var isActive = Number(f.is_active) === 1;
               var url = 'https://t.me/' + username;
               return (
                 '<a class="group relative flex flex-col h-full rounded-[1.75rem] border border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent p-6 hover:border-blue-500/40 hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-300" href="' +
@@ -395,13 +362,7 @@
                 esc(username) +
                 '</p>' +
                 '</div>' +
-                '<span class="shrink-0 inline-flex items-center rounded-full px-3 py-1.5 text-[9px] font-black uppercase tracking-wider ' +
-                (isActive
-                  ? 'border border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
-                  : 'border border-white/15 bg-white/[0.04] text-gray-500') +
-                '">' +
-                (isActive ? 'Активна' : 'Выкл.') +
-                '</span>' +
+                '<span class="shrink-0 inline-flex items-center rounded-full px-3 py-1.5 text-[9px] font-black uppercase tracking-wider border border-emerald-500/40 bg-emerald-500/15 text-emerald-300">Активна</span>' +
                 '</div>' +
                 '<div class="absolute top-[-1px] left-8 right-8 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>' +
                 '</a>'
@@ -409,27 +370,6 @@
             })
             .join('');
         }
-
-        function setFilterButtons() {
-          document.querySelectorAll('.fr-filter-btn').forEach(function (btn) {
-            var isActive = btn.getAttribute('data-filter') === filter;
-            btn.classList.toggle('active', isActive);
-            btn.classList.toggle('bg-blue-600', isActive);
-            btn.classList.toggle('text-black', isActive);
-            btn.classList.toggle('border-white/15', !isActive);
-            btn.classList.toggle('bg-white/[0.03]', !isActive);
-            btn.classList.toggle('text-gray-400', !isActive);
-            btn.classList.toggle('border-transparent', isActive);
-          });
-        }
-
-        document.querySelectorAll('.fr-filter-btn').forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            filter = btn.getAttribute('data-filter') || 'all';
-            setFilterButtons();
-            render();
-          });
-        });
 
         async function load() {
           try {
@@ -443,7 +383,6 @@
               '<div class="p-10 rounded-[2rem] border border-red-500/20 bg-red-500/5 text-center text-red-300/90 text-sm col-span-full">Не удалось загрузить список. Проверьте соединение или попробуйте позже.</div>';
             return;
           }
-          setFilterButtons();
           render();
         }
 
