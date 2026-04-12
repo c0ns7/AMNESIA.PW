@@ -1,10 +1,11 @@
 import { Controller, Get, Redirect, Res } from '@nestjs/common';
 import { join } from 'path';
 import { Response } from 'express';
+import { resolvePublicRoot } from './paths';
 
 @Controller()
 export class SiteController {
-  private readonly publicDir = join(__dirname, '..', 'public');
+  private readonly publicDir = resolvePublicRoot(__dirname);
 
   @Get('login')
   @Redirect('/lk', 302)

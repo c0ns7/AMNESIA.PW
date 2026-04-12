@@ -212,6 +212,15 @@ export class RemnawaveService {
     }
   }
 
+  /** Скрыть служебные / LTE / «автоматически» с публичной главной. */
+  private isHiddenPublicHost(name: string): boolean {
+    const t = (name || '').toLowerCase();
+    if (t.includes('автоматически')) return true;
+    if (t.includes('обход') && t.includes('глушил')) return true;
+    if (t.includes('lte') && (t.includes('обход') || t.includes('глушил'))) return true;
+    return false;
+  }
+
   private normalizeNodeSnapshot(node: Record<string, unknown>): NodeSnapshot {
     return {
       uuid: this.readString(node, 'uuid', 'id'),
@@ -285,9 +294,10 @@ export class RemnawaveService {
     }
 
     const nodes = hostsRows.map((host, i) => this.normalizeHost(host, i, nodeMap));
+    const visibleNodes = nodes.filter((n) => !this.isHiddenPublicHost(n.name));
 
-    const onlineUsers = nodes.reduce((sum, n) => sum + n.usersOnline, 0);
-    let activeUsers = nodes.reduce(
+    const onlineUsers = visibleNodes.reduce((sum, n) => sum + n.usersOnline, 0);
+    let activeUsers = visibleNodes.reduce(
       (sum, n) => sum + (n.activeUsers || n.usersOnline),
       0,
     );
@@ -304,10 +314,10 @@ export class RemnawaveService {
       activeUsers,
       totalTrafficBytes,
       totalTrafficLabel: this.formatTraffic(totalTrafficBytes),
-      locations: nodes.length,
+      locations: visibleNodes.length,
     };
 
-    const safeNodes = nodes.map((node) => ({
+    const safeNodes = visibleNodes.map((node) => ({
       id: node.id,
       name: node.name,
       countryCode: node.countryCode,

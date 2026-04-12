@@ -853,10 +853,18 @@
           );
         }
 
+        function isHiddenInfraHostName(name) {
+          var t = String(name || '').toLowerCase();
+          if (t.indexOf('автоматически') !== -1) return true;
+          if (t.indexOf('обход') !== -1 && t.indexOf('глушил') !== -1) return true;
+          if (t.indexOf('lte') !== -1 && (t.indexOf('обход') !== -1 || t.indexOf('глушил') !== -1)) return true;
+          return false;
+        }
+
         function renderNodes(nodes, errorText) {
           var onlineNodes = Array.isArray(nodes)
             ? nodes.filter(function (node) {
-                return Boolean(node && node.online);
+                return Boolean(node && node.online && !isHiddenInfraHostName(node.name));
               })
             : [];
 

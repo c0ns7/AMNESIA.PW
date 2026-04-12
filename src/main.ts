@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import { existsSync } from 'fs';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
@@ -6,13 +7,14 @@ import { NextFunction, Request, Response } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+import { resolvePublicRoot } from './paths';
 
 // Make env loading robust for systemd (cwd may differ).
 dotenv.config({ path: join(process.cwd(), '.env') });
 dotenv.config({ path: join(__dirname, '..', '.env') });
 dotenv.config();
 
-const publicRoot = join(__dirname, '..', 'public');
+const publicRoot = resolvePublicRoot(__dirname);
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -51,7 +53,11 @@ async function bootstrap() {
       fromOriginal === '/admin' ||
       fromOriginal === '/admin/';
     if (isAdmin) {
-      return res.sendFile(join(publicRoot, 'admin', 'index.html'), (err) => {
+      const adminHtml = join(publicRoot, 'admin', 'index.html');
+      if (!existsSync(adminHtml)) {
+        return next();
+      }
+      return res.sendFile(adminHtml, (err) => {
         if (err) {
           next(err);
         }
@@ -80,6 +86,18 @@ async function bootstrap() {
     }
     if (res.headersSent) {
       return next();
+    }
+    if (req.method === 'GET') {
+      const p = (req.path || '').split('?')[0];
+      if (p === '/admin' || p === '/admin/') {
+        const adminHtml = join(publicRoot, 'admin', 'index.html');
+        if (existsSync(adminHtml)) {
+          return res.sendFile(adminHtml, (err) => {
+            if (!err) return;
+            return res.status(404).sendFile(join(publicRoot, '404.html'));
+          });
+        }
+      }
     }
     return res.status(404).sendFile(join(publicRoot, '404.html'));
   });
